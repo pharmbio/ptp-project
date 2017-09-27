@@ -7,6 +7,37 @@ import (
 	sp "github.com/scipipe/scipipe"
 )
 
+const (
+	bowes44 = []string{
+		"ADORA2A",
+		"ADRA1A",
+		"ADRA2A",
+		"ADRB1",
+		"ADRB2",
+		"CNR1",
+		"CNR2",
+		"CCKAR",
+		"DRD1",
+		"DRD2",
+		"EDNRA",
+		"HRH1",
+		"HRH2",
+		"OPRD1",
+		"OPRK1",
+		"OPRM1",
+		"CHRM1",
+		"CHRM2",
+		"CHRM3",
+		"HTR1A",
+		"HTR1B",
+		"HTR2A",
+		"HTR2B",
+		"AVPR1A",
+		"CHRNA1",
+		"CHRNA4",
+	}
+)
+
 func main() {
 	// --------------------------------
 	// Create a pipeline runner
