@@ -18,7 +18,7 @@ func main() {
 	// Initialize processes and add to runner
 	// --------------------------------
 
-	excapeDBFileName := "pubchem.chembl.dataset4publication_inchi_smiles.tsv.xz"
+	excapeDBFileName := "dat/pubchem.chembl.dataset4publication_inchi_smiles.tsv.xz"
 	dlExcapeDB := sp.NewFromShell("dlDB", fmt.Sprintf("wget https://zenodo.org/record/173258/files/%s -O {o:excapexz}", excapeDBFileName))
 	dlExcapeDB.SetPathStatic("excapexz", excapeDBFileName)
 	run.AddProcess(dlExcapeDB)
