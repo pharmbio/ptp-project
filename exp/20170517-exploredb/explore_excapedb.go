@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	bowes44 = []string{
+	bowesRiskGenes = []string{
 		"ADORA2A",
 		"ADRA1A",
 		"ADRA2A",
@@ -35,6 +35,26 @@ const (
 		"AVPR1A",
 		"CHRNA1",
 		"CHRNA4",
+		"CACNA1C",
+		"GABRA1",
+		"KCNH2",
+		"KCNQ1",
+		"KCNE1",
+		"GRIN1",
+		"HTR3A",
+		"SCN5A",
+		"ACHE",
+		"PTGS1",
+		"PTGS2",
+		"MAOA",
+		"PDE3A",
+		"PDE4D",
+		"LCK",
+		"SLC6A3",
+		"SLC6A2",
+		"SLC6A4",
+		"AR",
+		"NR3C1",
 	}
 )
 
@@ -56,12 +76,20 @@ func main() {
 	unPackDB := wf.NewProc("unPackDB", "xzcat {i:xzfile} > {o:unxzed}")
 	unPackDB.SetPathReplace("xzfile", "unxzed", ".xz", "")
 	// Slurm string
-	unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
+	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
 	// --------------------------------
 	// Connect workflow dependency network
 	// --------------------------------
 	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
+
+	// --------------------------------
+	// Count ligands in targets
+	// --------------------------------
+	// for _, gene := range bowesRiskGenes {
+
+	// }
+
 	wf.ConnectLast(unPackDB.Out("unxzed"))
 
 	// --------------------------------
