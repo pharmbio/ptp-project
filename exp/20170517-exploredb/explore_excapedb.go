@@ -5,9 +5,11 @@ package main
 import (
 	"fmt"
 	sp "github.com/scipipe/scipipe"
+	spc "github.com/scipipe/scipipe/components"
+	"strings"
 )
 
-const (
+var (
 	bowesRiskGenes = []string{
 		"ADORA2A",
 		"ADRA1A",
@@ -62,20 +64,18 @@ func main() {
 	// --------------------------------
 	// Create a pipeline runner
 	// --------------------------------
-
 	wf := sp.NewWorkflow("explore_excapedb")
 
 	// --------------------------------
 	// Initialize processes and add to runner
 	// --------------------------------
-
 	dbFileName := "pubchem.chembl.dataset4publication_inchi_smiles.tsv.xz"
 	dlExcapeDB := wf.NewProc("dlDB", fmt.Sprintf("wget https://zenodo.org/record/173258/files/%s -O {o:excapexz}", dbFileName))
 	dlExcapeDB.SetPathStatic("excapexz", "dat/"+dbFileName)
 
 	unPackDB := wf.NewProc("unPackDB", "xzcat {i:xzfile} > {o:unxzed}")
 	unPackDB.SetPathReplace("xzfile", "unxzed", ".xz", "")
-	// Slurm string
+	// SLURM string
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
 	// --------------------------------
@@ -83,18 +83,27 @@ func main() {
 	// --------------------------------
 	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
 
+	unPackDBFanOut := spc.NewFanOut("unpackdb_fanout")
+	unPackDBFanOut.InFile.Connect(unPackDB.Out("unxzed"))
+	wf.Add(unPackDBFanOut) // Oh, this is so easy to forget!!!
+
 	// --------------------------------
 	// Count ligands in targets
 	// --------------------------------
-	// for _, gene := range bowesRiskGenes {
+	for _, gene := range bowesRiskGenes {
+		geneLC := strings.ToLower(gene)
+		procName := "cnt_comp_" + geneLC
 
-	// }
-
-	wf.ConnectLast(unPackDB.Out("unxzed"))
+		countCompoundsPerTarget := wf.NewProc(procName, "awk '$9 == \""+gene+"\" { SUM += 1 } END { print SUM }' {i:tsvfile} > {o:compound_count}")
+		countCompoundsPerTarget.SetPathStatic("compound_count", "dat/compound_count_"+geneLC+".txt")
+		countCompoundsPerTarget.In("tsvfile").Connect(unPackDBFanOut.Out("to_" + procName))
+		// SLURM string
+		countCompoundsPerTarget.Prepend = "salloc -A snic2017-7-89 -n 2 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun "
+		wf.ConnectLast(countCompoundsPerTarget.Out("compound_count"))
+	}
 
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
-
 	wf.Run()
 }
