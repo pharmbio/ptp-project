@@ -87,7 +87,7 @@ func main() {
 	unPackDBFanOut.InFile.Connect(unPackDB.Out("unxzed"))
 	wf.Add(unPackDBFanOut) // Oh, this is so easy to forget!!!
 
-	tableFile := "dat/compound_counts.csv"
+	tableFile := "dat/compound_counts.tsv"
 	createTableFile := wf.NewProc("create_table_file", "echo 'Gene_symbol,Compound_count' > {o:table}")
 	createTableFile.SetPathStatic("table", tableFile)
 
@@ -108,7 +108,7 @@ func main() {
 		// SLURM string
 		countCompoundsPerTarget.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun "
 
-		writeToTable := wf.NewProc("write_to_table_"+geneLC, "echo \""+gene+",$(head -n 1 {i:cnt})\" >> {i:create_table}; touch {o:write_done}")
+		writeToTable := wf.NewProc("write_to_table_"+geneLC, "echo \""+gene+"\t$(head -n 1 {i:cnt})\" >> {i:create_table}; touch {o:write_done}")
 		writeToTable.SetPathStatic("write_done", tableFile+".write_done_"+geneLC)
 		writeToTable.In("create_table").Connect(createTableFanOut.Out("table_" + gene))
 		writeToTable.In("cnt").Connect(countCompoundsPerTarget.Out("compound_count"))
