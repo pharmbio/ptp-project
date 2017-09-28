@@ -108,12 +108,12 @@ func main() {
 		// SLURM string
 		countCompoundsPerTarget.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun "
 
-		writeToTable := wf.NewProc("write_to_table_"+geneLC, "echo \""+gene+",$(cat {i:cnt})\" >> {o:table} # {i:create_table}")
-		writeToTable.SetPathStatic("table", tableFile)
+		writeToTable := wf.NewProc("write_to_table_"+geneLC, "echo \""+gene+",$(head -n 1 {i:cnt})\" >> {i:create_table}; touch {o:write_done}")
+		writeToTable.SetPathStatic("write_done", tableFile+".write_done_"+geneLC)
 		writeToTable.In("create_table").Connect(createTableFanOut.Out("table_" + gene))
 		writeToTable.In("cnt").Connect(countCompoundsPerTarget.Out("compound_count"))
 
-		wf.ConnectLast(writeToTable.Out("table"))
+		wf.ConnectLast(writeToTable.Out("write_done"))
 	}
 
 	// --------------------------------
