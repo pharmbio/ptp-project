@@ -98,7 +98,7 @@ func main() {
 		countCompoundsPerTarget.SetPathStatic("compound_count", "dat/compound_count_"+geneLC+".txt")
 		countCompoundsPerTarget.In("tsvfile").Connect(unPackDBFanOut.Out("to_" + procName))
 		// SLURM string
-		countCompoundsPerTarget.Prepend = "salloc -A snic2017-7-89 -n 2 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun "
+		countCompoundsPerTarget.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun "
 		wf.ConnectLast(countCompoundsPerTarget.Out("compound_count"))
 	}
 
