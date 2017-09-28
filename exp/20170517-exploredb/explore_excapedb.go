@@ -87,6 +87,14 @@ func main() {
 	unPackDBFanOut.InFile.Connect(unPackDB.Out("unxzed"))
 	wf.Add(unPackDBFanOut) // Oh, this is so easy to forget!!!
 
+	tableFile := "dat/compound_counts.csv"
+	createTableFile := wf.NewProc("create_table_file", "echo 'Gene_symbol,Compound_count' > {o:table}")
+	createTableFile.SetPathStatic("table", tableFile)
+
+	createTableFanOut := spc.NewFanOut("create_table_fanout")
+	createTableFanOut.InFile.Connect(createTableFile.Out("table"))
+	wf.Add(createTableFanOut)
+
 	// --------------------------------
 	// Count ligands in targets
 	// --------------------------------
@@ -99,7 +107,13 @@ func main() {
 		countCompoundsPerTarget.In("tsvfile").Connect(unPackDBFanOut.Out("to_" + procName))
 		// SLURM string
 		countCompoundsPerTarget.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun "
-		wf.ConnectLast(countCompoundsPerTarget.Out("compound_count"))
+
+		writeToTable := wf.NewProc("write_to_table_"+geneLC, "echo \""+gene+",$(cat {i:cnt})\" >> {o:table} # {i:create_table}")
+		writeToTable.SetPathStatic("table", tableFile)
+		writeToTable.In("create_table").Connect(createTableFanOut.Out("table_" + gene))
+		writeToTable.In("cnt").Connect(countCompoundsPerTarget.Out("compound_count"))
+
+		wf.ConnectLast(writeToTable.Out("table"))
 	}
 
 	// --------------------------------
