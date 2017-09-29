@@ -1,7 +1,5 @@
 
-# Reproducible Probabilistic Target Profiles using Cross Venn-ABERS Predictors
-
-a.k.a. "The PTP project"
+# Reproducible Probabilistic Target Profiles (aka PTP)
 
 ## Main links
 
