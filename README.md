@@ -9,4 +9,5 @@ a.k.a. "The PTP project"
 
 ## Misc links
 
+- [CPSign Documentation](http://cpsign-docs.genettasoft.com/)
 - [An old Masters project description for the PTP project (GDocs)](https://docs.google.com/document/d/1pwisHGEUrjrmaRFQG4ZNWPWGhpt5ZCYHHJGyCSjQEw8/edit)
