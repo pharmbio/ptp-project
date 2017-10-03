@@ -72,7 +72,7 @@ func main() {
 	// --------------------------------
 	dbFileName := "pubchem.chembl.dataset4publication_inchi_smiles.tsv.xz"
 	dlExcapeDB := wf.NewProc("dlDB", fmt.Sprintf("wget https://zenodo.org/record/173258/files/%s -O {o:excapexz}", dbFileName))
-	dlExcapeDB.SetPathStatic("excapexz", "dat/"+dbFileName)
+	dlExcapeDB.SetPathStatic("excapexz", "../../raw/"+dbFileName)
 
 	unPackDB := wf.NewProc("unPackDB", "xzcat {i:xzfile} > {o:unxzed}")
 	unPackDB.SetPathReplace("xzfile", "unxzed", ".xz", "")
