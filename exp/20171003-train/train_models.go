@@ -65,7 +65,7 @@ func main() {
 	// --------------------------------
 	// Create a pipeline runner
 	// --------------------------------
-	wf := sp.NewWorkflow("explore_excapedb")
+	wf := sp.NewWorkflow("train_models")
 
 	// --------------------------------
 	// Initialize processes and add to runner
