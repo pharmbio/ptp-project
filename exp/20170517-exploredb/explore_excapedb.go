@@ -86,7 +86,7 @@ func main() {
 
 	unPackDBFanOut := spc.NewFanOut("unpackdb_fanout")
 	unPackDBFanOut.InFile.Connect(unPackDB.Out("unxzed"))
-	wf.Add(unPackDBFanOut) // Oh, this is so easy to forget!!!
+	wf.AddProc(unPackDBFanOut) // Oh, this is so easy to forget!!!
 
 	tableFile := "dat/compound_counts.tsv"
 	createTableFile := wf.NewProc("create_table_file", "echo 'Gene_symbol,Compound_count' > {o:table}")
@@ -94,7 +94,7 @@ func main() {
 
 	createTableFanOut := spc.NewFanOut("create_table_fanout")
 	createTableFanOut.InFile.Connect(createTableFile.Out("table"))
-	wf.Add(createTableFanOut)
+	wf.AddProc(createTableFanOut)
 
 	// --------------------------------
 	// Count ligands in targets
