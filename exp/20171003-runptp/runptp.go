@@ -88,34 +88,19 @@ func main() {
 	unPackDBFanOut.InFile.Connect(unPackDB.Out("unxzed"))
 	wf.AddProc(unPackDBFanOut) // Oh, this is so easy to forget!!!
 
-	tableFile := "dat/compound_counts.tsv"
-	createTableFile := wf.NewProc("create_table_file", "echo 'Gene_symbol,Compound_count' > {o:table}")
-	createTableFile.SetPathStatic("table", tableFile)
-
-	createTableFanOut := spc.NewFanOut("create_table_fanout")
-	createTableFanOut.InFile.Connect(createTableFile.Out("table"))
-	wf.AddProc(createTableFanOut)
-
 	// --------------------------------
 	// Count ligands in targets
 	// --------------------------------
 	for _, gene := range bowesRiskGenes {
 		geneLC := strings.ToLower(gene)
-		procName := "cnt_comp_" + geneLC
+		procName := "extract_target_data_" + geneLC
 
-		countCompoundsPerTarget := wf.NewProc(procName, "awk '$9 == \""+gene+"\" { SUM += 1 } END { print SUM }' {i:tsvfile} > {o:compound_count}")
-		countCompoundsPerTarget.SetPathStatic("compound_count", "dat/compound_count_"+geneLC+".txt")
-		countCompoundsPerTarget.In("tsvfile").Connect(unPackDBFanOut.Out("to_" + procName))
+		extractTargetData := wf.NewProc(procName, fmt.Sprintf(`awk -F"\t" '$9 == "%s" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`, gene))
+		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLC, geneLC))
+		extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun " // SLURM string
+		extractTargetData.In("raw_data").Connect(unPackDBFanOut.Out("unxzed"))
 
-		// SLURM string
-		countCompoundsPerTarget.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun "
-
-		writeToTable := wf.NewProc("write_to_table_"+geneLC, "echo \""+gene+"\t$(head -n 1 {i:cnt})\" >> {i:create_table}; touch {o:write_done}")
-		writeToTable.SetPathStatic("write_done", tableFile+".write_done_"+geneLC)
-		writeToTable.In("create_table").Connect(createTableFanOut.Out("table_" + gene))
-		writeToTable.In("cnt").Connect(countCompoundsPerTarget.Out("compound_count"))
-
-		wf.ConnectLast(writeToTable.Out("write_done"))
+		wf.ConnectLast(extractTargetData.Out("target_data"))
 	}
 
 	// --------------------------------
