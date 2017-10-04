@@ -42,8 +42,8 @@ var (
 		"KCNH2",
 		"KCNQ1",
 		// Not available in dataset: "KCNE1",
-		"MINK1", // Used instead of KCNE1
-		"GRIN1",
+		"MINK1", // Used instead of KCNE1.
+		"GRIN1", // They both share the same alias "MinK", and also confirmed by Wes to be the same.
 		"HTR3A",
 		"SCN5A",
 		"ACHE",
