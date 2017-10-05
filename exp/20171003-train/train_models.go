@@ -59,6 +59,14 @@ var (
 		"AR",
 		"NR3C1",
 	}
+	smallestGene = []string{
+		"KCNQ1",
+	}
+	smallestThreeGenes = []string{
+		"KCNQ1",
+		"GABRA1",
+		"CACNA1C",
+	}
 )
 
 func main() {
@@ -91,7 +99,8 @@ func main() {
 	// --------------------------------
 	// Count ligands in targets
 	// --------------------------------
-	for _, gene := range bowesRiskGenes {
+	//for _, gene := range bowesRiskGenes {
+	for _, gene := range smallestGene {
 		geneLC := strings.ToLower(gene)
 		procName := "extract_target_data_" + geneLC
 
