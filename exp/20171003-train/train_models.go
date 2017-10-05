@@ -100,7 +100,15 @@ func main() {
 		extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun " // SLURM string
 		extractTargetData.In("raw_data").Connect(unPackDBFanOut.Out("unxzed"))
 
-		wf.ConnectLast(extractTargetData.Out("target_data"))
+		trainModel := wf.NewProc("train_model_"+geneLC,
+			fmt.Sprintf(`cpsign-train --cptype 1 --train-file {i:target_data} -i liblinear --nr-models %d --model-name "Ligand binding to %s gene" --model-out {o:model}`,
+				3,
+				gene))
+		trainModel.SetPathExtend("target_data", "model", ".cpsign")
+		trainModel.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
+		trainModel.In("target_data").Connect(extractTargetData.Out("target_data"))
+
+		wf.ConnectLast(trainModel.Out("model"))
 	}
 
 	// --------------------------------
