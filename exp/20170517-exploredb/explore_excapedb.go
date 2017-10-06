@@ -103,7 +103,7 @@ func main() {
 		geneLC := strings.ToLower(gene)
 		procName := "cnt_comp_" + geneLC
 
-		countCompoundsPerTarget := wf.NewProc(procName, "awk '$9 == \""+gene+"\" { SUM += 1 } END { print SUM }' {i:tsvfile} > {o:compound_count}")
+		countCompoundsPerTarget := wf.NewProc(procName, fmt.Sprintf(`awk -F"\t" '$9 == "%s" { SUM += 1 } END { print SUM }' {i:tsvfile} > {o:compound_count}`, gene))
 		countCompoundsPerTarget.SetPathStatic("compound_count", "dat/compound_count_"+geneLC+".txt")
 		countCompoundsPerTarget.In("tsvfile").Connect(unPackDBFanOut.Out("to_" + procName))
 
