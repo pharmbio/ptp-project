@@ -110,7 +110,7 @@ func main() {
 		extractTargetData.In("raw_data").Connect(unPackDBFanOut.Out("unxzed"))
 
 		trainModel := wf.NewProc("train_model_"+geneLC,
-			fmt.Sprintf(`cpsign-train --cptype 1 --train-file {i:target_data} -i liblinear --nr-models %d --model-name "Ligand binding to %s gene" --model-out {o:model}`,
+			fmt.Sprintf(`cpsign-train --cptype 1 --trainfile {i:target_data} -i liblinear -l A, N --nr-models %d --model-name "Ligand binding to %s gene" --model-out {o:model}`,
 				3,
 				gene))
 		trainModel.SetPathExtend("target_data", "model", ".cpsign")
