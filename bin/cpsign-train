@@ -6,4 +6,4 @@ fi;
 script=$(realpath $0)
 scriptpath=$(dirname $script)
 
-java -jar $scriptpath/cpsign-0.6.0.jar train --license $scriptpath/cpsign.lic "$@"
+java -jar $scriptpath/cpsign-0.6.1.jar train --license $scriptpath/cpsign.lic "$@"
