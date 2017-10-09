@@ -73,7 +73,7 @@ func main() {
 	// --------------------------------
 	// Create a pipeline runner
 	// --------------------------------
-	wf := sp.NewWorkflow("train_models")
+	wf := sp.NewWorkflow("train_models", 4)
 
 	// --------------------------------
 	// Initialize processes and add to runner
