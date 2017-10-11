@@ -107,7 +107,7 @@ func main() {
 		extractTargetData := wf.NewProc(procName, fmt.Sprintf(`awk -F"\t" '$9 == "%s" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`, gene))
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLC, geneLC))
 		extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun " // SLURM string
-		extractTargetData.In("raw_data").Connect(unPackDBFanOut.Out("unxzed"))
+		extractTargetData.In("raw_data").Connect(unPackDBFanOut.Out("unxzed_" + geneLC))
 
 		trainModel := wf.NewProc("train_model_"+geneLC,
 			fmt.Sprintf(`cpsign-train --cptype 1 --trainfile {i:target_data} -i liblinear -l A, N --nr-models %d --model-name "Ligand_binding_to_%s_gene" --model-out {o:model}`,
