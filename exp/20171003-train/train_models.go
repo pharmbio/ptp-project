@@ -100,7 +100,7 @@ func main() {
 	// Count ligands in targets
 	// --------------------------------
 	//for _, gene := range bowesRiskGenes {
-	for _, gene := range smallestGene {
+	for _, gene := range smallestThreeGenes {
 		geneLC := strings.ToLower(gene)
 		procName := "extract_target_data_" + geneLC
 
