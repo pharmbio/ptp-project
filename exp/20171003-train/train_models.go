@@ -60,12 +60,12 @@ var (
 		"NR3C1",
 	}
 	smallestGene = []string{
-		"KCNQ1",
+		"GABRA1",
 	}
 	smallestThreeGenes = []string{
-		"KCNQ1",
 		"GABRA1",
 		"CACNA1C",
+		"CHRNA4",
 	}
 )
 
