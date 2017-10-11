@@ -5,7 +5,6 @@ package main
 import (
 	"fmt"
 	sp "github.com/scipipe/scipipe"
-	spc "github.com/scipipe/scipipe/components"
 	"strings"
 )
 
@@ -70,9 +69,7 @@ var (
 )
 
 func main() {
-	// --------------------------------
-	// Create a pipeline runner
-	// --------------------------------
+	//sp.InitLogDebug()
 	wf := sp.NewWorkflow("train_models", 4)
 
 	// --------------------------------
@@ -84,20 +81,11 @@ func main() {
 
 	unPackDB := wf.NewProc("unPackDB", "xzcat {i:xzfile} > {o:unxzed}")
 	unPackDB.SetPathReplace("xzfile", "unxzed", ".xz", "")
-	// SLURM string
+	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
 	// --------------------------------
-	// Connect workflow dependency network
-	// --------------------------------
-	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
-
-	unPackDBFanOut := spc.NewFanOut("unpackdb_fanout")
-	unPackDBFanOut.InFile.Connect(unPackDB.Out("unxzed"))
-	wf.AddProc(unPackDBFanOut) // Oh, this is so easy to forget!!!
-
-	// --------------------------------
-	// Count ligands in targets
+	// Set up gene-specific workflow branches
 	// --------------------------------
 	//for _, gene := range bowesRiskGenes {
 	for _, gene := range smallestThreeGenes {
@@ -106,15 +94,15 @@ func main() {
 
 		extractTargetData := wf.NewProc(procName, fmt.Sprintf(`awk -F"\t" '$9 == "%s" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`, gene))
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLC, geneLC))
-		extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun " // SLURM string
-		extractTargetData.In("raw_data").Connect(unPackDBFanOut.Out("unxzed_" + geneLC))
+		//extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun " // SLURM string
+		extractTargetData.In("raw_data").Connect(unPackDB.Out("unxzed"))
 
 		trainModel := wf.NewProc("train_model_"+geneLC,
 			fmt.Sprintf(`cpsign-train --cptype 1 --trainfile {i:target_data} -i liblinear -l A, N --nr-models %d --model-name "Ligand_binding_to_%s_gene" --model-out {o:model}`,
 				3,
 				gene))
 		trainModel.SetPathExtend("target_data", "model", ".cpsign")
-		trainModel.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
+		//trainModel.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
 		trainModel.In("target_data").Connect(extractTargetData.Out("target_data"))
 
 		wf.ConnectLast(trainModel.Out("model"))
