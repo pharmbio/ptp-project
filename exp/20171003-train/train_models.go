@@ -110,7 +110,7 @@ func main() {
 
 		for _, cost := range costVals {
 			for _, gamma := range gammaVals {
-				gene_cost_gamma := fmt.Sprintf("%s_%s_%s", geneLC, cost, gamma)
+				gene_cost_gamma := fmt.Sprintf("%s_%s_%s", geneLC, cost, gamma) // A string to make process names unique
 
 				trainModel := wf.NewProc("train_"+gene_cost_gamma,
 					sp.ExpandParams(`cpsign-train --cptype 1 --trainfile {i:target_data} -i liblinear -l A, N --cost {p:cost} --gamma {p:gamma} --nr-models {p:nrmodels} --model-name "Ligand_binding_to_{p:gene}_gene" --model-out {o:model} && mv {o:model}/*.cpsign {o:model}.rename && rmdir {o:model} && mv {o:model}.rename {o:model};`,
@@ -125,8 +125,8 @@ func main() {
 				trainModel.ParamPort("cost").Connect(spc.NewStringGen(wf, "costgen_"+gene_cost_gamma, cost).Out)
 				trainModel.ParamPort("gamma").Connect(spc.NewStringGen(wf, "gammagen_"+gene_cost_gamma, gamma).Out)
 				//trainModel.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
-				wf.ConnectLast(trainModel.Out("model"))
 
+				wf.ConnectLast(trainModel.Out("model"))
 			}
 		}
 
