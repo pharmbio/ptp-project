@@ -98,7 +98,7 @@ func main() {
 	// Set up gene-specific workflow branches
 	// --------------------------------
 	//for _, gene := range bowesRiskGenes {
-	for _, gene := range smallestGene {
+	for _, gene := range smallestThreeGenes {
 		geneLC := str.ToLower(gene)
 		procName := "extract_target_data_" + geneLC
 
