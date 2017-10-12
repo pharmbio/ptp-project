@@ -61,10 +61,16 @@ var (
 	smallestGene = []string{
 		"GABRA1",
 	}
-	smallestThreeGenes = []string{
+	smallestThree = []string{
 		"GABRA1",
 		"CACNA1C",
 		"CHRNA4",
+	}
+	smallestFour = []string{
+		"GABRA1",
+		"CACNA1C",
+		"CHRNA4",
+		"PDE3A",
 	}
 	costVals = []string{
 		"1",
@@ -98,7 +104,7 @@ func main() {
 	// Set up gene-specific workflow branches
 	// --------------------------------
 	//for _, gene := range bowesRiskGenes {
-	for _, gene := range smallestThreeGenes {
+	for _, gene := range smallestFour {
 		geneLC := str.ToLower(gene)
 		procName := "extract_target_data_" + geneLC
 
