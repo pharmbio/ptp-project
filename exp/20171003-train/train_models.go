@@ -5,7 +5,6 @@ package main
 import (
 	"fmt"
 	sp "github.com/scipipe/scipipe"
-	spc "github.com/scipipe/scipipe/components"
 	str "strings"
 )
 
@@ -122,8 +121,8 @@ func main() {
 					return t.InTargets["target_data"].GetPath() + fmt.Sprintf(".c%s_g%s", t.Params["cost"], t.Params["gamma"]) + ".cpsign"
 				})
 				trainModel.In("target_data").Connect(extractTargetData.Out("target_data"))
-				trainModel.ParamPort("cost").Connect(spc.NewStringGen(wf, "costgen_"+gene_cost_gamma, cost).Out)
-				trainModel.ParamPort("gamma").Connect(spc.NewStringGen(wf, "gammagen_"+gene_cost_gamma, gamma).Out)
+				trainModel.ParamPort("cost").ConnectStrings(cost)
+				trainModel.ParamPort("gamma").ConnectStrings(gamma)
 				//trainModel.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
 
 				wf.ConnectLast(trainModel.Out("model"))
