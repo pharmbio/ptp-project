@@ -139,8 +139,8 @@ func main() {
 					return t.InPath("target_data") + fmt.Sprintf(".c%s_g%s", t.Param("cost"), t.Param("gamma")) + ".stats.txt"
 				})
 				crossValidate.In("target_data").Connect(extractTargetData.Out("target_data"))
-				crossValidate.ParamPort("cost").ConnectStrings(cost)
-				crossValidate.ParamPort("gamma").ConnectStrings(gamma)
+				crossValidate.ParamPort("cost").ConnectStr(cost)
+				crossValidate.ParamPort("gamma").ConnectStr(gamma)
 				//crossValidate.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
 
 				wf.ConnectLast(crossValidate.Out("stats"))
