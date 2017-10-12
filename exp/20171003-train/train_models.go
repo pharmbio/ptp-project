@@ -146,7 +146,6 @@ func main() {
 				wf.ConnectLast(crossValidate.Out("stats"))
 			}
 		}
-
 	}
 
 	// --------------------------------
