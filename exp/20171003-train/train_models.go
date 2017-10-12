@@ -117,21 +117,33 @@ func main() {
 			for _, gamma := range gammaVals {
 				gene_cost_gamma := fmt.Sprintf("%s_%s_%s", geneLC, cost, gamma) // A string to make process names unique
 
-				trainModel := wf.NewProc("train_"+gene_cost_gamma,
-					sp.ExpandParams(`java -jar ../../bin/cpsign-0.6.2.jar train --license ../../bin/cpsign.lic --cptype 1 --trainfile {i:target_data} -i liblinear -l A, N --cost {p:cost} --gamma {p:gamma} --nr-models {p:nrmodels} --model-name "Ligand_binding_to_{p:gene}_gene" --model-out {o:model}`,
+				crossValidate := wf.NewProc("crossval_"+gene_cost_gamma,
+					sp.ExpandParams(`java -jar ../../bin/cpsign-0.6.2.jar crossvalidate \
+									--license ../../bin/cpsign.lic \
+									--cptype 1 \
+									--trainfile {i:target_data} \
+									--impl liblinear \
+									--labels A, N \
+									--nr-models {p:nrmodels} \
+									--cost {p:cost} \
+									--gamma {p:gamma} \
+									--cv-folds {p:cvfolds} \
+									--confidence {p:confidence} > {o:stats}`,
 						map[string]string{
-							"nrmodels": "3",
-							"gene":     gene,
+							"nrmodels":   "3",
+							"gene":       gene,
+							"cvfolds":    "5",
+							"confidence": "0.9",
 						}))
-				trainModel.SetPathCustom("model", func(t *sp.SciTask) string {
-					return t.InPath("target_data") + fmt.Sprintf(".c%s_g%s", t.Param("cost"), t.Param("gamma")) + ".cpsign"
+				crossValidate.SetPathCustom("stats", func(t *sp.SciTask) string {
+					return t.InPath("target_data") + fmt.Sprintf(".c%s_g%s", t.Param("cost"), t.Param("gamma")) + ".stats.txt"
 				})
-				trainModel.In("target_data").Connect(extractTargetData.Out("target_data"))
-				trainModel.ParamPort("cost").ConnectStrings(cost)
-				trainModel.ParamPort("gamma").ConnectStrings(gamma)
-				//trainModel.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
+				crossValidate.In("target_data").Connect(extractTargetData.Out("target_data"))
+				crossValidate.ParamPort("cost").ConnectStrings(cost)
+				crossValidate.ParamPort("gamma").ConnectStrings(gamma)
+				//crossValidate.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
 
-				wf.ConnectLast(trainModel.Out("model"))
+				wf.ConnectLast(crossValidate.Out("stats"))
 			}
 		}
 
