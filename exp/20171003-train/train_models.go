@@ -118,7 +118,7 @@ func main() {
 							"gene":     gene,
 						}))
 				trainModel.SetPathCustom("model", func(t *sp.SciTask) string {
-					return t.InTargets["target_data"].GetPath() + fmt.Sprintf(".c%s_g%s", t.Params["cost"], t.Params["gamma"]) + ".cpsign"
+					return t.InPath("target_data") + fmt.Sprintf(".c%s_g%s", t.Param("cost"), t.Param("gamma")) + ".cpsign"
 				})
 				trainModel.In("target_data").Connect(extractTargetData.Out("target_data"))
 				trainModel.ParamPort("cost").ConnectStrings(cost)
