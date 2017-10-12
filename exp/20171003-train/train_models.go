@@ -132,7 +132,7 @@ func main() {
 						map[string]string{
 							"nrmodels":   "3",
 							"gene":       gene,
-							"cvfolds":    "5",
+							"cvfolds":    "10",
 							"confidence": "0.9",
 						}))
 				crossValidate.SetPathCustom("stats", func(t *sp.SciTask) string {
