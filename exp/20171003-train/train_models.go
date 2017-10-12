@@ -112,7 +112,7 @@ func main() {
 				gene_cost_gamma := fmt.Sprintf("%s_%s_%s", geneLC, cost, gamma) // A string to make process names unique
 
 				trainModel := wf.NewProc("train_"+gene_cost_gamma,
-					sp.ExpandParams(`cpsign-train --cptype 1 --trainfile {i:target_data} -i liblinear -l A, N --cost {p:cost} --gamma {p:gamma} --nr-models {p:nrmodels} --model-name "Ligand_binding_to_{p:gene}_gene" --model-out {o:model} && mv {o:model}/*.cpsign {o:model}.rename && rmdir {o:model} && mv {o:model}.rename {o:model};`,
+					sp.ExpandParams(`cpsign-train --cptype 1 --trainfile {i:target_data} -i liblinear -l A, N --cost {p:cost} --gamma {p:gamma} --nr-models {p:nrmodels} --model-name "Ligand_binding_to_{p:gene}_gene" --model-out {o:model}`,
 						map[string]string{
 							"nrmodels": "3",
 							"gene":     gene,
