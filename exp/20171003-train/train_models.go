@@ -5,7 +5,8 @@ package main
 import (
 	"fmt"
 	sp "github.com/scipipe/scipipe"
-	"strings"
+	spc "github.com/scipipe/scipipe/components"
+	str "strings"
 )
 
 var (
@@ -66,6 +67,16 @@ var (
 		"CACNA1C",
 		"CHRNA4",
 	}
+	costVals = []string{
+		"1",
+		"10",
+		"100",
+	}
+	gammaVals = []string{
+		"0.1",
+		"0.01",
+		"0.001",
+	}
 )
 
 func main() {
@@ -88,24 +99,37 @@ func main() {
 	// Set up gene-specific workflow branches
 	// --------------------------------
 	//for _, gene := range bowesRiskGenes {
-	for _, gene := range smallestThreeGenes {
-		geneLC := strings.ToLower(gene)
+	for _, gene := range smallestGene {
+		geneLC := str.ToLower(gene)
 		procName := "extract_target_data_" + geneLC
 
 		extractTargetData := wf.NewProc(procName, fmt.Sprintf(`awk -F"\t" '$9 == "%s" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`, gene))
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLC, geneLC))
-		//extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun " // SLURM string
 		extractTargetData.In("raw_data").Connect(unPackDB.Out("unxzed"))
+		//extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun " // SLURM string
 
-		trainModel := wf.NewProc("train_model_"+geneLC,
-			fmt.Sprintf(`cpsign-train --cptype 1 --trainfile {i:target_data} -i liblinear -l A, N --nr-models %d --model-name "Ligand_binding_to_%s_gene" --model-out {o:model}`,
-				3,
-				gene))
-		trainModel.SetPathExtend("target_data", "model", ".cpsign")
-		//trainModel.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
-		trainModel.In("target_data").Connect(extractTargetData.Out("target_data"))
+		for _, cost := range costVals {
+			for _, gamma := range gammaVals {
+				gene_cost_gamma := fmt.Sprintf("%s_%s_%s", geneLC, cost, gamma)
 
-		wf.ConnectLast(trainModel.Out("model"))
+				trainModel := wf.NewProc("train_"+gene_cost_gamma,
+					sp.ExpandParams(`cpsign-train --cptype 1 --trainfile {i:target_data} -i liblinear -l A, N --cost {p:cost} --gamma {p:gamma} --nr-models {p:nrmodels} --model-name "Ligand_binding_to_{p:gene}_gene" --model-out {o:model}`,
+						map[string]string{
+							"nrmodels": "3",
+							"gene":     gene,
+						}))
+				trainModel.SetPathCustom("model", func(t *sp.SciTask) string {
+					return t.InTargets["target_data"].GetPath() + fmt.Sprintf(".c%s_g%s", t.Params["cost"], t.Params["gamma"]) + ".cpsign"
+				})
+				trainModel.In("target_data").Connect(extractTargetData.Out("target_data"))
+				trainModel.ParamPort("cost").Connect(spc.NewStringGen(wf, "costgen_"+gene_cost_gamma, cost).Out)
+				trainModel.ParamPort("gamma").Connect(spc.NewStringGen(wf, "gammagen_"+gene_cost_gamma, gamma).Out)
+				//trainModel.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
+				wf.ConnectLast(trainModel.Out("model"))
+
+			}
+		}
+
 	}
 
 	// --------------------------------
