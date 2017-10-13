@@ -187,44 +187,48 @@ func (p *SummarizeCostGammaPerf) Run() {
 	defer p.OutCostGammaStats.Close()
 	go p.In.RunMergeInputs()
 
-	// Set up regexes
-	rEffic, err := regexp.Compile("Efficiency=([0-9.]+)")
-	sp.CheckErr(err)
-
-	rValid, err := regexp.Compile("Validity=([0-9.]+)")
-	sp.CheckErr(err)
-
-	outStr := "Efficiency\tValidity\tCost\tGamma\tGene\n"
-	for iip := range p.In.InChan {
-		dat := string(iip.Read())
-
-		efficiency := 0.0
-		validity := 0.0
-
-		effMatches := rEffic.FindStringSubmatch(dat)
-		if len(effMatches) > 1 {
-			efficiency, err = strconv.ParseFloat(effMatches[1], 64)
-			sp.CheckErr(err)
-		}
-
-		validMatches := rValid.FindStringSubmatch(dat)
-		if len(validMatches) > 1 {
-			validity, err = strconv.ParseFloat(validMatches[1], 64)
-			sp.CheckErr(err)
-		}
-
-		auditInfo := iip.GetAuditInfo()
-
-		cost := auditInfo.Params["cost"]
-		gamma := auditInfo.Params["gamma"]
-		gene := auditInfo.Params["gene"]
-
-		infoString := fmt.Sprintf("%f\t%f\t%s\t%s\t%s\n", efficiency, validity, cost, gamma, gene)
-		outStr = outStr + infoString
-	}
-
-	ioutil.WriteFile(p.FileName, []byte(outStr), 0644)
 	outIp := sp.NewInformationPacket(p.FileName)
+
+	if outIp.Exists() {
+		sp.Info.Printf("Process %s: Out-target %s already exists, so not skipping to run", p.Name(), outIp.GetPath())
+	} else {
+		// Set up regexes
+		rEffic, err := regexp.Compile("Efficiency=([0-9.]+)")
+		sp.CheckErr(err)
+
+		rValid, err := regexp.Compile("Validity=([0-9.]+)")
+		sp.CheckErr(err)
+
+		outStr := "Efficiency\tValidity\tCost\tGamma\tGene\n"
+		for iip := range p.In.InChan {
+			dat := string(iip.Read())
+
+			efficiency := 0.0
+			validity := 0.0
+
+			effMatches := rEffic.FindStringSubmatch(dat)
+			if len(effMatches) > 1 {
+				efficiency, err = strconv.ParseFloat(effMatches[1], 64)
+				sp.CheckErr(err)
+			}
+
+			validMatches := rValid.FindStringSubmatch(dat)
+			if len(validMatches) > 1 {
+				validity, err = strconv.ParseFloat(validMatches[1], 64)
+				sp.CheckErr(err)
+			}
+
+			auditInfo := iip.GetAuditInfo()
+
+			cost := auditInfo.Params["cost"]
+			gamma := auditInfo.Params["gamma"]
+			gene := auditInfo.Params["gene"]
+
+			infoString := fmt.Sprintf("%f\t%f\t%s\t%s\t%s\n", efficiency, validity, cost, gamma, gene)
+			outStr = outStr + infoString
+		}
+		ioutil.WriteFile(p.FileName, []byte(outStr), 0644)
+	}
 
 	p.OutCostGammaStats.Send(outIp)
 }
