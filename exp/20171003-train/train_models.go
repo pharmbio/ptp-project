@@ -103,7 +103,7 @@ func main() {
 	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
-	selectBest := NewBestCostGammaSelector(wf, "best_cost_gamma_selector", "dat/best_cost_gamma.tsv")
+	summarize := NewSummarizeCostGammaPerf(wf, "best_cost_gamma_selector", "dat/best_cost_gamma.tsv")
 
 	// --------------------------------
 	// Set up gene-specific workflow branches
@@ -122,7 +122,7 @@ func main() {
 				gene_cost_gamma := fmt.Sprintf("%s_%s_%s", geneLC, cost, gamma) // A string to make process names unique
 
 				crossValidate := wf.NewProc("crossval_"+gene_cost_gamma,
-					sp.ExpandParams(`java -jar ../../bin/cpsign-0.6.2.jar crossvalidate \
+					`java -jar ../../bin/cpsign-0.6.2.jar crossvalidate \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
 									--trainfile {i:target_data} \
@@ -132,88 +132,99 @@ func main() {
 									--cost {p:cost} \
 									--gamma {p:gamma} \
 									--cv-folds {p:cvfolds} \
-									--confidence {p:confidence} > {o:stats}`,
-						map[string]string{
-							"nrmodels":   "3",
-							"gene":       gene,
-							"cvfolds":    "10",
-							"confidence": "0.9",
-						}))
+									--confidence {p:confidence} > {o:stats} # {p:gene}`)
 				crossValidate.SetPathCustom("stats", func(t *sp.SciTask) string {
 					return t.InPath("target_data") + fmt.Sprintf(".c%s_g%s", t.Param("cost"), t.Param("gamma")) + ".stats.txt"
 				})
 				crossValidate.In("target_data").Connect(extractTargetData.Out("target_data"))
+				crossValidate.ParamPort("nrmodels").ConnectStr("3")
+				crossValidate.ParamPort("cvfolds").ConnectStr("10")
+				crossValidate.ParamPort("confidence").ConnectStr("0.9")
+				crossValidate.ParamPort("gene").ConnectStr(gene)
 				crossValidate.ParamPort("cost").ConnectStr(cost)
 				crossValidate.ParamPort("gamma").ConnectStr(gamma)
 				//crossValidate.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
 
-				selectBest.In.Connect(crossValidate.Out("stats"))
+				summarize.In.Connect(crossValidate.Out("stats"))
 			}
 		}
 	}
 
-	wf.ConnectLast(selectBest.OutBestCostGamma)
+	wf.ConnectLast(summarize.OutCostGammaStats)
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
 	wf.Run()
 }
 
-type BestCostGammaSelector struct {
-	In               *sp.FilePort
-	OutBestCostGamma *sp.FilePort
-	ProcName         string
-	FileName         string
+type SummarizeCostGammaPerf struct {
+	In                *sp.FilePort
+	OutCostGammaStats *sp.FilePort
+	ProcName          string
+	FileName          string
 }
 
-func NewBestCostGammaSelector(wf *sp.Workflow, name string, filename string) *BestCostGammaSelector {
-	bcgs := &BestCostGammaSelector{
-		In:               sp.NewFilePort(),
-		OutBestCostGamma: sp.NewFilePort(),
-		ProcName:         name,
-		FileName:         filename,
+func NewSummarizeCostGammaPerf(wf *sp.Workflow, name string, filename string) *SummarizeCostGammaPerf {
+	bcgs := &SummarizeCostGammaPerf{
+		In:                sp.NewFilePort(),
+		OutCostGammaStats: sp.NewFilePort(),
+		ProcName:          name,
+		FileName:          filename,
 	}
 	wf.AddProc(bcgs)
 	return bcgs
 }
 
-func (p *BestCostGammaSelector) Name() string {
+func (p *SummarizeCostGammaPerf) Name() string {
 	return p.ProcName
 }
 
-func (p *BestCostGammaSelector) Run() {
-	defer p.OutBestCostGamma.Close()
+func (p *SummarizeCostGammaPerf) Run() {
+	defer p.OutCostGammaStats.Close()
+	go p.In.RunMergeInputs()
 
 	// Set up regexes
-	rEffic, err := regexp.Compile("^Effiyciency=([0-9.]+)$")
+	rEffic, err := regexp.Compile("Efficiency=([0-9.]+)")
 	sp.CheckErr(err)
 
-	rValid, err := regexp.Compile("^Validity=([0-9.]+)$")
+	rValid, err := regexp.Compile("Validity=([0-9.]+)")
 	sp.CheckErr(err)
 
-	outStr := ""
-
+	outStr := "Efficiency\tValidity\tCost\tGamma\tGene\n"
 	for iip := range p.In.InChan {
 		dat := string(iip.Read())
-		efficiency, err := strconv.ParseFloat(rEffic.FindStringSubmatch(dat)[1], 64)
-		sp.CheckErr(err)
-		validity, err := strconv.ParseFloat(rValid.FindStringSubmatch(dat)[1], 64)
-		sp.CheckErr(err)
+
+		efficiency := 0.0
+		validity := 0.0
+
+		effMatches := rEffic.FindStringSubmatch(dat)
+		if len(effMatches) > 1 {
+			efficiency, err = strconv.ParseFloat(effMatches[1], 64)
+			sp.CheckErr(err)
+		}
+
+		validMatches := rValid.FindStringSubmatch(dat)
+		if len(validMatches) > 1 {
+			validity, err = strconv.ParseFloat(validMatches[1], 64)
+			sp.CheckErr(err)
+		}
 
 		auditInfo := iip.GetAuditInfo()
+
 		cost := auditInfo.Params["cost"]
 		gamma := auditInfo.Params["gamma"]
+		gene := auditInfo.Params["gene"]
 
-		infoString := fmt.Sprintf("Efficiency=%s\tValidity=%s\tCost=%s\tGamma=%s\n", efficiency, validity, cost, gamma)
+		infoString := fmt.Sprintf("%f\t%f\t%s\t%s\t%s\n", efficiency, validity, cost, gamma, gene)
 		outStr = outStr + infoString
 	}
 
 	ioutil.WriteFile(p.FileName, []byte(outStr), 0644)
 	outIp := sp.NewInformationPacket(p.FileName)
 
-	p.OutBestCostGamma.Send(outIp)
+	p.OutCostGammaStats.Send(outIp)
 }
 
-func (p *BestCostGammaSelector) IsConnected() bool {
-	return p.In.IsConnected() && p.OutBestCostGamma.IsConnected()
+func (p *SummarizeCostGammaPerf) IsConnected() bool {
+	return p.In.IsConnected() && p.OutCostGammaStats.IsConnected()
 }
