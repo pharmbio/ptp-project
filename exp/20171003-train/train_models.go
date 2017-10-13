@@ -103,7 +103,7 @@ func main() {
 	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
-	summarize := NewSummarizeCostGammaPerf(wf, "best_cost_gamma_selector", "dat/best_cost_gamma.tsv")
+	summarize := NewSummarizeCostGammaPerf(wf, "summarize_cost_gamma_perf", "dat/cost_gamma_perf.tsv")
 
 	// --------------------------------
 	// Set up gene-specific workflow branches
