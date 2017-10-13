@@ -134,7 +134,11 @@ func main() {
 									--cv-folds {p:cvfolds} \
 									--confidence {p:confidence} > {o:stats} # {p:gene}`)
 				crossValidate.SetPathCustom("stats", func(t *sp.SciTask) string {
-					return t.InPath("target_data") + fmt.Sprintf(".c%s_g%s", t.Param("cost"), t.Param("gamma")) + ".stats.txt"
+					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
+					sp.CheckErr(err)
+					g, err := strconv.ParseFloat(t.Param("gamma"), 64)
+					sp.CheckErr(err)
+					return t.InPath("target_data") + fmt.Sprintf(".c%03d_g%.3f", c, g) + ".stats.txt"
 				})
 				crossValidate.In("target_data").Connect(extractTargetData.Out("target_data"))
 				crossValidate.ParamPort("nrmodels").ConnectStr("3")
