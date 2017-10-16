@@ -338,9 +338,9 @@ func (p *BestEffCostGamma) Run() {
 			}
 		}
 		sp.Debug.Printf("Final max efficiency: %f (For: Cost:%03d, Gamma:%.3f)\n", max, maxCost, maxGamma)
-		p.OutBestCost.Send(fmt.Sprintf("%03d", maxCost))
+		p.OutBestCost.Send(fmt.Sprintf("%d", maxCost))
 		p.OutBestGamma.Send(fmt.Sprintf("%.3f", maxGamma))
-		p.OutBestEfficiency.Send(fmt.Sprintf("%.6f", max))
+		p.OutBestEfficiency.Send(fmt.Sprintf("%.3f", max))
 	}
 }
 
