@@ -17,6 +17,7 @@ import (
 var (
 	maxCores = flag.Int("maxcores", 4, "Max number of local cores to use")
 	geneSet  = flag.String("geneset", "smallest1", "Gene set to use (one of smallest1, smallest3, smallest4, bowes44)")
+	runSlurm = flag.Bool("slurm", false, "Start computationally heavy jobs via SLURM")
 
 	cpSignPath = "../../bin/cpsign-0.6.2.jar"
 	geneSets   = map[string][]string{
@@ -96,7 +97,9 @@ func main() {
 		extractTargetData := wf.NewProc(procName, fmt.Sprintf(`awk -F"\t" '$9 == "%s" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`, gene))
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLC, geneLC))
 		extractTargetData.In("raw_data").Connect(unPackDB.Out("unxzed"))
-		//extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun " // SLURM string
+		if *runSlurm {
+			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun " // SLURM string
+		}
 
 		// --------------------------------------------------------------------------------
 		// Optimize cost/gamma-step
@@ -132,7 +135,9 @@ func main() {
 				evalCostGamma.ParamPort("gene").ConnectStr(gene)
 				evalCostGamma.ParamPort("cost").ConnectStr(cost)
 				evalCostGamma.ParamPort("gamma").ConnectStr(gamma)
-				//evalCostGamma.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
+				if *runSlurm {
+					evalCostGamma.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1-00:00:00 -J evalcg_" + gene_cost_gamma + " srun " // SLURM string
+				}
 
 				summarize.In.Connect(evalCostGamma.Out("stats"))
 			}
@@ -153,6 +158,9 @@ func main() {
 									--model-name "`+gene+` target profile"`)
 		cpSignPrecomp.In("traindata").Connect(extractTargetData.Out("target_data"))
 		cpSignPrecomp.SetPathExtend("traindata", "model", ".precomp.mdl")
+		if *runSlurm {
+			cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1-00:00:00 -J precmp_" + geneLC + " srun " // SLURM string
+		}
 
 		// --------------------------------------------------------------------------------
 		// Train step
@@ -182,6 +190,9 @@ func main() {
 				t.Param("gamma"),
 				t.Param("acpfolds"))
 		})
+		if *runSlurm {
+			cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1-00:00:00 -J train_" + geneLC + " srun " // SLURM string
+		}
 
 		//paramPrinter := NewParamPrinter(wf, "param_printer_"+geneLC, "dat/best_cost_gamma_"+geneLC+".txt")
 		//paramPrinter.GetParamPort("cost").Connect(selectBest.OutBestCost)
