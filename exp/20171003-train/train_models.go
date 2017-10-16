@@ -5,6 +5,7 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
+	"flag"
 	"fmt"
 	sp "github.com/scipipe/scipipe"
 	"io/ioutil"
@@ -14,6 +15,8 @@ import (
 )
 
 var (
+	maxCores = flag.Int("maxcores", 4, "Max number of local cores to use")
+
 	cpSignPath     = "../../bin/cpsign-0.6.2.jar"
 	bowesRiskGenes = []string{
 		// Not available in dataset: "CHRNA1", Not available in dataset:
@@ -56,8 +59,12 @@ var (
 )
 
 func main() {
+	sp.InitLogAudit()
+	flag.Parse()
+	sp.Info.Fatalf("Using max %d cores\n", *maxCores)
+
 	//sp.InitLogDebug()
-	wf := sp.NewWorkflow("train_models", 4)
+	wf := sp.NewWorkflow("train_models", *maxCores)
 
 	// --------------------------------
 	// Initialize processes and add to runner
