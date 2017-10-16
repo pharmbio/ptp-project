@@ -16,35 +16,38 @@ import (
 
 var (
 	maxCores = flag.Int("maxcores", 4, "Max number of local cores to use")
+	geneSet  = flag.String("geneset", "smallest1", "Gene set to use (one of smallest1, smallest3, smallest4, bowes44)")
 
-	cpSignPath     = "../../bin/cpsign-0.6.2.jar"
-	bowesRiskGenes = []string{
-		// Not available in dataset: "CHRNA1", Not available in dataset:
-		// "KCNE1". Instead we use MinK1 as they both share the same alias
-		// "MinK", and also confirmed by Wes to be the same.
-		"ADORA2A", "ADRA1A", "ADRA2A", "ADRB1", "ADRB2",
-		"CNR1", "CNR2", "CCKAR", "DRD1", "DRD2",
-		"EDNRA", "HRH1", "HRH2", "OPRD1", "OPRK1",
-		"OPRM1", "CHRM1", "CHRM2", "CHRM3", "HTR1A",
-		"HTR1B", "HTR2A", "HTR2B", "AVPR1A", "CHRNA4",
-		"CACNA1C", "GABRA1", "KCNH2", "KCNQ1", "MINK1",
-		"GRIN1", "HTR3A", "SCN5A", "ACHE", "PTGS1",
-		"PTGS2", "MAOA", "PDE3A", "PDE4D", "LCK",
-		"SLC6A3", "SLC6A2", "SLC6A4", "AR", "NR3C1",
-	}
-	smallestGene = []string{
-		"GABRA1",
-	}
-	smallestThree = []string{
-		"GABRA1",
-		"CACNA1C",
-		"CHRNA4",
-	}
-	smallestFour = []string{
-		"GABRA1",
-		"CACNA1C",
-		"CHRNA4",
-		"PDE3A",
+	cpSignPath = "../../bin/cpsign-0.6.2.jar"
+	geneSets   = map[string][]string{
+		"bowes44": []string{
+			// Not available in dataset: "CHRNA1", Not available in dataset:
+			// "KCNE1". Instead we use MinK1 as they both share the same alias
+			// "MinK", and also confirmed by Wes to be the same.
+			"ADORA2A", "ADRA1A", "ADRA2A", "ADRB1", "ADRB2",
+			"CNR1", "CNR2", "CCKAR", "DRD1", "DRD2",
+			"EDNRA", "HRH1", "HRH2", "OPRD1", "OPRK1",
+			"OPRM1", "CHRM1", "CHRM2", "CHRM3", "HTR1A",
+			"HTR1B", "HTR2A", "HTR2B", "AVPR1A", "CHRNA4",
+			"CACNA1C", "GABRA1", "KCNH2", "KCNQ1", "MINK1",
+			"GRIN1", "HTR3A", "SCN5A", "ACHE", "PTGS1",
+			"PTGS2", "MAOA", "PDE3A", "PDE4D", "LCK",
+			"SLC6A3", "SLC6A2", "SLC6A4", "AR", "NR3C1",
+		},
+		"smallest1": []string{
+			"GABRA1",
+		},
+		"smallest3": []string{
+			"GABRA1",
+			"CACNA1C",
+			"CHRNA4",
+		},
+		"smallest4": []string{
+			"GABRA1",
+			"CACNA1C",
+			"CHRNA4",
+			"PDE3A",
+		},
 	}
 	costVals = []string{
 		"1",
@@ -61,7 +64,9 @@ var (
 func main() {
 	sp.InitLogAudit()
 	flag.Parse()
-	sp.Info.Fatalf("Using max %d cores\n", *maxCores)
+
+	sp.Info.Printf("Using max %d cores\n", *maxCores)
+	sp.Info.Printf("Starting workflow for %s geneset\n", *geneSet)
 
 	//sp.InitLogDebug()
 	wf := sp.NewWorkflow("train_models", *maxCores)
@@ -81,7 +86,7 @@ func main() {
 	// --------------------------------
 	// Set up gene-specific workflow branches
 	// --------------------------------
-	for _, gene := range smallestFour {
+	for _, gene := range geneSets[*geneSet] {
 		geneLC := str.ToLower(gene)
 
 		// --------------------------------------------------------------------------------
