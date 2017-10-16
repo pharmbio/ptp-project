@@ -77,19 +77,24 @@ func main() {
 	for _, gene := range smallestFour {
 		geneLC := str.ToLower(gene)
 
+		// --------------------------------------------------------------------------------
+		// Extract target data step
+		// --------------------------------------------------------------------------------
 		procName := "extract_target_data_" + geneLC
 		extractTargetData := wf.NewProc(procName, fmt.Sprintf(`awk -F"\t" '$9 == "%s" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`, gene))
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLC, geneLC))
 		extractTargetData.In("raw_data").Connect(unPackDB.Out("unxzed"))
 		//extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun " // SLURM string
 
-		summarize := NewSummarizeCostGammaPerf(wf, "summarize_cost_gamma_perf_"+geneLC, "dat/cost_gamma_perf_"+geneLC+".tsv")
-
+		// --------------------------------------------------------------------------------
+		// Optimize cost/gamma-step
+		// --------------------------------------------------------------------------------
+		summarize := NewSummarizeCostGammaPerf(wf, "summarize_cost_gamma_perf_"+geneLC, "dat/"+geneLC+"/"+geneLC+"_cost_gamma_perf_stats.tsv")
 		for _, cost := range costVals {
 			for _, gamma := range gammaVals {
 				gene_cost_gamma := fmt.Sprintf("%s_%s_%s", geneLC, cost, gamma) // A string to make process names unique
 
-				crossValidate := wf.NewProc("crossval_"+gene_cost_gamma,
+				evalCostGamma := wf.NewProc("crossval_"+gene_cost_gamma,
 					`java -jar `+cpSignPath+` crossvalidate \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
@@ -101,43 +106,77 @@ func main() {
 									--gamma {p:gamma} \
 									--cv-folds {p:cvfolds} \
 									--confidence {p:confidence} > {o:stats} # {p:gene}`)
-				crossValidate.SetPathCustom("stats", func(t *sp.SciTask) string {
+				evalCostGamma.SetPathCustom("stats", func(t *sp.SciTask) string {
 					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 					sp.CheckErr(err)
 					g, err := strconv.ParseFloat(t.Param("gamma"), 64)
 					sp.CheckErr(err)
 					return t.InPath("traindata") + fmt.Sprintf(".c%03d_g%.3f", c, g) + ".stats.txt"
 				})
-				crossValidate.In("traindata").Connect(extractTargetData.Out("target_data"))
-				crossValidate.ParamPort("nrmodels").ConnectStr("3")
-				crossValidate.ParamPort("cvfolds").ConnectStr("10")
-				crossValidate.ParamPort("confidence").ConnectStr("0.9")
-				crossValidate.ParamPort("gene").ConnectStr(gene)
-				crossValidate.ParamPort("cost").ConnectStr(cost)
-				crossValidate.ParamPort("gamma").ConnectStr(gamma)
-				//crossValidate.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
+				evalCostGamma.In("traindata").Connect(extractTargetData.Out("target_data"))
+				evalCostGamma.ParamPort("nrmodels").ConnectStr("3")
+				evalCostGamma.ParamPort("cvfolds").ConnectStr("10")
+				evalCostGamma.ParamPort("confidence").ConnectStr("0.9")
+				evalCostGamma.ParamPort("gene").ConnectStr(gene)
+				evalCostGamma.ParamPort("cost").ConnectStr(cost)
+				evalCostGamma.ParamPort("gamma").ConnectStr(gamma)
+				//evalCostGamma.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J cpsign_train_" + geneLC + " srun " // SLURM string
 
-				summarize.In.Connect(crossValidate.Out("stats"))
+				summarize.In.Connect(evalCostGamma.Out("stats"))
 			}
 		}
 		selectBest := NewBestEffCostGamma(wf, "select_best_cost_gamma_"+geneLC, '\t', false, 0)
 		selectBest.InCSVFile.Connect(summarize.OutCostGammaStats)
 
-		//cpSignPreComp := wf.NewProc("cpsign_precompute",
-		//	`java -jar `+cpSignPath+` precompute \
-		//							--license ../../bin/cpsign.lic \
-		//							--cptype 1 \
-		//							--trainfile {i:traindata} \
-		//							--labels A, N \
-		//							--model-out {o:model} \
-		//							--model-name {p:model_name}`)
+		// --------------------------------------------------------------------------------
+		// Pre-compute step
+		// --------------------------------------------------------------------------------
+		cpSignPrecomp := wf.NewProc("cpsign_precomp_"+geneLC,
+			`java -jar `+cpSignPath+` precompute \
+									--license ../../bin/cpsign.lic \
+									--cptype 1 \
+									--trainfile {i:traindata} \
+									--labels A, N \
+									--model-out {o:model} \
+									--model-name "`+gene+` target profile"`)
+		cpSignPrecomp.In("traindata").Connect(extractTargetData.Out("target_data"))
+		cpSignPrecomp.SetPathExtend("traindata", "model", ".precomp.mdl")
 
-		paramPrinter := NewParamPrinter(wf, "param_printer_"+geneLC, "dat/best_cost_gamma_"+geneLC+".txt")
-		paramPrinter.GetParamPort("cost").Connect(selectBest.OutBestCost)
-		paramPrinter.GetParamPort("gamma").Connect(selectBest.OutBestGamma)
-		paramPrinter.GetParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
+		// --------------------------------------------------------------------------------
+		// Train step
+		// --------------------------------------------------------------------------------
+		cpSignTrain := wf.NewProc("cpsign_train_"+geneLC,
+			`java -jar `+cpSignPath+` train \
+									--license ../../bin/cpsign.lic \
+									--cptype 1 \
+									--modelfile {i:model} \
+									--labels A, N \
+									--impl liblinear \
+									--nr-models {p:acpfolds} \
+									--cost {p:cost} \
+									--gamma {p:gamma} \
+									--model-out {o:model} \
+									--model-name "{p:gene} target profile" # Efficiency: {p:efficiency}`)
+		cpSignTrain.In("model").Connect(cpSignPrecomp.Out("model"))
+		cpSignTrain.ParamPort("acpfolds").ConnectStr("10")
+		cpSignTrain.ParamPort("cost").Connect(selectBest.OutBestCost)
+		cpSignTrain.ParamPort("gamma").Connect(selectBest.OutBestGamma)
+		cpSignTrain.ParamPort("gene").ConnectStr(gene)
+		cpSignTrain.ParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
+		cpSignTrain.SetPathCustom("model", func(t *sp.SciTask) string {
+			return fmt.Sprintf("dat/final_models/%s_c%s_g%s_acpfolds%s.mdl",
+				str.ToLower(t.Param("gene")),
+				t.Param("cost"),
+				t.Param("gamma"),
+				t.Param("acpfolds"))
+		})
 
-		wf.ConnectLast(paramPrinter.OutBestParamsFile)
+		//paramPrinter := NewParamPrinter(wf, "param_printer_"+geneLC, "dat/best_cost_gamma_"+geneLC+".txt")
+		//paramPrinter.GetParamPort("cost").Connect(selectBest.OutBestCost)
+		//paramPrinter.GetParamPort("gamma").Connect(selectBest.OutBestGamma)
+		//paramPrinter.GetParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
+
+		wf.ConnectLast(cpSignTrain.Out("model"))
 	}
 
 	// --------------------------------
@@ -299,7 +338,7 @@ func (p *BestEffCostGamma) Run() {
 			}
 		}
 		sp.Debug.Printf("Final max efficiency: %f (For: Cost:%03d, Gamma:%.3f)\n", max, maxCost, maxGamma)
-		p.OutBestCost.Send(fmt.Sprintf("%3d", maxCost))
+		p.OutBestCost.Send(fmt.Sprintf("%03d", maxCost))
 		p.OutBestGamma.Send(fmt.Sprintf("%.3f", maxGamma))
 		p.OutBestEfficiency.Send(fmt.Sprintf("%.6f", max))
 	}
