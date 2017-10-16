@@ -125,6 +125,20 @@ func main() {
 	selectBest := NewBestEffCostGamma(wf, "select_best_cost_gamma", '\t', false, 0)
 	selectBest.InCSVFile.Connect(summarize.OutCostGammaStats)
 
+	cpSignPreComp := wf.NewProc("cpsign_precompute",
+		`java -jar `+cpSignPath+` precompute \
+									--license ../../bin/cpsign.lic \
+									--cptype 1 \
+									--trainfile {i:target_data} \
+									--modelfile {i:modelfile} \
+									--proper-trainfile {i:proper_trainfile} \
+									--calibration-trainfile {i:calib_trainfile} \
+									--response-name {p:respname} \
+									--labels A, N \
+									--model-out {o:model} \
+									--model-name {p:model_name} \
+									--model-categor {p:model_category}`)
+
 	paramPrinter := NewParamPrinter(wf, "param_printer", "dat/best_cost_gamma.txt")
 	paramPrinter.GetParamPort("cost").Connect(selectBest.OutBestCost)
 	paramPrinter.GetParamPort("gamma").Connect(selectBest.OutBestGamma)
