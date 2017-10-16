@@ -3,6 +3,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/csv"
 	"fmt"
 	sp "github.com/scipipe/scipipe"
 	"io/ioutil"
@@ -154,13 +156,26 @@ func main() {
 		}
 	}
 
-	wf.ConnectLast(summarize.OutCostGammaStats)
+	selectBest := NewBestEffCostGamma(wf, "select_best_cost_gamma", '\t', false, 0)
+	selectBest.InCSVFile.Connect(summarize.OutCostGammaStats)
+
+	paramPrinter := NewParamPrinter(wf, "param_printer", "dat/best_cost_gamma.txt")
+	paramPrinter.GetParamPort("cost").Connect(selectBest.OutBestCost)
+	paramPrinter.GetParamPort("gamma").Connect(selectBest.OutBestGamma)
+	paramPrinter.GetParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
+
+	wf.SetDriver(paramPrinter)
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
 	wf.Run()
 }
 
+// --------------------------------------------------------------------------------
+
+// SummarizeCostGammaPerf is specialized a SciPipe Process that reads output
+// from cpSign status output to extract information about the efficiency and
+// validity of generated models for given cost and gamma values
 type SummarizeCostGammaPerf struct {
 	In                *sp.FilePort
 	OutCostGammaStats *sp.FilePort
@@ -190,7 +205,7 @@ func (p *SummarizeCostGammaPerf) Run() {
 	outIp := sp.NewInformationPacket(p.FileName)
 
 	if outIp.Exists() {
-		sp.Info.Printf("Process %s: Out-target %s already exists, so not skipping to run", p.Name(), outIp.GetPath())
+		sp.Info.Printf("Process %s: Out-target %s already exists, so not skipping\n", p.Name(), outIp.GetPath())
 	} else {
 		// Set up regexes
 		rEffic, err := regexp.Compile("Efficiency=([0-9.]+)")
@@ -224,7 +239,7 @@ func (p *SummarizeCostGammaPerf) Run() {
 			gamma := auditInfo.Params["gamma"]
 			gene := auditInfo.Params["gene"]
 
-			infoString := fmt.Sprintf("%f\t%f\t%s\t%s\t%s\n", efficiency, validity, cost, gamma, gene)
+			infoString := fmt.Sprintf("%.3f\t%.3f\t%s\t%s\t%s\n", efficiency, validity, cost, gamma, gene)
 			outStr = outStr + infoString
 		}
 		ioutil.WriteFile(p.FileName, []byte(outStr), 0644)
@@ -235,4 +250,153 @@ func (p *SummarizeCostGammaPerf) Run() {
 
 func (p *SummarizeCostGammaPerf) IsConnected() bool {
 	return p.In.IsConnected() && p.OutCostGammaStats.IsConnected()
+}
+
+// --------------------------------------------------------------------------------
+
+type BestEffCostGamma struct {
+	ProcName          string
+	InCSVFile         *sp.FilePort
+	OutBestCost       *sp.ParamPort
+	OutBestGamma      *sp.ParamPort
+	OutBestEfficiency *sp.ParamPort
+	Separator         rune
+	Header            bool
+	ColumnIndex       int // Which column to check for max value
+}
+
+func NewBestEffCostGamma(wf *sp.Workflow, procName string, separator rune, header bool, columnIndex int) *BestEffCostGamma {
+	sbcr := &BestEffCostGamma{
+		ProcName:          procName,
+		InCSVFile:         sp.NewFilePort(),
+		OutBestCost:       sp.NewParamPort(),
+		OutBestGamma:      sp.NewParamPort(),
+		OutBestEfficiency: sp.NewParamPort(),
+		Separator:         separator,
+		Header:            header,
+		ColumnIndex:       columnIndex,
+	}
+	wf.AddProc(sbcr)
+	return sbcr
+}
+
+func (p *BestEffCostGamma) Name() string {
+	return p.ProcName
+}
+
+func (p *BestEffCostGamma) Run() {
+	defer p.OutBestCost.Close()
+	defer p.OutBestGamma.Close()
+	defer p.OutBestEfficiency.Close()
+	go p.InCSVFile.RunMergeInputs()
+
+	for iip := range p.InCSVFile.InChan {
+		csvData := iip.Read()
+
+		bytesReader := bytes.NewReader(csvData)
+		csvReader := csv.NewReader(bytesReader)
+		csvReader.Comma = p.Separator
+
+		var max float64
+		var maxCost int64
+		var maxGamma float64
+
+		i := 0
+		for {
+			rec, err := csvReader.Read()
+			if err != nil {
+				break
+			}
+			i++
+			if i == 1 && !p.Header {
+				continue
+			}
+			eff, err := strconv.ParseFloat(rec[p.ColumnIndex], 64)
+			sp.CheckErr(err)
+			if eff > max {
+				max = eff
+
+				maxCost, err = strconv.ParseInt(rec[2], 10, 0)
+				sp.CheckErr(err)
+
+				maxGamma, err = strconv.ParseFloat(rec[3], 64)
+				sp.CheckErr(err)
+			}
+		}
+		sp.Debug.Printf("Final max efficiency: %f (For: Cost:%03d, Gamma:%.3f)\n", max, maxCost, maxGamma)
+		p.OutBestCost.Send(fmt.Sprintf("%3d", maxCost))
+		p.OutBestGamma.Send(fmt.Sprintf("%.3f", maxGamma))
+		p.OutBestEfficiency.Send(fmt.Sprintf("%.6f", max))
+	}
+}
+
+func (p *BestEffCostGamma) IsConnected() bool {
+	return p.InCSVFile.IsConnected() && p.OutBestCost.IsConnected() && p.OutBestGamma.IsConnected() && p.OutBestEfficiency.IsConnected()
+}
+
+// --------------------------------------------------------------------------------
+
+type ParamPrinter struct {
+	sp.SciProcess
+	ProcName           string
+	InParamPorts       map[string]*sp.ParamPort
+	OutBestParamsFile  *sp.FilePort
+	BestParamsFileName string
+}
+
+func NewParamPrinter(wf *sp.Workflow, procName string, fileName string) *ParamPrinter {
+	pp := &ParamPrinter{
+		ProcName:           procName,
+		InParamPorts:       make(map[string]*sp.ParamPort),
+		OutBestParamsFile:  sp.NewFilePort(),
+		BestParamsFileName: fileName,
+	}
+	wf.AddProc(pp)
+	return pp
+}
+
+func (p *ParamPrinter) GetParamPort(portName string) *sp.ParamPort {
+	if p.InParamPorts[portName] == nil {
+		p.InParamPorts[portName] = sp.NewParamPort()
+	}
+	return p.InParamPorts[portName]
+}
+
+func (p *ParamPrinter) Name() string {
+	return p.ProcName
+}
+
+func (p *ParamPrinter) Run() {
+	defer p.OutBestParamsFile.Close()
+
+	oip := sp.NewInformationPacket(p.BestParamsFileName)
+	if !oip.Exists() && !oip.TempFileExists() {
+		rows := []map[string]string{}
+		for len(p.InParamPorts) > 0 {
+			row := map[string]string{}
+			for pname, pport := range p.InParamPorts {
+				param, ok := <-pport.Chan
+				if !ok {
+					delete(p.InParamPorts, pname)
+					continue
+				}
+				row[pname] = param
+			}
+			rows = append(rows, row)
+		}
+
+		var outContent string
+
+		for _, row := range rows {
+			for name, val := range row {
+				outContent += fmt.Sprintf("%s=%s\n", name, val)
+			}
+		}
+		oip.WriteTempFile([]byte(outContent))
+		oip.Atomize()
+	} else {
+		sp.Info.Printf("Target file (or temp file) exists for: %s, so skipping\n", oip.GetPath())
+	}
+
+	p.OutBestParamsFile.Send(oip)
 }
