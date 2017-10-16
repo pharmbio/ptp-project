@@ -14,6 +14,7 @@ import (
 )
 
 var (
+	cpSignPath     = "../../bin/cpsign-0.6.2.jar"
 	bowesRiskGenes = []string{
 		// Not available in dataset: "CHRNA1", Not available in dataset:
 		// "KCNE1". Instead we use MinK1 as they both share the same alias
@@ -89,7 +90,7 @@ func main() {
 				gene_cost_gamma := fmt.Sprintf("%s_%s_%s", geneLC, cost, gamma) // A string to make process names unique
 
 				crossValidate := wf.NewProc("crossval_"+gene_cost_gamma,
-					`java -jar ../../bin/cpsign-0.6.2.jar crossvalidate \
+					`java -jar `+cpSignPath+` crossvalidate \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
 									--trainfile {i:target_data} \
