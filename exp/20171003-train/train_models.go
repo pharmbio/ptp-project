@@ -71,19 +71,19 @@ func main() {
 	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
-	summarize := NewSummarizeCostGammaPerf(wf, "summarize_cost_gamma_perf", "dat/cost_gamma_perf.tsv")
-
 	// --------------------------------
 	// Set up gene-specific workflow branches
 	// --------------------------------
 	for _, gene := range smallestFour {
 		geneLC := str.ToLower(gene)
-		procName := "extract_target_data_" + geneLC
 
+		procName := "extract_target_data_" + geneLC
 		extractTargetData := wf.NewProc(procName, fmt.Sprintf(`awk -F"\t" '$9 == "%s" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`, gene))
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLC, geneLC))
 		extractTargetData.In("raw_data").Connect(unPackDB.Out("unxzed"))
 		//extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun " // SLURM string
+
+		summarize := NewSummarizeCostGammaPerf(wf, "summarize_cost_gamma_perf_"+geneLC, "dat/cost_gamma_perf_"+geneLC+".tsv")
 
 		for _, cost := range costVals {
 			for _, gamma := range gammaVals {
@@ -93,7 +93,7 @@ func main() {
 					`java -jar `+cpSignPath+` crossvalidate \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
-									--trainfile {i:target_data} \
+									--trainfile {i:traindata} \
 									--impl liblinear \
 									--labels A, N \
 									--nr-models {p:nrmodels} \
@@ -106,9 +106,9 @@ func main() {
 					sp.CheckErr(err)
 					g, err := strconv.ParseFloat(t.Param("gamma"), 64)
 					sp.CheckErr(err)
-					return t.InPath("target_data") + fmt.Sprintf(".c%03d_g%.3f", c, g) + ".stats.txt"
+					return t.InPath("traindata") + fmt.Sprintf(".c%03d_g%.3f", c, g) + ".stats.txt"
 				})
-				crossValidate.In("target_data").Connect(extractTargetData.Out("target_data"))
+				crossValidate.In("traindata").Connect(extractTargetData.Out("target_data"))
 				crossValidate.ParamPort("nrmodels").ConnectStr("3")
 				crossValidate.ParamPort("cvfolds").ConnectStr("10")
 				crossValidate.ParamPort("confidence").ConnectStr("0.9")
@@ -120,31 +120,26 @@ func main() {
 				summarize.In.Connect(crossValidate.Out("stats"))
 			}
 		}
+		selectBest := NewBestEffCostGamma(wf, "select_best_cost_gamma_"+geneLC, '\t', false, 0)
+		selectBest.InCSVFile.Connect(summarize.OutCostGammaStats)
+
+		//cpSignPreComp := wf.NewProc("cpsign_precompute",
+		//	`java -jar `+cpSignPath+` precompute \
+		//							--license ../../bin/cpsign.lic \
+		//							--cptype 1 \
+		//							--trainfile {i:traindata} \
+		//							--labels A, N \
+		//							--model-out {o:model} \
+		//							--model-name {p:model_name}`)
+
+		paramPrinter := NewParamPrinter(wf, "param_printer_"+geneLC, "dat/best_cost_gamma_"+geneLC+".txt")
+		paramPrinter.GetParamPort("cost").Connect(selectBest.OutBestCost)
+		paramPrinter.GetParamPort("gamma").Connect(selectBest.OutBestGamma)
+		paramPrinter.GetParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
+
+		wf.ConnectLast(paramPrinter.OutBestParamsFile)
 	}
 
-	selectBest := NewBestEffCostGamma(wf, "select_best_cost_gamma", '\t', false, 0)
-	selectBest.InCSVFile.Connect(summarize.OutCostGammaStats)
-
-	cpSignPreComp := wf.NewProc("cpsign_precompute",
-		`java -jar `+cpSignPath+` precompute \
-									--license ../../bin/cpsign.lic \
-									--cptype 1 \
-									--trainfile {i:target_data} \
-									--modelfile {i:modelfile} \
-									--proper-trainfile {i:proper_trainfile} \
-									--calibration-trainfile {i:calib_trainfile} \
-									--response-name {p:respname} \
-									--labels A, N \
-									--model-out {o:model} \
-									--model-name {p:model_name} \
-									--model-categor {p:model_category}`)
-
-	paramPrinter := NewParamPrinter(wf, "param_printer", "dat/best_cost_gamma.txt")
-	paramPrinter.GetParamPort("cost").Connect(selectBest.OutBestCost)
-	paramPrinter.GetParamPort("gamma").Connect(selectBest.OutBestGamma)
-	paramPrinter.GetParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
-
-	wf.SetDriver(paramPrinter)
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
