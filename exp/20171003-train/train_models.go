@@ -10,12 +10,14 @@ import (
 	sp "github.com/scipipe/scipipe"
 	"io/ioutil"
 	"regexp"
+	"runtime"
 	"strconv"
 	str "strings"
 )
 
 var (
-	maxCores = flag.Int("maxcores", 4, "Max number of local cores to use")
+	maxTasks = flag.Int("maxtasks", 4, "Max number of local cores to use")
+	threads  = flag.Int("threads", 1, "Number of threads that Go is allowed to start")
 	geneSet  = flag.String("geneset", "smallest1", "Gene set to use (one of smallest1, smallest3, smallest4, bowes44)")
 	runSlurm = flag.Bool("slurm", false, "Start computationally heavy jobs via SLURM")
 
@@ -66,11 +68,13 @@ func main() {
 	sp.InitLogAudit()
 	flag.Parse()
 
-	sp.Info.Printf("Using max %d cores\n", *maxCores)
+	sp.Info.Printf("Using max %d OS threads to schedule max %d tasks\n", *threads, *maxTasks)
 	sp.Info.Printf("Starting workflow for %s geneset\n", *geneSet)
 
+	runtime.GOMAXPROCS(*threads)
+
 	//sp.InitLogDebug()
-	wf := sp.NewWorkflow("train_models", *maxCores)
+	wf := sp.NewWorkflow("train_models", *maxTasks)
 
 	// --------------------------------
 	// Initialize processes and add to runner
@@ -98,7 +102,7 @@ func main() {
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLC, geneLC))
 		extractTargetData.In("raw_data").Connect(unPackDB.Out("unxzed"))
 		if *runSlurm {
-			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC + " srun " // SLURM string
+			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC // SLURM string
 		}
 
 		// --------------------------------------------------------------------------------
@@ -136,7 +140,7 @@ func main() {
 				evalCostGamma.ParamPort("cost").ConnectStr(cost)
 				evalCostGamma.ParamPort("gamma").ConnectStr(gamma)
 				if *runSlurm {
-					evalCostGamma.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1-00:00:00 -J evalcg_" + gene_cost_gamma + " srun " // SLURM string
+					evalCostGamma.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + gene_cost_gamma // SLURM string
 				}
 
 				summarize.In.Connect(evalCostGamma.Out("stats"))
@@ -159,7 +163,7 @@ func main() {
 		cpSignPrecomp.In("traindata").Connect(extractTargetData.Out("target_data"))
 		cpSignPrecomp.SetPathExtend("traindata", "model", ".precomp.mdl")
 		if *runSlurm {
-			cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1-00:00:00 -J precmp_" + geneLC + " srun " // SLURM string
+			cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLC // SLURM string
 		}
 
 		// --------------------------------------------------------------------------------
@@ -191,7 +195,7 @@ func main() {
 				t.Param("acpfolds"))
 		})
 		if *runSlurm {
-			cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -t 1-00:00:00 -J train_" + geneLC + " srun " // SLURM string
+			cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + geneLC // SLURM string
 		}
 
 		//paramPrinter := NewParamPrinter(wf, "param_printer_"+geneLC, "dat/best_cost_gamma_"+geneLC+".txt")
