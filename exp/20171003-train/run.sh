@@ -5,6 +5,6 @@
 #SBATCH -J Run_PTPWF_on_one_node
 #SBATCH -t 4-00:00:00
 #SBATCH --mail-user samuel.lampa@farmbio.uu.se
-#SBATCH --mail-type FAIL,END
+#SBATCH --mail-type BEGIN,FAIL,END
 module load java/sun_jdk1.8.0_92
 go run train_models.go -threads 2 -maxtasks 10 -geneset bowes44
