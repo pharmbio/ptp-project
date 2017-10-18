@@ -169,7 +169,7 @@ func main() {
 			summarize.In.Connect(evalCostGamma.Out("stats"))
 			//}
 		}
-		selectBest := NewBestEffCostGamma(wf, "select_best_cost_gamma_"+geneLC, '\t', false, 0, includeGamma)
+		selectBest := NewBestEffCostGamma(wf, "select_best_cost_gamma_"+geneLC, '\t', false, 1, includeGamma)
 		selectBest.InCSVFile.Connect(summarize.OutStats)
 
 		// --------------------------------------------------------------------------------
@@ -353,11 +353,11 @@ type BestEffCostGamma struct {
 	OutBestEfficiency *sp.ParamPort
 	Separator         rune
 	Header            bool
-	ColumnIndex       int // Which column to check for max value
+	EffValColIdx      int // Which column to check for the efficiency value
 	IncludeGamma      bool
 }
 
-func NewBestEffCostGamma(wf *sp.Workflow, procName string, separator rune, header bool, columnIndex int, includeGamma bool) *BestEffCostGamma {
+func NewBestEffCostGamma(wf *sp.Workflow, procName string, separator rune, header bool, effValColIdx int, includeGamma bool) *BestEffCostGamma {
 	sbcr := &BestEffCostGamma{
 		ProcName:          procName,
 		InCSVFile:         sp.NewFilePort(),
@@ -366,7 +366,7 @@ func NewBestEffCostGamma(wf *sp.Workflow, procName string, separator rune, heade
 		OutBestEfficiency: sp.NewParamPort(),
 		Separator:         separator,
 		Header:            header,
-		ColumnIndex:       columnIndex,
+		EffValColIdx:      effValColIdx,
 		IncludeGamma:      includeGamma,
 	}
 	wf.AddProc(sbcr)
@@ -406,7 +406,7 @@ func (p *BestEffCostGamma) Run() {
 			if i == 1 && !p.Header {
 				continue
 			}
-			eff, err := strconv.ParseFloat(rec[p.ColumnIndex], 64)
+			eff, err := strconv.ParseFloat(rec[p.EffValColIdEffValColIdx], 64)
 			sp.CheckErr(err)
 			if eff < minEff {
 				minEff = eff
