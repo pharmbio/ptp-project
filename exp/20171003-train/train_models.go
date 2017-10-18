@@ -406,7 +406,7 @@ func (p *BestEffCostGamma) Run() {
 			if i == 1 && !p.Header {
 				continue
 			}
-			eff, err := strconv.ParseFloat(rec[p.EffValColIdEffValColIdx], 64)
+			eff, err := strconv.ParseFloat(rec[p.EffValColIdx], 64)
 			sp.CheckErr(err)
 			if eff < minEff {
 				minEff = eff
