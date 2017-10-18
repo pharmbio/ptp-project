@@ -7,6 +7,13 @@
 - Do we need to do any type of filtering of the data ... such as only selecting
   compounds with IC50/EC50 or ... values? ... or those with value over
   10microMolar? (Like in the TargetNet paper)
+  - Already filtered in ExcapeDB
 
 - Do we need to take any measures to guarantee that we have balance between
   positive and negative examples in our data?
+  - No, we do mondrian CP already
+
+- How many to run with libSVM? (size < 10000 or 5000?)
+
+- How many more genes?
+  - Do the 44 and evaluate ... possibly 600 later
