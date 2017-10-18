@@ -338,9 +338,9 @@ func (p *BestEffCostGamma) Run() {
 		csvReader := csv.NewReader(bytesReader)
 		csvReader.Comma = p.Separator
 
-		var max float64
-		var maxCost int64
-		var maxGamma float64
+		var minEff float64 // N.B: The best efficiency in Conformal Prediction is the *minimal* one
+		var bestCost int64
+		var bestGamma float64
 
 		i := 0
 		for {
@@ -354,20 +354,20 @@ func (p *BestEffCostGamma) Run() {
 			}
 			eff, err := strconv.ParseFloat(rec[p.ColumnIndex], 64)
 			sp.CheckErr(err)
-			if eff > max {
-				max = eff
+			if eff < minEff {
+				minEff = eff
 
-				maxCost, err = strconv.ParseInt(rec[2], 10, 0)
+				bestCost, err = strconv.ParseInt(rec[2], 10, 0)
 				sp.CheckErr(err)
 
-				maxGamma, err = strconv.ParseFloat(rec[3], 64)
+				bestGamma, err = strconv.ParseFloat(rec[3], 64)
 				sp.CheckErr(err)
 			}
 		}
-		sp.Debug.Printf("Final max efficiency: %f (For: Cost:%03d, Gamma:%.3f)\n", max, maxCost, maxGamma)
-		p.OutBestCost.Send(fmt.Sprintf("%d", maxCost))
-		p.OutBestGamma.Send(fmt.Sprintf("%.3f", maxGamma))
-		p.OutBestEfficiency.Send(fmt.Sprintf("%.3f", max))
+		sp.Debug.Printf("Final optimal (minmal) efficiency: %f (For: Cost:%03d, Gamma:%.3f)\n", minEff, bestCost, bestGamma)
+		p.OutBestCost.Send(fmt.Sprintf("%d", bestCost))
+		p.OutBestGamma.Send(fmt.Sprintf("%.3f", bestGamma))
+		p.OutBestEfficiency.Send(fmt.Sprintf("%.3f", minEff))
 	}
 }
 
