@@ -65,7 +65,7 @@ var (
 )
 
 func main() {
-	sp.InitLogAudit()
+	sp.InitLogDebug()
 	flag.Parse()
 
 	sp.Info.Printf("Using max %d OS threads to schedule max %d tasks\n", *threads, *maxTasks)
@@ -121,7 +121,7 @@ func main() {
 									--trainfile {i:traindata} \
 									--impl liblinear \
 									--labels A, N \
-									--nr-models {p:nrmdls} \
+									--nr-models {p:nrmdl} \
 									--cost {p:cost} \
 									--cv-folds {p:cvfolds} \
 									--confidence {p:confidence} > {o:stats} # {p:gene}`
@@ -139,7 +139,7 @@ func main() {
 			//					--trainfile {i:traindata} \
 			//					--impl libsvm \
 			//					--labels A, N \
-			//					--nr-models {p:nrmdls} \
+			//					--nr-models {p:nrmdl} \
 			//					--cost {p:cost} \
 			//					--gamma {p:gamma} \
 			//					--cv-folds {p:cvfolds} \
@@ -156,7 +156,7 @@ func main() {
 			evalCostGamma.SetPathCustom("stats", pathFuncLibLin)
 			// Connect
 			evalCostGamma.In("traindata").Connect(extractTargetData.Out("target_data"))
-			evalCostGamma.ParamPort("nrmdls").ConnectStr("10")
+			evalCostGamma.ParamPort("nrmdl").ConnectStr("10")
 			evalCostGamma.ParamPort("cvfolds").ConnectStr("10")
 			evalCostGamma.ParamPort("confidence").ConnectStr("0.9")
 			evalCostGamma.ParamPort("gene").ConnectStr(gene)
@@ -181,10 +181,10 @@ func main() {
 									--cptype 1 \
 									--trainfile {i:traindata} \
 									--labels A, N \
-									--model-out {o:model} \
+									--model-out {o:precomp} \
 									--model-name "`+gene+` target profile"`)
 		cpSignPrecomp.In("traindata").Connect(extractTargetData.Out("target_data"))
-		cpSignPrecomp.SetPathExtend("traindata", "model", ".precomp.mdl")
+		cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
 		if *runSlurm {
 			cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLC // SLURM string
 		}
@@ -200,17 +200,17 @@ func main() {
 		//							--modelfile {i:model} \
 		//							--labels A, N \
 		//							--impl libsvm \
-		//							--nr-models {p:nrmdls} \
+		//							--nr-models {p:nrmdl} \
 		//							--cost {p:cost} \
 		//							--gamma {p:gamma} \
 		//							--model-out {o:model} \
 		//							--model-name "{p:gene} target profile" # Efficiency: {p:efficiency}`)
 		//cpSignTrainPathFunc := func(t *sp.SciTask) string {
-		//	return fmt.Sprintf("dat/final_models/%s_c%s_g%s_nrmdls%s.mdl",
+		//	return fmt.Sprintf("dat/final_models/%s_c%s_g%s_nrmdl%s.mdl",
 		//		str.ToLower(t.Param("gene")),
 		//		t.Param("cost"),
 		//		t.Param("gamma"),
-		//		t.Param("nrmdls"))
+		//		t.Param("nrmdl"))
 		//}
 		cpSignTrain := wf.NewProc("cpsign_train_"+geneLC,
 			`java -jar `+cpSignPath+` train \
@@ -219,19 +219,20 @@ func main() {
 									--modelfile {i:model} \
 									--labels A, N \
 									--impl liblinear \
-									--nr-models {p:nrmdls} \
+									--nr-models {p:nrmdl} \
 									--cost {p:cost} \
 									--model-out {o:model} \
 									--model-name "{p:gene} target profile" # Efficiency: {p:efficiency}`)
 		cpSignTrainPathFunc := func(t *sp.SciTask) string {
-			return fmt.Sprintf("dat/final_models/%s_c%s_nrmdls%s.mdl",
+			return fmt.Sprintf("dat/final_models/%s_%s_c%s_nrmdl%s.mdl",
 				str.ToLower(t.Param("gene")),
+				"liblin",
 				t.Param("cost"),
-				t.Param("nrmdls"))
+				t.Param("nrmdl"))
 		}
 
-		cpSignTrain.In("model").Connect(cpSignPrecomp.Out("model"))
-		cpSignTrain.ParamPort("nrmdls").ConnectStr("10")
+		cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
+		cpSignTrain.ParamPort("nrmdl").ConnectStr("10")
 		cpSignTrain.ParamPort("cost").Connect(selectBest.OutBestCost)
 		//cpSignTrain.ParamPort("gamma").Connect(selectBest.OutBestGamma)
 		cpSignTrain.ParamPort("gene").ConnectStr(gene)
@@ -392,7 +393,7 @@ func (p *BestEffCostGamma) Run() {
 		csvReader := csv.NewReader(bytesReader)
 		csvReader.Comma = p.Separator
 
-		var minEff float64 // N.B: The best efficiency in Conformal Prediction is the *minimal* one
+		minEff := 1000000.000 // N.B: The best efficiency in Conformal Prediction is the *minimal* one. Initializing here with an unreasonably large number in order to spot when something is wrong.
 		var bestCost int64
 		var bestGamma float64 // Only used for libSVM
 
@@ -411,7 +412,9 @@ func (p *BestEffCostGamma) Run() {
 			if eff < minEff {
 				minEff = eff
 
+				sp.Debug.Printf("Proc:%s Raw cost value: %s\n", p.Name(), rec[3])
 				bestCost, err = strconv.ParseInt(rec[3], 10, 0)
+				sp.Debug.Printf("Proc:%s Parsed cost value: %d\n", p.Name(), rec[3])
 				sp.CheckErr(err)
 
 				if p.IncludeGamma {
