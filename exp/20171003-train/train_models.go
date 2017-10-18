@@ -411,11 +411,11 @@ func (p *BestEffCostGamma) Run() {
 			if eff < minEff {
 				minEff = eff
 
-				bestCost, err = strconv.ParseInt(rec[2], 10, 0)
+				bestCost, err = strconv.ParseInt(rec[3], 10, 0)
 				sp.CheckErr(err)
 
 				if p.IncludeGamma {
-					bestGamma, err = strconv.ParseFloat(rec[3], 64)
+					bestGamma, err = strconv.ParseFloat(rec[4], 64)
 					sp.CheckErr(err)
 				}
 			}
