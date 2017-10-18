@@ -192,6 +192,26 @@ func main() {
 		// --------------------------------------------------------------------------------
 		// Train step
 		// --------------------------------------------------------------------------------
+		// For LibSVM
+		//cpSignTrain:= wf.NewProc("cpsign_train_"+geneLC,
+		//	`java -jar `+cpSignPath+` train \
+		//							--license ../../bin/cpsign.lic \
+		//							--cptype 1 \
+		//							--modelfile {i:model} \
+		//							--labels A, N \
+		//							--impl libsvm \
+		//							--nr-models {p:nrmdls} \
+		//							--cost {p:cost} \
+		//							--gamma {p:gamma} \
+		//							--model-out {o:model} \
+		//							--model-name "{p:gene} target profile" # Efficiency: {p:efficiency}`)
+		//cpSignTrainPathFunc := func(t *sp.SciTask) string {
+		//	return fmt.Sprintf("dat/final_models/%s_c%s_g%s_nrmdls%s.mdl",
+		//		str.ToLower(t.Param("gene")),
+		//		t.Param("cost"),
+		//		t.Param("gamma"),
+		//		t.Param("nrmdls"))
+		//}
 		cpSignTrain := wf.NewProc("cpsign_train_"+geneLC,
 			`java -jar `+cpSignPath+` train \
 									--license ../../bin/cpsign.lic \
@@ -199,24 +219,24 @@ func main() {
 									--modelfile {i:model} \
 									--labels A, N \
 									--impl liblinear \
-									--nr-models {p:acpfolds} \
+									--nr-models {p:nrmdls} \
 									--cost {p:cost} \
-									--gamma {p:gamma} \
 									--model-out {o:model} \
 									--model-name "{p:gene} target profile" # Efficiency: {p:efficiency}`)
+		cpSignTrainPathFunc := func(t *sp.SciTask) string {
+			return fmt.Sprintf("dat/final_models/%s_c%s_nrmdls%s.mdl",
+				str.ToLower(t.Param("gene")),
+				t.Param("cost"),
+				t.Param("nrmdls"))
+		}
+
 		cpSignTrain.In("model").Connect(cpSignPrecomp.Out("model"))
-		cpSignTrain.ParamPort("acpfolds").ConnectStr("10")
+		cpSignTrain.ParamPort("nrmdls").ConnectStr("10")
 		cpSignTrain.ParamPort("cost").Connect(selectBest.OutBestCost)
 		//cpSignTrain.ParamPort("gamma").Connect(selectBest.OutBestGamma)
 		cpSignTrain.ParamPort("gene").ConnectStr(gene)
 		cpSignTrain.ParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
-		cpSignTrain.SetPathCustom("model", func(t *sp.SciTask) string {
-			return fmt.Sprintf("dat/final_models/%s_c%s_g%s_acpfolds%s.mdl",
-				str.ToLower(t.Param("gene")),
-				t.Param("cost"),
-				t.Param("gamma"),
-				t.Param("acpfolds"))
-		})
+		cpSignTrain.SetPathCustom("model", cpSignTrainPathFunc)
 		if *runSlurm {
 			cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + geneLC // SLURM string
 		}
