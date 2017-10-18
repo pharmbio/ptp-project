@@ -65,7 +65,7 @@ var (
 )
 
 func main() {
-	sp.InitLogDebug()
+	sp.InitLogAudit()
 	flag.Parse()
 
 	sp.Info.Printf("Using max %d OS threads to schedule max %d tasks\n", *threads, *maxTasks)
