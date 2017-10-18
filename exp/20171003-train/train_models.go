@@ -110,41 +110,63 @@ func main() {
 		// --------------------------------------------------------------------------------
 		summarize := NewSummarizeCostGammaPerf(wf, "summarize_cost_gamma_perf_"+geneLC, "dat/"+geneLC+"/"+geneLC+"_cost_gamma_perf_stats.tsv")
 		for _, cost := range costVals {
-			for _, gamma := range gammaVals {
-				gene_cost_gamma := fmt.Sprintf("%s_%s_%s", geneLC, cost, gamma) // A string to make process names unique
+			//for _, gamma := range gammaVals {
 
-				evalCostGamma := wf.NewProc("crossval_"+gene_cost_gamma,
-					`java -jar `+cpSignPath+` crossvalidate \
+			// If Liblinear
+			unique_string := fmt.Sprintf("liblin_%s_%s", geneLC, cost) // A string to make process names unique
+			crossvalCmdLiblin := `java -jar ` + cpSignPath + ` crossvalidate \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
 									--trainfile {i:traindata} \
 									--impl liblinear \
 									--labels A, N \
 									--nr-models {p:nrmodels} \
-									--cost {p:cost} \
 									--gamma {p:gamma} \
 									--cv-folds {p:cvfolds} \
-									--confidence {p:confidence} > {o:stats} # {p:gene}`)
-				evalCostGamma.SetPathCustom("stats", func(t *sp.SciTask) string {
-					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
-					sp.CheckErr(err)
-					g, err := strconv.ParseFloat(t.Param("gamma"), 64)
-					sp.CheckErr(err)
-					return t.InPath("traindata") + fmt.Sprintf(".c%03d_g%.3f", c, g) + ".stats.txt"
-				})
-				evalCostGamma.In("traindata").Connect(extractTargetData.Out("target_data"))
-				evalCostGamma.ParamPort("nrmodels").ConnectStr("3")
-				evalCostGamma.ParamPort("cvfolds").ConnectStr("10")
-				evalCostGamma.ParamPort("confidence").ConnectStr("0.9")
-				evalCostGamma.ParamPort("gene").ConnectStr(gene)
-				evalCostGamma.ParamPort("cost").ConnectStr(cost)
-				evalCostGamma.ParamPort("gamma").ConnectStr(gamma)
-				if *runSlurm {
-					evalCostGamma.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + gene_cost_gamma // SLURM string
-				}
-
-				summarize.In.Connect(evalCostGamma.Out("stats"))
+									--confidence {p:confidence} > {o:stats} # {p:gene}`
+			pathFuncLibLin := func(t *sp.SciTask) string {
+				c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
+				sp.CheckErr(err)
+				return t.InPath("traindata") + fmt.Sprintf(".liblin_c%03d", c) + ".stats.txt"
 			}
+
+			// If LibSVM
+			//unique_string := fmt.Sprintf("libsvm_%s_%s_%s", geneLC, cost, gamma) // A string to make process names unique
+			//crossvalCmdLibSVM := `java -jar ` + cpSignPath + ` crossvalidate \
+			//					--license ../../bin/cpsign.lic \
+			//					--cptype 1 \
+			//					--trainfile {i:traindata} \
+			//					--impl libsvm \
+			//					--labels A, N \
+			//					--nr-models {p:nrmodels} \
+			//					--cost {p:cost} \
+			//					--gamma {p:gamma} \
+			//					--cv-folds {p:cvfolds} \
+			//					--confidence {p:confidence} > {o:stats} # {p:gene}`
+			//pathFuncLibSVM := func(t *sp.SciTask) string {
+			//	c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
+			//	sp.CheckErr(err)
+			//	g, err := strconv.ParseFloat(t.Param("gamma"), 64)
+			//	sp.CheckErr(err)
+			//	return t.InPath("traindata") + fmt.Sprintf(".libsvm_c%03d_g%.3f", c, g) + ".stats.txt"
+			//}
+
+			evalCostGamma := wf.NewProc("crossval_"+unique_string, crossvalCmdLiblin)
+			evalCostGamma.SetPathCustom("stats", pathFuncLibLin)
+			// Connect
+			evalCostGamma.In("traindata").Connect(extractTargetData.Out("target_data"))
+			evalCostGamma.ParamPort("nrmodels").ConnectStr("3")
+			evalCostGamma.ParamPort("cvfolds").ConnectStr("10")
+			evalCostGamma.ParamPort("confidence").ConnectStr("0.9")
+			evalCostGamma.ParamPort("gene").ConnectStr(gene)
+			evalCostGamma.ParamPort("cost").ConnectStr(cost)
+			//evalCostGamma.ParamPort("gamma").ConnectStr(gamma) // Only used with liblinear
+			if *runSlurm {
+				evalCostGamma.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + unique_string // SLURM string
+			}
+
+			summarize.In.Connect(evalCostGamma.Out("stats"))
+			//}
 		}
 		selectBest := NewBestEffCostGamma(wf, "select_best_cost_gamma_"+geneLC, '\t', false, 0)
 		selectBest.InCSVFile.Connect(summarize.OutCostGammaStats)
