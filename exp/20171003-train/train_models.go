@@ -20,6 +20,7 @@ var (
 	threads  = flag.Int("threads", 1, "Number of threads that Go is allowed to start")
 	geneSet  = flag.String("geneset", "smallest1", "Gene set to use (one of smallest1, smallest3, smallest4, bowes44)")
 	runSlurm = flag.Bool("slurm", false, "Start computationally heavy jobs via SLURM")
+	debug    = flag.Bool("debug", false, "Increase logging level to include DEBUG messages")
 
 	cpSignPath = "../../bin/cpsign-0.6.2.jar"
 	geneSets   = map[string][]string{
@@ -65,8 +66,12 @@ var (
 )
 
 func main() {
-	sp.InitLogAudit()
 	flag.Parse()
+	if *debug {
+		sp.InitLogDebug()
+	} else {
+		sp.InitLogAudit()
+	}
 
 	sp.Info.Printf("Using max %d OS threads to schedule max %d tasks\n", *threads, *maxTasks)
 	sp.Info.Printf("Starting workflow for %s geneset\n", *geneSet)
