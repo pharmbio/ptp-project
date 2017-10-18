@@ -121,7 +121,7 @@ func main() {
 									--trainfile {i:traindata} \
 									--impl liblinear \
 									--labels A, N \
-									--nr-models {p:nrmodels} \
+									--nr-models {p:nrmdls} \
 									--cost {p:cost} \
 									--cv-folds {p:cvfolds} \
 									--confidence {p:confidence} > {o:stats} # {p:gene}`
@@ -139,7 +139,7 @@ func main() {
 			//					--trainfile {i:traindata} \
 			//					--impl libsvm \
 			//					--labels A, N \
-			//					--nr-models {p:nrmodels} \
+			//					--nr-models {p:nrmdls} \
 			//					--cost {p:cost} \
 			//					--gamma {p:gamma} \
 			//					--cv-folds {p:cvfolds} \
@@ -156,7 +156,7 @@ func main() {
 			evalCostGamma.SetPathCustom("stats", pathFuncLibLin)
 			// Connect
 			evalCostGamma.In("traindata").Connect(extractTargetData.Out("target_data"))
-			evalCostGamma.ParamPort("nrmodels").ConnectStr("3")
+			evalCostGamma.ParamPort("nrmdls").ConnectStr("10")
 			evalCostGamma.ParamPort("cvfolds").ConnectStr("10")
 			evalCostGamma.ParamPort("confidence").ConnectStr("0.9")
 			evalCostGamma.ParamPort("gene").ConnectStr(gene)
@@ -420,9 +420,9 @@ func (p *BestEffCostGamma) Run() {
 				}
 			}
 		}
-		sp.Debug.Printf("Final optimal (minmal) efficiency: %f (For: Cost:%03d)\n", minEff, bestCost)
+		sp.Debug.Printf("Final optimal (minimal) efficiency: %f (For: Cost:%03d)\n", minEff, bestCost)
 		if p.IncludeGamma {
-			sp.Debug.Printf("Final optimal (minmal) efficiency: %f (For: Cost:%03d, Gamma:%.3f)\n", minEff, bestCost, bestGamma)
+			sp.Debug.Printf("Final optimal (minimal) efficiency: %f (For: Cost:%03d, Gamma:%.3f)\n", minEff, bestCost, bestGamma)
 		}
 		p.OutBestCost.Send(fmt.Sprintf("%d", bestCost))
 		if p.IncludeGamma {
