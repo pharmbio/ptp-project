@@ -181,7 +181,7 @@ func main() {
 			summarize.In.Connect(evalCostGamma.Out("stats"))
 			//}
 		}
-		selectBest := NewBestEffCostGamma(wf, "select_best_cost_gamma_"+geneLC, '\t', false, 1, includeGamma)
+		selectBest := NewBestEffCostGamma(wf, "select_best_cost_gamma_"+geneLC, '\t', false, 1, 2, includeGamma)
 		selectBest.InCSVFile.Connect(summarize.OutStats)
 
 		// --------------------------------------------------------------------------------
@@ -234,7 +234,7 @@ func main() {
 									--nr-models {p:nrmdl} \
 									--cost {p:cost} \
 									--model-out {o:model} \
-									--model-name "{p:gene} target profile" # Efficiency: {p:efficiency}`)
+									--model-name "{p:gene} target profile" # (Efficiency: {p:efficiency}, Validity: {p:validity})`)
 		cpSignTrainPathFunc := func(t *sp.SciTask) string {
 			return fmt.Sprintf("dat/final_models/%s_%s_c%s_nrmdl%s.mdl",
 				str.ToLower(t.Param("gene")),
@@ -249,6 +249,7 @@ func main() {
 		//cpSignTrain.ParamPort("gamma").Connect(selectBest.OutBestGamma)
 		cpSignTrain.ParamPort("gene").ConnectStr(gene)
 		cpSignTrain.ParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
+		cpSignTrain.ParamPort("validity").Connect(selectBest.OutBestValidity)
 		cpSignTrain.SetPathCustom("model", cpSignTrainPathFunc)
 		if *runSlurm {
 			cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + geneLC // SLURM string
@@ -359,28 +360,32 @@ func (p *SummarizeCostGammaPerf) IsConnected() bool {
 // --------------------------------------------------------------------------------
 
 type BestEffCostGamma struct {
-	ProcName          string
-	InCSVFile         *sp.FilePort
-	OutBestCost       *sp.ParamPort
-	OutBestGamma      *sp.ParamPort
-	OutBestEfficiency *sp.ParamPort
-	Separator         rune
-	Header            bool
-	EffValColIdx      int // Which column to check for the efficiency value
-	IncludeGamma      bool
+	ProcName            string
+	InCSVFile           *sp.FilePort
+	OutBestCost         *sp.ParamPort
+	OutBestGamma        *sp.ParamPort
+	OutBestEfficiency   *sp.ParamPort
+	OutBestValidity     *sp.ParamPort
+	Separator           rune
+	Header              bool
+	EfficiencyValColIdx int // Which column to check for the efficiency value
+	ValidityValColIdx   int // Which column to check for the validity value
+	IncludeGamma        bool
 }
 
-func NewBestEffCostGamma(wf *sp.Workflow, procName string, separator rune, header bool, effValColIdx int, includeGamma bool) *BestEffCostGamma {
+func NewBestEffCostGamma(wf *sp.Workflow, procName string, separator rune, header bool, effValColIdx int, valValColIdx int, includeGamma bool) *BestEffCostGamma {
 	sbcr := &BestEffCostGamma{
-		ProcName:          procName,
-		InCSVFile:         sp.NewFilePort(),
-		OutBestCost:       sp.NewParamPort(),
-		OutBestGamma:      sp.NewParamPort(),
-		OutBestEfficiency: sp.NewParamPort(),
-		Separator:         separator,
-		Header:            header,
-		EffValColIdx:      effValColIdx,
-		IncludeGamma:      includeGamma,
+		ProcName:            procName,
+		InCSVFile:           sp.NewFilePort(),
+		OutBestCost:         sp.NewParamPort(),
+		OutBestGamma:        sp.NewParamPort(),
+		OutBestEfficiency:   sp.NewParamPort(),
+		OutBestValidity:     sp.NewParamPort(),
+		Separator:           separator,
+		Header:              header,
+		EfficiencyValColIdx: effValColIdx,
+		ValidityValColIdx:   valValColIdx,
+		IncludeGamma:        includeGamma,
 	}
 	wf.AddProc(sbcr)
 	return sbcr
@@ -396,6 +401,8 @@ func (p *BestEffCostGamma) Run() {
 		defer p.OutBestGamma.Close()
 	}
 	defer p.OutBestEfficiency.Close()
+	defer p.OutBestValidity.Close()
+
 	go p.InCSVFile.RunMergeInputs()
 
 	for iip := range p.InCSVFile.InChan {
@@ -406,8 +413,10 @@ func (p *BestEffCostGamma) Run() {
 		csvReader.Comma = p.Separator
 
 		minEff := 1000000.000 // N.B: The best efficiency in Conformal Prediction is the *minimal* one. Initializing here with an unreasonably large number in order to spot when something is wrong.
+
 		var bestCost int64
 		var bestGamma float64 // Only used for libSVM
+		var bestValidity float64
 
 		i := 0
 		for {
@@ -419,20 +428,26 @@ func (p *BestEffCostGamma) Run() {
 			if i == 1 && !p.Header {
 				continue
 			}
-			eff, err := strconv.ParseFloat(rec[p.EffValColIdx], 64)
+
+			eff, err := strconv.ParseFloat(rec[p.EfficiencyValColIdx], 64)
 			sp.CheckErr(err)
+
 			if eff < minEff {
 				minEff = eff
 
 				sp.Debug.Printf("Proc:%s Raw cost value: %s\n", p.Name(), rec[3])
 				bestCost, err = strconv.ParseInt(rec[3], 10, 0)
-				sp.Debug.Printf("Proc:%s Parsed cost value: %d\n", p.Name(), rec[3])
+
+				sp.Debug.Printf("Proc:%s Parsed cost value: %d\n", p.Name(), bestCost)
 				sp.CheckErr(err)
 
 				if p.IncludeGamma {
 					bestGamma, err = strconv.ParseFloat(rec[4], 64)
 					sp.CheckErr(err)
 				}
+
+				bestValidity, err = strconv.ParseFloat(rec[p.ValidityValColIdx], 64)
+				sp.CheckErr(err)
 			}
 		}
 		sp.Debug.Printf("Final optimal (minimal) efficiency: %f (For: Cost:%03d)\n", minEff, bestCost)
@@ -444,14 +459,15 @@ func (p *BestEffCostGamma) Run() {
 			p.OutBestGamma.Send(fmt.Sprintf("%.3f", bestGamma))
 		}
 		p.OutBestEfficiency.Send(fmt.Sprintf("%.3f", minEff))
+		p.OutBestValidity.Send(fmt.Sprintf("%.3f", bestValidity))
 	}
 }
 
 func (p *BestEffCostGamma) IsConnected() bool {
 	if p.IncludeGamma {
-		return p.InCSVFile.IsConnected() && p.OutBestCost.IsConnected() && p.OutBestGamma.IsConnected() && p.OutBestEfficiency.IsConnected()
+		return p.InCSVFile.IsConnected() && p.OutBestCost.IsConnected() && p.OutBestGamma.IsConnected() && p.OutBestEfficiency.IsConnected() && p.OutBestValidity.IsConnected()
 	}
-	return p.InCSVFile.IsConnected() && p.OutBestCost.IsConnected() && p.OutBestEfficiency.IsConnected()
+	return p.InCSVFile.IsConnected() && p.OutBestCost.IsConnected() && p.OutBestEfficiency.IsConnected() && p.OutBestValidity.IsConnected()
 }
 
 // --------------------------------------------------------------------------------
