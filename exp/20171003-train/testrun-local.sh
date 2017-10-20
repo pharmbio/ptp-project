@@ -6,4 +6,4 @@
 #SBATCH -t 1:00:00
 #SBATCH --mail-user samuel.lampa@farmbio.uu.se
 #SBATCH --mail-type FAIL,END
-go run train_models.go -threads 4 -maxtasks 4 -geneset smallestgene
+go run train_models.go -threads 2 -maxtasks 4 -geneset smallest1 # -debug
