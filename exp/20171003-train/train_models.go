@@ -72,6 +72,13 @@ func main() {
 	} else {
 		sp.InitLogAudit()
 	}
+	if len(geneSets[*geneSet]) == 0 {
+		names := []string{}
+		for n, _ := range geneSets {
+			names = append(names, n)
+		}
+		sp.Error.Fatalf("Incorrect gene set %s specified! Only allowed values are: %s\n", *geneSet, str.Join(names, ", "))
+	}
 
 	sp.Info.Printf("Using max %d OS threads to schedule max %d tasks\n", *threads, *maxTasks)
 	sp.Info.Printf("Starting workflow for %s geneset\n", *geneSet)
