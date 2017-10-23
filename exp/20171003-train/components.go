@@ -12,10 +12,6 @@ import (
 	str "strings"
 
 	sp "github.com/scipipe/scipipe"
-	"gonum.org/v1/plot"
-	"gonum.org/v1/plot/plotter"
-	"gonum.org/v1/plot/plotutil"
-	"gonum.org/v1/plot/vg"
 )
 
 // ================================================================================
@@ -359,60 +355,4 @@ func (p *FinalModelSummarizer) Run() {
 	csvWriter.Flush()
 	oip.Atomize()
 	p.OutSummary.Send(oip)
-}
-
-// ================================================================================
-
-type PlotCreator struct {
-	ProcName     string
-	PlotFileName string
-	InStatsFile  *sp.FilePort
-	OutPlotImage *sp.FilePort
-}
-
-func NewPlotCreator(wf *sp.Workflow, name string, plotFileName string) *PlotCreator {
-	pc := &PlotCreator{
-		ProcName:     name,
-		PlotFileName: plotFileName,
-		InStatsFile:  sp.NewFilePort(),
-		OutPlotImage: sp.NewFilePort(),
-	}
-	wf.AddProc(pc)
-	return pc
-}
-
-func (p *PlotCreator) Name() string {
-	return p.ProcName
-}
-
-func (p *PlotCreator) Run() {
-	defer p.OutPlotImage.Close()
-	go p.InStatsFile.RunMergeInputs()
-
-	for iip := range p.InStatsFile.InChan {
-		fmt.Println("Received in plot creator: ", iip.GetPath())
-
-		oip := sp.NewInformationPacket(p.PlotFileName)
-
-		plt, err := plot.New()
-		sp.CheckErr(err)
-
-		pts := make(plotter.XYs, 10)
-		for i := range pts {
-			fmt.Println("Generating values for point ", i, "...")
-			pts[i].X = float64(i)
-			pts[i].Y = float64(i * 2)
-		}
-
-		err = plotutil.AddLinePoints(plt, "123", pts)
-		sp.CheckErr(err)
-		err = plt.Save(15*vg.Centimeter, 10*vg.Centimeter, oip.GetPath())
-		sp.CheckErr(err)
-
-		p.OutPlotImage.Send(oip)
-	}
-}
-
-func (p *PlotCreator) IsConnected() bool {
-	return p.InStatsFile.IsConnected() && p.OutPlotImage.IsConnected()
 }
