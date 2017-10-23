@@ -318,7 +318,7 @@ func (p *FinalModelSummarizer) Run() {
 	defer p.OutSummary.Close()
 	go p.InModel.RunMergeInputs()
 
-	rows := [][]string{[]string{"Gene", "Efficiency", "Validity", "Cost", "ExecTimeMS"}}
+	rows := [][]string{[]string{"Gene", "Efficiency", "Validity", "Cost", "ExecTimeMS", "FileSize"}}
 	for iip := range p.InModel.InChan {
 		ai := iip.GetAuditInfo()
 		row := []string{
@@ -327,6 +327,7 @@ func (p *FinalModelSummarizer) Run() {
 			ai.Params["validity"],
 			ai.Params["cost"],
 			fmt.Sprintf("%d", ai.ExecTimeMS),
+			fmt.Sprintf("%d", iip.GetSize()),
 		}
 		rows = append(rows, row)
 	}
