@@ -115,9 +115,10 @@ func main() {
 			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC // SLURM string
 		}
 
-		countTargetDataRows := wf.NewProc("cnt_targetdata_rows_"+geneLC, `wc -l {i:targetdata} | awk '{ print $1 }' > {o:count}`)
+		countTargetDataRows := wf.NewProc("cnt_targetdata_rows_"+geneLC, `wc -l {i:targetdata} | awk '{ print $1 }' > {o:count} # {p:gene}`)
 		countTargetDataRows.SetPathExtend("targetdata", "count", ".count")
 		countTargetDataRows.In("targetdata").Connect(extractTargetData.Out("target_data"))
+		countTargetDataRows.ParamPort("gene").ConnectStr(gene)
 
 		// --------------------------------------------------------------------------------
 		// Optimize cost/gamma-step

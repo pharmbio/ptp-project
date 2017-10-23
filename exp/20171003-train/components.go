@@ -328,8 +328,6 @@ func (p *FinalModelSummarizer) Run() {
 		ai := tdip.GetAuditInfo()
 		gene := ai.Params["gene"]
 		strs := str.Split(string(tdip.Read()), "\t")
-		fmt.Println("STRS: ", strs)
-		fmt.Println("GENE: ", gene)
 		sizeStr := str.TrimSuffix(strs[0], "\n")
 		size, err := strconv.ParseInt(sizeStr, 10, 64)
 		sp.CheckErr(err)
