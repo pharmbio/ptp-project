@@ -273,7 +273,7 @@ func main() {
 		finalModelsSummary.InTargetDataCount.Connect(countTargetDataRows.Out("count"))
 	}
 
-	sortSummaryOnDataSize := wf.NewProc("sort_summary", "sort -n -k 7 {i:summary} > {o:sorted}")
+	sortSummaryOnDataSize := wf.NewProc("sort_summary", "sort -n -k 9 {i:summary} > {o:sorted}")
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
 	sortSummaryOnDataSize.In("summary").Connect(finalModelsSummary.OutSummary)
 
