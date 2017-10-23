@@ -9,6 +9,8 @@ import (
 	"regexp"
 	"strconv"
 
+	str "strings"
+
 	sp "github.com/scipipe/scipipe"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -287,20 +289,22 @@ func (p *ParamPrinter) Run() {
 // ================================================================================
 
 type FinalModelSummarizer struct {
-	ProcName        string
-	SummaryFileName string
-	Separator       rune
-	InModel         *sp.FilePort
-	OutSummary      *sp.FilePort
+	ProcName          string
+	SummaryFileName   string
+	Separator         rune
+	InModel           *sp.FilePort
+	InTargetDataCount *sp.FilePort
+	OutSummary        *sp.FilePort
 }
 
 func NewFinalModelSummarizer(wf *sp.Workflow, name string, fileName string, separator rune) *FinalModelSummarizer {
 	fms := &FinalModelSummarizer{
-		ProcName:        name,
-		SummaryFileName: fileName,
-		InModel:         sp.NewFilePort(),
-		OutSummary:      sp.NewFilePort(),
-		Separator:       separator,
+		ProcName:          name,
+		SummaryFileName:   fileName,
+		InModel:           sp.NewFilePort(),
+		InTargetDataCount: sp.NewFilePort(),
+		OutSummary:        sp.NewFilePort(),
+		Separator:         separator,
 	}
 	wf.AddProc(fms)
 	return fms
@@ -317,8 +321,22 @@ func (p *FinalModelSummarizer) IsConnected() bool {
 func (p *FinalModelSummarizer) Run() {
 	defer p.OutSummary.Close()
 	go p.InModel.RunMergeInputs()
+	go p.InTargetDataCount.RunMergeInputs()
 
-	rows := [][]string{[]string{"Gene", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize"}}
+	dataSizes := map[string]int64{}
+	for tdip := range p.InTargetDataCount.InChan {
+		ai := tdip.GetAuditInfo()
+		gene := ai.Params["gene"]
+		strs := str.Split(string(tdip.Read()), "\t")
+		fmt.Println("STRS: ", strs)
+		fmt.Println("GENE: ", gene)
+		sizeStr := str.TrimSuffix(strs[0], "\n")
+		size, err := strconv.ParseInt(sizeStr, 10, 64)
+		sp.CheckErr(err)
+		dataSizes[gene] = size
+	}
+
+	rows := [][]string{[]string{"Gene", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "DataSetSize"}}
 	for iip := range p.InModel.InChan {
 		ai := iip.GetAuditInfo()
 		row := []string{
@@ -328,6 +346,7 @@ func (p *FinalModelSummarizer) Run() {
 			ai.Params["cost"],
 			fmt.Sprintf("%d", ai.ExecTimeMS),
 			fmt.Sprintf("%d", iip.GetSize()),
+			fmt.Sprintf("%d", dataSizes[ai.Params["gene"]]),
 		}
 		rows = append(rows, row)
 	}

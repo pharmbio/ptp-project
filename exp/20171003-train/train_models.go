@@ -107,12 +107,17 @@ func main() {
 		// Extract target data step
 		// --------------------------------------------------------------------------------
 		procName := "extract_target_data_" + geneLC
-		extractTargetData := wf.NewProc(procName, fmt.Sprintf(`awk -F"\t" '$9 == "%s" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`, gene))
+		extractTargetData := wf.NewProc(procName, `awk -F"\t" '$9 == "{p:gene}" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`)
+		extractTargetData.ParamPort("gene").ConnectStr(gene)
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLC, geneLC))
 		extractTargetData.In("raw_data").Connect(unPackDB.Out("unxzed"))
 		if *runSlurm {
 			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC // SLURM string
 		}
+
+		countTargetDataRows := wf.NewProc("cnt_targetdata_rows_"+geneLC, `wc -l {i:targetdata} | awk '{ print $1 }' > {o:count}`)
+		countTargetDataRows.SetPathExtend("targetdata", "count", ".count")
+		countTargetDataRows.In("targetdata").Connect(extractTargetData.Out("target_data"))
 
 		// --------------------------------------------------------------------------------
 		// Optimize cost/gamma-step
@@ -263,6 +268,7 @@ func main() {
 		//wf.ConnectLast(plotStats.OutPlotImage)
 
 		finalModelsSummary.InModel.Connect(cpSignTrain.Out("model"))
+		finalModelsSummary.InTargetDataCount.Connect(countTargetDataRows.Out("count"))
 	}
 	wf.ConnectLast(finalModelsSummary.OutSummary)
 
