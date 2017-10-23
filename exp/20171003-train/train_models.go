@@ -21,8 +21,9 @@ var (
 	cpSignPath = "../../bin/cpsign-0.6.2.jar"
 	geneSets   = map[string][]string{
 		"bowes44": []string{
-			// Not available in dataset: "CHRNA1", Not available in dataset:
-			// "KCNE1". Instead we use MinK1 as they both share the same alias
+			// Not available in dataset: "CHRNA1".
+			// Not available in dataset: "KCNE1"
+			// Instead we use MinK1 as they both share the same alias
 			// "MinK", and also confirmed by Wes to be the same.
 			"ADORA2A", "ADRA1A", "ADRA2A", "ADRB1", "ADRB2",
 			"CNR1", "CNR2", "CCKAR", "DRD1", "DRD2",
