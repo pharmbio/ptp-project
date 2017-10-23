@@ -24,14 +24,14 @@ if ( is.null(opt$format) || is.null(opt$infile) || is.null(opt$outfile) ) {
 
 # Set output format
 if (opt$format == 'png') {
-	png(opt$outfile, width=1920, height=800, units="px")
+	png(opt$outfile, width=640, height=1024, units="px")
 } else if (opt$format =='pdf') {
 	pdf(opt$outfile);
 }
 
 d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 
-par(mfrow=c(2,2));
+par(mfrow=c(4,1));
 
 barplot(d$DataSetSize,names=d$Gene, main = 'Dataset size (ligands)');
 barplot(d$Efficiency,names=d$Gene, ylim=c(0,1), main = 'Efficiency');
