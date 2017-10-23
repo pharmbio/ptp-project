@@ -5,14 +5,15 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
+	"io/ioutil"
+	"regexp"
+	"strconv"
+
 	sp "github.com/scipipe/scipipe"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
-	"io/ioutil"
-	"regexp"
-	"strconv"
 )
 
 // ================================================================================
@@ -281,6 +282,65 @@ func (p *ParamPrinter) Run() {
 	}
 
 	p.OutBestParamsFile.Send(oip)
+}
+
+// ================================================================================
+
+type FinalModelSummarizer struct {
+	ProcName        string
+	SummaryFileName string
+	Separator       rune
+	InModel         *sp.FilePort
+	OutSummary      *sp.FilePort
+}
+
+func NewFinalModelSummarizer(wf *sp.Workflow, name string, fileName string, separator rune) *FinalModelSummarizer {
+	fms := &FinalModelSummarizer{
+		ProcName:        name,
+		SummaryFileName: fileName,
+		InModel:         sp.NewFilePort(),
+		OutSummary:      sp.NewFilePort(),
+		Separator:       separator,
+	}
+	wf.AddProc(fms)
+	return fms
+}
+
+func (p *FinalModelSummarizer) Name() string {
+	return p.ProcName
+}
+
+func (p *FinalModelSummarizer) IsConnected() bool {
+	return p.InModel.IsConnected() && p.OutSummary.IsConnected()
+}
+
+func (p *FinalModelSummarizer) Run() {
+	defer p.OutSummary.Close()
+	go p.InModel.RunMergeInputs()
+
+	rows := [][]string{[]string{"Gene", "Efficiency", "Validity", "Cost", "ExecTimeMS"}}
+	for iip := range p.InModel.InChan {
+		ai := iip.GetAuditInfo()
+		row := []string{
+			ai.Params["gene"],
+			ai.Params["efficiency"],
+			ai.Params["validity"],
+			ai.Params["cost"],
+			fmt.Sprintf("%d", ai.ExecTimeMS),
+		}
+		rows = append(rows, row)
+	}
+
+	oip := sp.NewInformationPacket(p.SummaryFileName)
+	fh := oip.OpenWriteTemp()
+	csvWriter := csv.NewWriter(fh)
+	csvWriter.Comma = p.Separator
+	for _, row := range rows {
+		csvWriter.Write(row)
+	}
+	csvWriter.Flush()
+	oip.Atomize()
+	p.OutSummary.Send(oip)
 }
 
 // ================================================================================

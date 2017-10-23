@@ -4,10 +4,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	sp "github.com/scipipe/scipipe"
 	"runtime"
 	"strconv"
 	str "strings"
+
+	sp "github.com/scipipe/scipipe"
 )
 
 var (
@@ -95,6 +96,7 @@ func main() {
 	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
+	finalModelsSummary := NewFinalModelSummarizer(wf, "finalmodels_summary_creator", "dat/final_models/summary.tsv", '\t')
 	// --------------------------------
 	// Set up gene-specific workflow branches
 	// --------------------------------
@@ -256,10 +258,13 @@ func main() {
 		//paramPrinter.GetParamPort("gamma").Connect(selectBest.OutBestGamma)
 		//paramPrinter.GetParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
 
-		plotStats := NewPlotCreator(wf, "plot_stats_"+geneLC, "plot_"+geneLC+".png")
-		plotStats.InStatsFile.Connect(cpSignTrain.Out("model"))
-		wf.ConnectLast(plotStats.OutPlotImage)
+		//plotStats := NewPlotCreator(wf, "plot_stats_"+geneLC, "plot_"+geneLC+".png")
+		//plotStats.InStatsFile.Connect(cpSignTrain.Out("model"))
+		//wf.ConnectLast(plotStats.OutPlotImage)
+
+		finalModelsSummary.InModel.Connect(cpSignTrain.Out("model"))
 	}
+	wf.ConnectLast(finalModelsSummary.OutSummary)
 
 	// --------------------------------
 	// Run the pipeline!
