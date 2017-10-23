@@ -7,7 +7,7 @@ library(getopt)
 optspec = matrix(c(
   'infile', 'i', 1, 'character',
   'outfile', 'o', 1, 'character',
-  'format', 'f', 1, 'character',
+  'format', 'f', 1, 'character'
 ), byrow=TRUE, ncol=4);
 opt = getopt(optspec);
 
@@ -24,12 +24,20 @@ if ( is.null(opt$format) || is.null(opt$infile) || is.null(opt$outfile) ) {
 
 # Set output format
 if (opt$format == 'png') {
-	png(opt$outfile);
+	png(opt$outfile, width=1920, height = 800, units = "px")
 } else if (opt$format =='pdf') {
 	pdf(opt$outfile);
 }
 
-d <- read.csv(opt$infile, sep = '\t', header = TRUE)
-plot(d)
+d <- read.csv(opt$infile, sep = '\t', header = TRUE);
+
+par(mfrow=c(2,2));
+
+barplot(d$DataSetSize,names=d$Gene, main = 'Dataset size (ligands)');
+barplot(d$Efficiency,names=d$Gene, ylim=c(0,1), main = 'Efficiency');
+barplot(d$Validity,names=d$Gene, ylim=c(0,1), main = 'Validity');
+barplot(d$ModelFileSize,names=d$Gene, main = 'Model file size (bytes)');
 
 dev.off()
+
+quit(save = "no", status = 0, runLast = FALSE)

@@ -271,7 +271,16 @@ func main() {
 		finalModelsSummary.InModel.Connect(cpSignTrain.Out("model"))
 		finalModelsSummary.InTargetDataCount.Connect(countTargetDataRows.Out("count"))
 	}
-	wf.ConnectLast(finalModelsSummary.OutSummary)
+
+	sortSummaryOnDataSize := wf.NewProc("sort_summary", "sort -k 7 {i:summary} > {o:sorted}")
+	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
+	sortSummaryOnDataSize.In("summary").Connect(finalModelsSummary.OutSummary)
+
+	plotSummary := wf.NewProc("plot_summary", "Rscript bin/plot_summary.r -i {i:summary} -o {o:plot} -f png")
+	plotSummary.SetPathExtend("summary", "plot", ".plot.png")
+	plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
+
+	wf.ConnectLast(plotSummary.Out("plot"))
 
 	// --------------------------------
 	// Run the pipeline!
