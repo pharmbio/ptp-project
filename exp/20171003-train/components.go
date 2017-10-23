@@ -319,18 +319,22 @@ func (p *FinalModelSummarizer) Run() {
 	go p.InModel.RunMergeInputs()
 	go p.InTargetDataCount.RunMergeInputs()
 
-	dataSizes := map[string]int64{}
+	activeCounts := map[string]int64{}
+	nonActiveCounts := map[string]int64{}
 	for tdip := range p.InTargetDataCount.InChan {
 		ai := tdip.GetAuditInfo()
 		gene := ai.Params["gene"]
 		strs := str.Split(string(tdip.Read()), "\t")
-		sizeStr := str.TrimSuffix(strs[0], "\n")
-		size, err := strconv.ParseInt(sizeStr, 10, 64)
+		activeStr := str.TrimSuffix(strs[0], "\n")
+		activeCnt, err := strconv.ParseInt(activeStr, 10, 64)
+		nonActiveStr := str.TrimSuffix(strs[0], "\n")
+		nonActiveCnt, err := strconv.ParseInt(nonActiveStr, 10, 64)
 		sp.CheckErr(err)
-		dataSizes[gene] = size
+		activeCounts[gene] = activeCnt
+		nonActiveCounts[gene] = nonActiveCnt
 	}
 
-	rows := [][]string{[]string{"Gene", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "DataSetSize"}}
+	rows := [][]string{[]string{"Gene", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "Actuve", "Nonactive"}}
 	for iip := range p.InModel.InChan {
 		ai := iip.GetAuditInfo()
 		row := []string{
@@ -340,7 +344,8 @@ func (p *FinalModelSummarizer) Run() {
 			ai.Params["cost"],
 			fmt.Sprintf("%d", ai.ExecTimeMS),
 			fmt.Sprintf("%d", iip.GetSize()),
-			fmt.Sprintf("%d", dataSizes[ai.Params["gene"]]),
+			fmt.Sprintf("%d", activeCounts[ai.Params["gene"]]),
+			fmt.Sprintf("%d", nonActiveCounts[ai.Params["gene"]]),
 		}
 		rows = append(rows, row)
 	}
