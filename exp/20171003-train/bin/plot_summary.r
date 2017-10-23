@@ -33,7 +33,7 @@ d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 
 par(mfrow=c(4,1));
 
-counts <- table(d$Active, d$Nonactive)
+counts <- c(d$Active, d$Nonactive)
 
 barplot(counts,names=rownames(counts), col=c("dodgerblue3", "gold3"), main = 'Active / Nonactive compounds');
 barplot(d$Efficiency,names=d$Gene, ylim=c(0,1), main = 'Efficiency');
