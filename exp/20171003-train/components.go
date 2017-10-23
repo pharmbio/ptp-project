@@ -321,6 +321,7 @@ func (p *FinalModelSummarizer) Run() {
 
 	activeCounts := map[string]int64{}
 	nonActiveCounts := map[string]int64{}
+	totalCompounds := map[string]int64{}
 	for tdip := range p.InTargetDataCount.InChan {
 		ai := tdip.GetAuditInfo()
 		gene := ai.Params["gene"]
@@ -332,9 +333,10 @@ func (p *FinalModelSummarizer) Run() {
 		sp.CheckErr(err)
 		activeCounts[gene] = activeCnt
 		nonActiveCounts[gene] = nonActiveCnt
+		totalCompounds[gene] = activeCnt + nonActiveCnt
 	}
 
-	rows := [][]string{[]string{"Gene", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "Active", "Nonactive"}}
+	rows := [][]string{[]string{"Gene", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "Active", "Nonactive", "TotalCompounds"}}
 	for iip := range p.InModel.InChan {
 		ai := iip.GetAuditInfo()
 		row := []string{
@@ -346,6 +348,7 @@ func (p *FinalModelSummarizer) Run() {
 			fmt.Sprintf("%d", iip.GetSize()),
 			fmt.Sprintf("%d", activeCounts[ai.Params["gene"]]),
 			fmt.Sprintf("%d", nonActiveCounts[ai.Params["gene"]]),
+			fmt.Sprintf("%d", totalCompounds[ai.Params["gene"]]),
 		}
 		rows = append(rows, row)
 	}
