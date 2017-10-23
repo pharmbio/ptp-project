@@ -328,7 +328,7 @@ func (p *FinalModelSummarizer) Run() {
 		strs := str.Split(string(tdip.Read()), "\t")
 		activeStr := str.TrimSuffix(strs[0], "\n")
 		activeCnt, err := strconv.ParseInt(activeStr, 10, 64)
-		nonActiveStr := str.TrimSuffix(strs[0], "\n")
+		nonActiveStr := str.TrimSuffix(strs[1], "\n")
 		nonActiveCnt, err := strconv.ParseInt(nonActiveStr, 10, 64)
 		sp.CheckErr(err)
 		activeCounts[gene] = activeCnt
