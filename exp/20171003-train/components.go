@@ -334,7 +334,7 @@ func (p *FinalModelSummarizer) Run() {
 		nonActiveCounts[gene] = nonActiveCnt
 	}
 
-	rows := [][]string{[]string{"Gene", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "Actuve", "Nonactive"}}
+	rows := [][]string{[]string{"Gene", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "Active", "Nonactive"}}
 	for iip := range p.InModel.InChan {
 		ai := iip.GetAuditInfo()
 		row := []string{
