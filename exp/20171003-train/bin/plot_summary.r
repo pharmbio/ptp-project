@@ -24,7 +24,7 @@ if ( is.null(opt$format) || is.null(opt$infile) || is.null(opt$outfile) ) {
 
 # Set output format
 if (opt$format == 'png') {
-	png(opt$outfile, width=1920, height = 800, units = "px")
+	png(opt$outfile, width=1920, height=800, units="px")
 } else if (opt$format =='pdf') {
 	pdf(opt$outfile);
 }
