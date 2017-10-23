@@ -39,13 +39,13 @@ d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 par(mfrow=c(4,1));
 
 counts <- rbind(d$Active, d$Nonactive)
-barplot(counts, names=d$Gene, beside = FALSE, col=c("white", "black"), main = 'Active / Nonactive compounds', log="y", las=2, cex.axis=0.8);
+barplot(counts, names=d$Gene, beside = FALSE, col=c("white", "black"), main = 'Active / Nonactive compounds count (log-scaled)', log="y", las=2, cex.axis=0.8);
 
-barplot(d$Efficiency,names=d$Gene, ylim=c(0,1), main = 'Efficiency');
+barplot(d$Efficiency,names=d$Gene, ylim=c(0,1), main = 'Efficiency', las=2);
 
-barplot(d$Validity,names=d$Gene, ylim=c(0,1), main = 'Validity');
+barplot(d$Validity,names=d$Gene, ylim=c(0,1), main = 'Validity', las=2);
 
-barplot(d$ModelFileSize,names=d$Gene, main = 'Model file size (bytes)');
+barplot(d$ModelFileSize/(1024*1024),names=d$Gene, main = 'Model file size (MB)', las=2);
 
 dev.off()
 
