@@ -35,7 +35,7 @@ par(mfrow=c(4,1));
 
 counts <- table(d$Active, d$Nonactive)
 
-barplot(d$DataSetSize,names=counts, col=c("lightblue", "darkyellow"), main = 'Active / Nonactive compounds');
+barplot(counts,names=rownames(counts), col=c("lightblue", "darkyellow"), main = 'Active / Nonactive compounds');
 barplot(d$Efficiency,names=d$Gene, ylim=c(0,1), main = 'Efficiency');
 barplot(d$Validity,names=d$Gene, ylim=c(0,1), main = 'Validity');
 barplot(d$ModelFileSize,names=d$Gene, main = 'Model file size (bytes)');
