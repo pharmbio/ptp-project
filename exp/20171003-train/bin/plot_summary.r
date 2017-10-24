@@ -39,50 +39,55 @@ d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 # --------------------------------------------------------------------------------
 
 counts <- rbind(d$Active, d$Nonactive)
-  
+
 # Force to avoid scientific numerical format (sci-penalty)
 options(scipen=1, digits="0");
 
 # Set margins (in inches, thus mai), for the whole plot
-par(mai=c(1.2,1.2,1.2,1.2))
+par(mai=c(1.2,1.2,1.2,1.4))
+
 # Plot active/nonactive compounds
-bp <- barplot(counts, 
-        names=d$Gene, 
-        beside = FALSE, 
-        col=c("white", "#dddddd"), 
-        main = 'Active / Nonactive compounds count (log-scaled)', 
-        log="y", 
+bp <- barplot(counts,
+        names=d$Gene,
+        beside = FALSE,
+        col=c("white", "#dddddd"),
+        main = "Compounds counts, training time and efficiency per target",
+        log="y",
         las=2,
         cex.names=0.8,
-        ylim=c(1,1e8),
+        ylim=c(1,1e6),
         legend = FALSE,
-        xlab=NA)
-mtext("Compounds", side=2, line=3.6);
-legend("bottomright", 
+        xlab=NA,
+        ylab=NA,
+        axes=FALSE);
+axis(2, las=2, col.axis="black", at=c(1, 100, 1000, 10000, 1000000), labels=c("1", "100", "1 k", "10 k", "1 M"));
+mtext("Compounds",
+      side=2,
+      line=3.6);
+legend("bottomright",
        c("Active", "Nonactive"),
-       fill=c("white", "#dddddd", NA, NA),
-);
+       fill=c("white", "#dddddd"));
 
 par(new=TRUE);
-      
+
 # Plot training time (minutes)
 plot(bp,d$ExecTimeMS/(1000*60), type="b", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
-axis(2, las=2, col.axis="red", col.ticks="red");
-mtext("Training time (m)", side=2, line=5, col="red")
+axis(4, las=2, col="white", col.axis="red", col.ticks="red", at=c(1,30,60), labels=c("1 min", "30 min", "1 h"));
+mtext("Training time (min)", side=4, line=4.8, col="red")
 par(new=TRUE)
 
 # Plot 1-Efficiency
 plot(bp,1-d$Efficiency, type="b", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-axis(4, las=2, col="blue", col.axis="blue")
-mtext("1-Efficiency", side=4, line=4, col="blue")
+axis(4, las=2, col="blue", col.axis="blue", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
+mtext("Efficiency", side=4, line=3.6, col="blue")
 
 # --------------------------------------------------------------------------------
 # Alternative legend, with the line plots included:
 # --------------------------------------------------------------------------------
-#legend("bottomright", 
-#       c("Active", "Nonactive", "Training time (m)", "1-Efficiency"), 
-#       pch=c(NA, NA, 1, 1), 
-#       col=c(NA, NA, "red", "blue"), 
+#legend("bottomright",
+#       c("Active", "Nonactive", "Training time (min)", "1-Efficiency"),
+#       pch=c(NA, NA, 1, 1),
+#       col=c(NA, NA, "red", "blue"),
 #       fill=c("white", "#dddddd", NA, NA),
 #       border=c("black", "black", NA, NA),
 #   );
