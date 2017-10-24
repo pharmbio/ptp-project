@@ -60,7 +60,7 @@ bp <- barplot(counts,
         xlab=NA,
         ylab=NA,
         axes=FALSE);
-axis(2, las=2, col.axis="black", at=c(1, 100, 1000, 10000, 1000000), labels=c("1", "100", "1 k", "10 k", "1 M"));
+axis(2, las=2, col.axis="black", at=c(1, 100, 1000, 10000, 100000, 1000000), labels=c("1", "100", "1 k", "10 k", "100 k", "1 M"));
 mtext("Compounds",
       side=2,
       line=3.6);
