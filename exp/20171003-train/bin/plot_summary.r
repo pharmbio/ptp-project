@@ -73,13 +73,13 @@ par(new=TRUE);
 # Plot training time (minutes)
 plot(bp,d$ExecTimeMS/(1000*60), type="b", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
 axis(4, las=2, col="white", col.axis="red", col.ticks="red", at=c(1,30,60), labels=c("1 min", "30 min", "1 h"));
-mtext("Training time (min)", side=4, line=4.8, col="red")
+mtext("Training time (min)", side=4, line=3.6, col="red")
 par(new=TRUE)
 
 # Plot 1-Efficiency
 plot(bp,1-d$Efficiency, type="b", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 axis(4, las=2, col="blue", col.axis="blue", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
-mtext("Efficiency", side=4, line=3.6, col="blue")
+mtext("Efficiency", side=4, line=4.8, col="blue")
 
 # --------------------------------------------------------------------------------
 # Alternative legend, with the line plots included:
