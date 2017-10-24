@@ -97,7 +97,7 @@ func main() {
 	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
-	finalModelsSummary := NewFinalModelSummarizer(wf, "finalmodels_summary_creator", "dat/final_models/summary.tsv", '\t')
+	finalModelsSummary := NewFinalModelSummarizer(wf, "finalmodels_summary_creator", "res/final_models_summary.tsv", '\t')
 	// --------------------------------
 	// Set up gene-specific workflow branches
 	// --------------------------------
