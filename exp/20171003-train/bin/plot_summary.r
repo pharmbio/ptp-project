@@ -52,15 +52,14 @@ bp <- barplot(counts,
         beside = FALSE,
         col=c("white", "#dddddd"),
         main = "Compound counts, training time and efficiency per target",
-        log="y",
         las=2,
         cex.names=0.8,
-        ylim=c(1,1e6),
+        ylim=c(0,450000),
         legend = FALSE,
         xlab=NA,
         ylab=NA,
         axes=FALSE);
-axis(2, las=2, col.axis="black", at=c(1, 100, 1000, 10000, 100000, 1000000), labels=c("1", "100", "1 k", "10 k", "100 k", "1 M"));
+axis(2, las=2, col.axis="black", at=c(0, 100000, 200000, 300000, 400000), labels=c("0", "100 k", "200 k", "300 k", "400 k"));
 mtext("Compounds",
       side=2,
       line=3.6);
