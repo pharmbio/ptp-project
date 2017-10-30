@@ -25,14 +25,10 @@ var (
 			// Not available in dataset: "KCNE1"
 			// Instead we use MinK1 as they both share the same alias
 			// "MinK", and also confirmed by Wes to be the same.
-			"ADORA2A", "ADRA1A", "ADRA2A", "ADRB1", "ADRB2",
-			"CNR1", "CNR2", "CCKAR", "DRD1", "DRD2",
-			"EDNRA", "HRH1", "HRH2", "OPRD1", "OPRK1",
-			"OPRM1", "CHRM1", "CHRM2", "CHRM3", "HTR1A",
-			"HTR1B", "HTR2A", "HTR2B", "AVPR1A", "CHRNA4",
-			"CACNA1C", "GABRA1", "KCNH2", "KCNQ1", "MINK1",
-			"GRIN1", "HTR3A", "SCN5A", "ACHE", "PTGS1",
-			"PTGS2", "MAOA", "PDE3A", "PDE4D", "LCK",
+			"ADORA2A", "ADRA1A", "ADRA2A", "ADRB1", "ADRB2", "CNR1", "CNR2", "CCKAR", "DRD1", "DRD2",
+			"EDNRA", "HRH1", "HRH2", "OPRD1", "OPRK1", "OPRM1", "CHRM1", "CHRM2", "CHRM3", "HTR1A",
+			"HTR1B", "HTR2A", "HTR2B", "AVPR1A", "CHRNA4", "CACNA1C", "GABRA1", "KCNH2", "KCNQ1", "MINK1",
+			"GRIN1", "HTR3A", "SCN5A", "ACHE", "PTGS1", "PTGS2", "MAOA", "PDE3A", "PDE4D", "LCK",
 			"SLC6A3", "SLC6A2", "SLC6A4", "AR", "NR3C1",
 		},
 		"bowes44min100percls": []string{
@@ -45,15 +41,10 @@ var (
 			"GABRA1",
 		},
 		"smallest3": []string{
-			"GABRA1",
-			"CACNA1C",
-			"CHRNA4",
+			"GABRA1", "CACNA1C", "CHRNA4",
 		},
 		"smallest4": []string{
-			"GABRA1",
-			"CACNA1C",
-			"CHRNA4",
-			"PDE3A",
+			"GABRA1", "CACNA1C", "CHRNA4", "PDE3A",
 		},
 	}
 	costVals = []string{
