@@ -35,6 +35,12 @@ var (
 			"PTGS2", "MAOA", "PDE3A", "PDE4D", "LCK",
 			"SLC6A3", "SLC6A2", "SLC6A4", "AR", "NR3C1",
 		},
+		"bowes44min100percls": []string{
+			"PDE3A", "SCN5A", "CCKAR", "ADRB1", "PTGS1", "CHRM3", "CHRM2", "EDNRA", "MAOA", "LCK",
+			"PTGS2", "SLC6A2", "ACHE", "CNR2", "CNR1", "ADORA2A", "OPRD1", "NR3C1", "AR", "SLC6A4",
+			"OPRM1", "HTR1A", "SLC6A3", "OPRK1", "AVPR1A", "ADRB2", "DRD2", "KCNH2", "DRD1", "HTR2A",
+			"CHRM1",
+		},
 		"smallest1": []string{
 			"GABRA1",
 		},
