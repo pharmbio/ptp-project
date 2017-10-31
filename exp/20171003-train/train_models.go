@@ -18,7 +18,7 @@ var (
 	runSlurm = flag.Bool("slurm", false, "Start computationally heavy jobs via SLURM")
 	debug    = flag.Bool("debug", false, "Increase logging level to include DEBUG messages")
 
-	cpSignPath = "../../bin/cpsign-0.6.2.jar"
+	cpSignPath = "../../bin/cpsign-0.6.3.jar"
 	geneSets   = map[string][]string{
 		"bowes44": []string{
 			// Not available in dataset: "CHRNA1".
