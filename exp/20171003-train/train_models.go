@@ -9,6 +9,7 @@ import (
 	str "strings"
 
 	sp "github.com/scipipe/scipipe"
+	spc "github.com/scipipe/scipipe/components"
 )
 
 var (
@@ -38,7 +39,7 @@ var (
 			"CHRM1",
 		},
 		"smallest1": []string{
-			"GABRA1",
+			"PDE3A",
 		},
 		"smallest3": []string{
 			"GABRA1", "CACNA1C", "CHRNA4",
@@ -138,13 +139,13 @@ func main() {
 									--nr-models {p:nrmdl} \
 									--cost {p:cost} \
 									--cv-folds {p:cvfolds} \
-									--confidence {p:confidence} > {o:stats} # {p:gene}`
+									--output-format json \
+									--confidence {p:confidence} | grep -P "^{" > {o:stats} # {p:gene}`
 			pathFuncLibLin := func(t *sp.SciTask) string {
 				c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 				sp.CheckErr(err)
-				return t.InPath("traindata") + fmt.Sprintf(".liblin_c%03d", c) + ".stats.txt"
+				return t.InPath("traindata") + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
 			}
-
 			// If LibSVM
 			//unique_string := fmt.Sprintf("libsvm_%s_%s_%s", geneLC, cost, gamma) // A string to make process names unique
 			//crossvalCmdLibSVM := `java -jar ` + cpSignPath + ` crossvalidate \
@@ -165,10 +166,8 @@ func main() {
 			//	sp.CheckErr(err)
 			//	return t.InPath("traindata") + fmt.Sprintf(".libsvm_c%03d_g%.3f", c, g) + ".stats.txt"
 			//}
-
 			evalCostGamma := wf.NewProc("crossval_"+unique_string, crossvalCmdLiblin)
 			evalCostGamma.SetPathCustom("stats", pathFuncLibLin)
-			// Connect
 			evalCostGamma.In("traindata").Connect(extractTargetData.Out("target_data"))
 			evalCostGamma.ParamPort("nrmdl").ConnectStr("10")
 			evalCostGamma.ParamPort("cvfolds").ConnectStr("10")
@@ -180,7 +179,20 @@ func main() {
 				evalCostGamma.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + unique_string // SLURM string
 			}
 
-			summarize.In.Connect(evalCostGamma.Out("stats"))
+			extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+unique_string, func(ip *sp.InformationPacket) map[string]string {
+				crossValOut := &cpSignCrossValOutput{}
+				ip.UnMarshalJson(crossValOut)
+				newKeys := map[string]string{}
+				newKeys["validity"] = fmt.Sprintf("%.3f", crossValOut.Validity)
+				newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
+				newKeys["of_active"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Active)
+				newKeys["of_nonactive"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Nonactive)
+				newKeys["of_overall"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Overall)
+				return newKeys
+			})
+			extractCostGammaStats.In.Connect(evalCostGamma.Out("stats"))
+
+			summarize.In.Connect(extractCostGammaStats.Out)
 			//}
 		}
 		selectBest := NewBestEffCostGamma(wf, "select_best_cost_gamma_"+geneLC, '\t', false, 1, 2, includeGamma)
@@ -284,4 +296,33 @@ func main() {
 	// Run the pipeline!
 	// --------------------------------
 	wf.Run()
+}
+
+// JSON types
+
+// JSON output of cpSign crossvalidate
+// {
+//     "classConfidence": 0.855,
+//     "observedFuzziness": {
+//         "A": 0.253,
+//         "N": 0.207,
+//         "overall": 0.231
+//     },
+//     "validity": 0.917,
+//     "efficiency": 0.333,
+//     "classCredibility": 0.631
+// }
+
+type cpSignCrossValOutput struct {
+	ClassConfidence   float64                 `json:"classConfidence"`
+	ObservedFuzziness cpSignObservedFuzziness `json:"observedFuzziness"`
+	Validity          float64                 `json:"validity"`
+	Efficiency        float64                 `json:"efficiency"`
+	ClassCredibility  float64                 `json:"classCredibility"`
+}
+
+type cpSignObservedFuzziness struct {
+	Active    float64 `json:"A"`
+	Nonactive float64 `json:"N"`
+	Overall   float64 `json:"overall"`
 }

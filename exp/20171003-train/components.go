@@ -6,7 +6,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io/ioutil"
-	"regexp"
 	"strconv"
 
 	str "strings"
@@ -22,7 +21,7 @@ import (
 type SummarizeCostGammaPerf struct {
 	In           *sp.FilePort
 	OutStats     *sp.FilePort
-	ProcName     string
+	procName     string
 	FileName     string
 	IncludeGamma bool
 }
@@ -31,7 +30,7 @@ func NewSummarizeCostGammaPerf(wf *sp.Workflow, name string, filename string, in
 	bcgs := &SummarizeCostGammaPerf{
 		In:           sp.NewFilePort(),
 		OutStats:     sp.NewFilePort(),
-		ProcName:     name,
+		procName:     name,
 		FileName:     filename,
 		IncludeGamma: includeGamma,
 	}
@@ -40,7 +39,7 @@ func NewSummarizeCostGammaPerf(wf *sp.Workflow, name string, filename string, in
 }
 
 func (p *SummarizeCostGammaPerf) Name() string {
-	return p.ProcName
+	return p.procName
 }
 
 func (p *SummarizeCostGammaPerf) Run() {
@@ -48,53 +47,27 @@ func (p *SummarizeCostGammaPerf) Run() {
 	go p.In.RunMergeInputs()
 
 	outIp := sp.NewInformationPacket(p.FileName)
-
 	if outIp.Exists() {
-		sp.Info.Printf("Process %s: Out-target %s already exists, so not skipping\n", p.Name(), outIp.GetPath())
+		sp.Info.Printf("Process %s: Out-target %s already exists, so skipping\n", p.Name(), outIp.GetPath())
 	} else {
-		// Set up regexes
-		rEffic, err := regexp.Compile("Efficiency=([0-9.]+)")
-		sp.CheckErr(err)
-
-		rValid, err := regexp.Compile("Validity=([0-9.]+)")
-		sp.CheckErr(err)
-
 		outStr := "Gene\tEfficiency\tValidity\tCost\n"
 		if p.IncludeGamma {
 			outStr = "Gene\tEfficiency\tValidity\tCost\tGamma\n"
 		}
 		for iip := range p.In.InChan {
-			dat := string(iip.Read())
-
-			efficiency := 0.0
-			validity := 0.0
-
-			effMatches := rEffic.FindStringSubmatch(dat)
-			if len(effMatches) > 1 {
-				efficiency, err = strconv.ParseFloat(effMatches[1], 64)
-				sp.CheckErr(err)
-			}
-
-			validMatches := rValid.FindStringSubmatch(dat)
-			if len(validMatches) > 1 {
-				validity, err = strconv.ParseFloat(validMatches[1], 64)
-				sp.CheckErr(err)
-			}
-
-			auditInfo := iip.GetAuditInfo()
-			cost := auditInfo.Params["cost"]
-			gene := auditInfo.Params["gene"]
-			infoString := fmt.Sprintf("%s\t%.3f\t%.3f\t%s\n", gene, efficiency, validity, cost)
+			gene := iip.GetParam("gene")
+			efficiency := iip.GetKey("efficiency")
+			validity := iip.GetKey("validity")
+			cost := iip.GetParam("cost")
+			infoString := fmt.Sprintf("%s\t%s\t%s\t%s\n", gene, efficiency, validity, cost)
 			if p.IncludeGamma {
-				gamma := auditInfo.Params["gamma"]
-				infoString = fmt.Sprintf("%s\t%.3f\t%.3f\t%s\t%s\n", gene, efficiency, validity, cost, gamma)
+				gamma := iip.GetParam("gamma")
+				infoString = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\n", gene, efficiency, validity, cost, gamma)
 			}
-
 			outStr = outStr + infoString
 		}
 		ioutil.WriteFile(p.FileName, []byte(outStr), 0644)
 	}
-
 	p.OutStats.Send(outIp)
 }
 
@@ -105,7 +78,7 @@ func (p *SummarizeCostGammaPerf) IsConnected() bool {
 // ================================================================================
 
 type BestEffCostGamma struct {
-	ProcName            string
+	procName            string
 	InCSVFile           *sp.FilePort
 	OutBestCost         *sp.ParamPort
 	OutBestGamma        *sp.ParamPort
@@ -120,7 +93,7 @@ type BestEffCostGamma struct {
 
 func NewBestEffCostGamma(wf *sp.Workflow, procName string, separator rune, header bool, effValColIdx int, valValColIdx int, includeGamma bool) *BestEffCostGamma {
 	sbcr := &BestEffCostGamma{
-		ProcName:            procName,
+		procName:            procName,
 		InCSVFile:           sp.NewFilePort(),
 		OutBestCost:         sp.NewParamPort(),
 		OutBestGamma:        sp.NewParamPort(),
@@ -137,7 +110,7 @@ func NewBestEffCostGamma(wf *sp.Workflow, procName string, separator rune, heade
 }
 
 func (p *BestEffCostGamma) Name() string {
-	return p.ProcName
+	return p.procName
 }
 
 func (p *BestEffCostGamma) Run() {
@@ -219,7 +192,7 @@ func (p *BestEffCostGamma) IsConnected() bool {
 
 type ParamPrinter struct {
 	sp.SciProcess
-	ProcName           string
+	procName           string
 	InParamPorts       map[string]*sp.ParamPort
 	OutBestParamsFile  *sp.FilePort
 	BestParamsFileName string
@@ -227,7 +200,7 @@ type ParamPrinter struct {
 
 func NewParamPrinter(wf *sp.Workflow, procName string, fileName string) *ParamPrinter {
 	pp := &ParamPrinter{
-		ProcName:           procName,
+		procName:           procName,
 		InParamPorts:       make(map[string]*sp.ParamPort),
 		OutBestParamsFile:  sp.NewFilePort(),
 		BestParamsFileName: fileName,
@@ -244,7 +217,7 @@ func (p *ParamPrinter) GetParamPort(portName string) *sp.ParamPort {
 }
 
 func (p *ParamPrinter) Name() string {
-	return p.ProcName
+	return p.procName
 }
 
 func (p *ParamPrinter) Run() {
@@ -285,7 +258,7 @@ func (p *ParamPrinter) Run() {
 // ================================================================================
 
 type FinalModelSummarizer struct {
-	ProcName          string
+	procName          string
 	SummaryFileName   string
 	Separator         rune
 	InModel           *sp.FilePort
@@ -295,7 +268,7 @@ type FinalModelSummarizer struct {
 
 func NewFinalModelSummarizer(wf *sp.Workflow, name string, fileName string, separator rune) *FinalModelSummarizer {
 	fms := &FinalModelSummarizer{
-		ProcName:          name,
+		procName:          name,
 		SummaryFileName:   fileName,
 		InModel:           sp.NewFilePort(),
 		InTargetDataCount: sp.NewFilePort(),
@@ -307,7 +280,7 @@ func NewFinalModelSummarizer(wf *sp.Workflow, name string, fileName string, sepa
 }
 
 func (p *FinalModelSummarizer) Name() string {
-	return p.ProcName
+	return p.procName
 }
 
 func (p *FinalModelSummarizer) IsConnected() bool {
