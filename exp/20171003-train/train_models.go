@@ -185,9 +185,9 @@ func main() {
 				newKeys := map[string]string{}
 				newKeys["validity"] = fmt.Sprintf("%.3f", crossValOut.Validity)
 				newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
-				newKeys["of_active"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Active)
-				newKeys["of_nonactive"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Nonactive)
-				newKeys["of_overall"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Overall)
+				newKeys["obsfuzz_active"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Active)
+				newKeys["obsfuzz_nonactive"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Nonactive)
+				newKeys["obsfuzz_overall"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Overall)
 				return newKeys
 			})
 			extractCostGammaStats.In.Connect(evalCostGamma.Out("stats"))
@@ -195,7 +195,7 @@ func main() {
 			summarize.In.Connect(extractCostGammaStats.Out)
 			//}
 		}
-		selectBest := NewBestEffCostGamma(wf, "select_best_cost_gamma_"+geneLC, '\t', false, 1, 2, includeGamma)
+		selectBest := NewBestCostGamma(wf, "select_best_cost_gamma_"+geneLC, '\t', false, includeGamma)
 		selectBest.InCSVFile.Connect(summarize.OutStats)
 
 		// --------------------------------------------------------------------------------
@@ -248,7 +248,7 @@ func main() {
 									--nr-models {p:nrmdl} \
 									--cost {p:cost} \
 									--model-out {o:model} \
-									--model-name "{p:gene} target profile" # (Efficiency: {p:efficiency}, Validity: {p:validity})`)
+									--model-name "{p:gene} target profile" # (Cost-Equalized Observed Fuzziness: {p:clsavgobsfuzz}, Validity: {p:validity})`)
 		cpSignTrainPathFunc := func(t *sp.SciTask) string {
 			return fmt.Sprintf("dat/final_models/%s_%s_c%s_nrmdl%s.mdl",
 				str.ToLower(t.Param("gene")),
@@ -262,7 +262,7 @@ func main() {
 		cpSignTrain.ParamPort("cost").Connect(selectBest.OutBestCost)
 		//cpSignTrain.ParamPort("gamma").Connect(selectBest.OutBestGamma)
 		cpSignTrain.ParamPort("gene").ConnectStr(gene)
-		cpSignTrain.ParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
+		cpSignTrain.ParamPort("clsavgobsfuzz").Connect(selectBest.OutBestClassAvgObsFuzz)
 		cpSignTrain.ParamPort("validity").Connect(selectBest.OutBestValidity)
 		cpSignTrain.SetPathCustom("model", cpSignTrainPathFunc)
 		if *runSlurm {
@@ -272,7 +272,7 @@ func main() {
 		//paramPrinter := NewParamPrinter(wf, "param_printer_"+geneLC, "dat/best_cost_gamma_"+geneLC+".txt")
 		//paramPrinter.GetParamPort("cost").Connect(selectBest.OutBestCost)
 		//paramPrinter.GetParamPort("gamma").Connect(selectBest.OutBestGamma)
-		//paramPrinter.GetParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
+		//paramPrinter.GetParamPort("clsavgobsfuzz").Connect(selectBest.OutBestEfficiency)
 
 		//plotStats := NewPlotCreator(wf, "plot_stats_"+geneLC, "plot_"+geneLC+".png")
 		//plotStats.InStatsFile.Connect(cpSignTrain.Out("model"))
@@ -298,8 +298,9 @@ func main() {
 	wf.Run()
 }
 
+// --------------------------------------------------------------------------------
 // JSON types
-
+// --------------------------------------------------------------------------------
 // JSON output of cpSign crossvalidate
 // {
 //     "classConfidence": 0.855,
@@ -312,6 +313,7 @@ func main() {
 //     "efficiency": 0.333,
 //     "classCredibility": 0.631
 // }
+// --------------------------------------------------------------------------------
 
 type cpSignCrossValOutput struct {
 	ClassConfidence   float64                 `json:"classConfidence"`

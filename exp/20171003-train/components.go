@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
-	"io/ioutil"
 	"strconv"
 
 	str "strings"
@@ -14,6 +13,19 @@ import (
 )
 
 // ================================================================================
+
+var fid = map[string]int{
+	"gene":             0,
+	"efficiency":       1,
+	"validity":         2,
+	"obsFuzzActive":    3,
+	"obsFuzzNonactive": 4,
+	"obsFuzzOverall":   5,
+	"cost":             6,
+	"gamma":            7,
+}
+
+// gene, efficiency, validity, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, cost)
 
 // SummarizeCostGammaPerf is specialized a SciPipe Process that reads output
 // from cpSign status output to extract information about the efficiency and
@@ -50,23 +62,29 @@ func (p *SummarizeCostGammaPerf) Run() {
 	if outIp.Exists() {
 		sp.Info.Printf("Process %s: Out-target %s already exists, so skipping\n", p.Name(), outIp.GetPath())
 	} else {
-		outStr := "Gene\tEfficiency\tValidity\tCost\n"
+		outStr := "Gene\tEfficiency\tValidity\tObsFuzzActive\tObsFuzzNonactive\tObsFuzzOverall\tCost\n"
 		if p.IncludeGamma {
-			outStr = "Gene\tEfficiency\tValidity\tCost\tGamma\n"
+			outStr = "Gene\tEfficiency\tValidity\tObsFuzzActive\tObsFuzzNonactive\tObsFuzzOverall\tCost\tGamma\n"
 		}
 		for iip := range p.In.InChan {
 			gene := iip.GetParam("gene")
 			efficiency := iip.GetKey("efficiency")
 			validity := iip.GetKey("validity")
 			cost := iip.GetParam("cost")
-			infoString := fmt.Sprintf("%s\t%s\t%s\t%s\n", gene, efficiency, validity, cost)
+
+			obsFuzzActive := iip.GetKey("obsfuzz_active")
+			obsFuzzNonactive := iip.GetKey("obsfuzz_nonactive")
+			obsFuzzOverall := iip.GetKey("obsfuzz_overall")
+
+			infoString := fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n", gene, efficiency, validity, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, cost)
 			if p.IncludeGamma {
 				gamma := iip.GetParam("gamma")
-				infoString = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\n", gene, efficiency, validity, cost, gamma)
+				infoString = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", gene, efficiency, validity, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, cost, gamma)
 			}
 			outStr = outStr + infoString
 		}
-		ioutil.WriteFile(p.FileName, []byte(outStr), 0644)
+		outIp.WriteTempFile([]byte(outStr))
+		outIp.Atomize()
 	}
 	p.OutStats.Send(outIp)
 }
@@ -77,48 +95,46 @@ func (p *SummarizeCostGammaPerf) IsConnected() bool {
 
 // ================================================================================
 
-type BestEffCostGamma struct {
-	procName            string
-	InCSVFile           *sp.FilePort
-	OutBestCost         *sp.ParamPort
-	OutBestGamma        *sp.ParamPort
-	OutBestEfficiency   *sp.ParamPort
-	OutBestValidity     *sp.ParamPort
-	Separator           rune
-	Header              bool
-	EfficiencyValColIdx int // Which column to check for the efficiency value
-	ValidityValColIdx   int // Which column to check for the validity value
-	IncludeGamma        bool
+type BestCostGamma struct {
+	procName               string
+	InCSVFile              *sp.FilePort
+	OutBestCost            *sp.ParamPort
+	OutBestGamma           *sp.ParamPort
+	OutBestClassAvgObsFuzz *sp.ParamPort
+	OutBestValidity        *sp.ParamPort
+	Separator              rune
+	Header                 bool
+	EfficiencyValColIdx    int // Which column to check for the efficiency value
+	ValidityValColIdx      int // Which column to check for the validity value
+	IncludeGamma           bool
 }
 
-func NewBestEffCostGamma(wf *sp.Workflow, procName string, separator rune, header bool, effValColIdx int, valValColIdx int, includeGamma bool) *BestEffCostGamma {
-	sbcr := &BestEffCostGamma{
-		procName:            procName,
-		InCSVFile:           sp.NewFilePort(),
-		OutBestCost:         sp.NewParamPort(),
-		OutBestGamma:        sp.NewParamPort(),
-		OutBestEfficiency:   sp.NewParamPort(),
-		OutBestValidity:     sp.NewParamPort(),
-		Separator:           separator,
-		Header:              header,
-		EfficiencyValColIdx: effValColIdx,
-		ValidityValColIdx:   valValColIdx,
-		IncludeGamma:        includeGamma,
+func NewBestCostGamma(wf *sp.Workflow, procName string, separator rune, header bool, includeGamma bool) *BestCostGamma {
+	sbcr := &BestCostGamma{
+		procName:               procName,
+		InCSVFile:              sp.NewFilePort(),
+		OutBestCost:            sp.NewParamPort(),
+		OutBestGamma:           sp.NewParamPort(),
+		OutBestClassAvgObsFuzz: sp.NewParamPort(),
+		OutBestValidity:        sp.NewParamPort(),
+		Separator:              separator,
+		Header:                 header,
+		IncludeGamma:           includeGamma,
 	}
 	wf.AddProc(sbcr)
 	return sbcr
 }
 
-func (p *BestEffCostGamma) Name() string {
+func (p *BestCostGamma) Name() string {
 	return p.procName
 }
 
-func (p *BestEffCostGamma) Run() {
+func (p *BestCostGamma) Run() {
 	defer p.OutBestCost.Close()
 	if p.IncludeGamma {
 		defer p.OutBestGamma.Close()
 	}
-	defer p.OutBestEfficiency.Close()
+	defer p.OutBestClassAvgObsFuzz.Close()
 	defer p.OutBestValidity.Close()
 
 	go p.InCSVFile.RunMergeInputs()
@@ -130,7 +146,7 @@ func (p *BestEffCostGamma) Run() {
 		csvReader := csv.NewReader(bytesReader)
 		csvReader.Comma = p.Separator
 
-		minEff := 1000000.000 // N.B: The best efficiency in Conformal Prediction is the *minimal* one. Initializing here with an unreasonably large number in order to spot when something is wrong.
+		minClassAvgObsFuzz := 1000000.000 // N.B: The best efficiency in Conformal Prediction is the *minimal* one. Initializing here with an unreasonably large number in order to spot when something is wrong.
 
 		var bestCost int64
 		var bestGamma float64 // Only used for libSVM
@@ -147,45 +163,49 @@ func (p *BestEffCostGamma) Run() {
 				continue
 			}
 
-			eff, err := strconv.ParseFloat(rec[p.EfficiencyValColIdx], 64)
+			obsFuzzActive, err := strconv.ParseFloat(rec[fid["obsFuzzActive"]], 64)
 			sp.CheckErr(err)
 
-			if eff < minEff {
-				minEff = eff
+			obsFuzzNonactive, err := strconv.ParseFloat(rec[fid["obsFuzzNonactive"]], 64)
+			sp.CheckErr(err)
 
-				sp.Debug.Printf("Proc:%s Raw cost value: %s\n", p.Name(), rec[3])
-				bestCost, err = strconv.ParseInt(rec[3], 10, 0)
+			classAvgObsFuzz := (obsFuzzActive + obsFuzzNonactive) / 2 // We take the average for the two classes, to get more equal influence of each class
 
+			if classAvgObsFuzz < minClassAvgObsFuzz {
+				minClassAvgObsFuzz = classAvgObsFuzz
+
+				sp.Debug.Printf("Proc:%s Raw cost value: %s\n", p.Name(), rec[fid["cost"]])
+				bestCost, err = strconv.ParseInt(rec[fid["cost"]], 10, 0)
 				sp.Debug.Printf("Proc:%s Parsed cost value: %d\n", p.Name(), bestCost)
 				sp.CheckErr(err)
 
 				if p.IncludeGamma {
-					bestGamma, err = strconv.ParseFloat(rec[4], 64)
+					bestGamma, err = strconv.ParseFloat(rec[fid["gamma"]], 64)
 					sp.CheckErr(err)
 				}
 
-				bestValidity, err = strconv.ParseFloat(rec[p.ValidityValColIdx], 64)
+				bestValidity, err = strconv.ParseFloat(rec[fid["validity"]], 64)
 				sp.CheckErr(err)
 			}
 		}
-		sp.Debug.Printf("Final optimal (minimal) efficiency: %f (For: Cost:%03d)\n", minEff, bestCost)
+		sp.Debug.Printf("Final optimal (minimal) class-equalized observed fuzziness: %f (For: Cost:%03d)\n", minClassAvgObsFuzz, bestCost)
 		if p.IncludeGamma {
-			sp.Debug.Printf("Final optimal (minimal) efficiency: %f (For: Cost:%03d, Gamma:%.3f)\n", minEff, bestCost, bestGamma)
+			sp.Debug.Printf("Final optimal (minimal) class-equalized observed fuzziness: %f (For: Cost:%03d, Gamma:%.3f)\n", minClassAvgObsFuzz, bestCost, bestGamma)
 		}
 		p.OutBestCost.Send(fmt.Sprintf("%d", bestCost))
 		if p.IncludeGamma {
 			p.OutBestGamma.Send(fmt.Sprintf("%.3f", bestGamma))
 		}
-		p.OutBestEfficiency.Send(fmt.Sprintf("%.3f", minEff))
+		p.OutBestClassAvgObsFuzz.Send(fmt.Sprintf("%.3f", minClassAvgObsFuzz))
 		p.OutBestValidity.Send(fmt.Sprintf("%.3f", bestValidity))
 	}
 }
 
-func (p *BestEffCostGamma) IsConnected() bool {
+func (p *BestCostGamma) IsConnected() bool {
 	if p.IncludeGamma {
-		return p.InCSVFile.IsConnected() && p.OutBestCost.IsConnected() && p.OutBestGamma.IsConnected() && p.OutBestEfficiency.IsConnected() && p.OutBestValidity.IsConnected()
+		return p.InCSVFile.IsConnected() && p.OutBestCost.IsConnected() && p.OutBestGamma.IsConnected() && p.OutBestClassAvgObsFuzz.IsConnected() && p.OutBestValidity.IsConnected()
 	}
-	return p.InCSVFile.IsConnected() && p.OutBestCost.IsConnected() && p.OutBestEfficiency.IsConnected() && p.OutBestValidity.IsConnected()
+	return p.InCSVFile.IsConnected() && p.OutBestCost.IsConnected() && p.OutBestClassAvgObsFuzz.IsConnected() && p.OutBestValidity.IsConnected()
 }
 
 // ================================================================================
@@ -296,8 +316,7 @@ func (p *FinalModelSummarizer) Run() {
 	nonActiveCounts := map[string]int64{}
 	totalCompounds := map[string]int64{}
 	for tdip := range p.InTargetDataCount.InChan {
-		ai := tdip.GetAuditInfo()
-		gene := ai.Params["gene"]
+		gene := tdip.GetParam("gene")
 		strs := str.Split(string(tdip.Read()), "\t")
 		activeStr := str.TrimSuffix(strs[0], "\n")
 		activeCnt, err := strconv.ParseInt(activeStr, 10, 64)
@@ -309,19 +328,18 @@ func (p *FinalModelSummarizer) Run() {
 		totalCompounds[gene] = activeCnt + nonActiveCnt
 	}
 
-	rows := [][]string{[]string{"Gene", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "Active", "Nonactive", "TotalCompounds"}}
+	rows := [][]string{[]string{"Gene", "ClassAvgObsFuzz", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "Active", "Nonactive", "TotalCompounds"}}
 	for iip := range p.InModel.InChan {
-		ai := iip.GetAuditInfo()
 		row := []string{
-			ai.Params["gene"],
-			ai.Params["efficiency"],
-			ai.Params["validity"],
-			ai.Params["cost"],
-			fmt.Sprintf("%d", ai.ExecTimeMS),
+			iip.GetParam("gene"),
+			iip.GetParam("clsavgobsfuzz"),
+			iip.GetParam("validity"),
+			iip.GetParam("cost"),
+			fmt.Sprintf("%d", iip.GetAuditInfo().ExecTimeMS),
 			fmt.Sprintf("%d", iip.GetSize()),
-			fmt.Sprintf("%d", activeCounts[ai.Params["gene"]]),
-			fmt.Sprintf("%d", nonActiveCounts[ai.Params["gene"]]),
-			fmt.Sprintf("%d", totalCompounds[ai.Params["gene"]]),
+			fmt.Sprintf("%d", activeCounts[iip.GetParam("gene")]),
+			fmt.Sprintf("%d", nonActiveCounts[iip.GetParam("gene")]),
+			fmt.Sprintf("%d", totalCompounds[iip.GetParam("gene")]),
 		}
 		rows = append(rows, row)
 	}

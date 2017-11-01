@@ -51,7 +51,7 @@ bp <- barplot(counts,
         names=d$Gene,
         beside = FALSE,
         col=c("white", "#dddddd"),
-        main = "Compound counts, training time and efficiency per target",
+        main = "Compound counts, training time and observed fuzziness per target",
         las=2,
         cex.names=0.8,
         ylim=c(0,10000),
@@ -75,16 +75,16 @@ axis(4, las=2, col="white", col.axis="red", col.ticks="red", at=c(1,30,60), labe
 mtext("Training time (min)", side=4, line=3.6, col="red")
 par(new=TRUE)
 
-# Plot 1-Efficiency
-plot(bp,1-d$Efficiency, type="b", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+# Plot 1-ClassAvgObsFuzz
+plot(bp,1-d$ClassAvgObsFuzz, type="b", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 axis(4, las=2, col="blue", col.axis="blue", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
-mtext("Efficiency", side=4, line=4.8, col="blue")
+mtext("Class-averaged Observed Fuzziness", side=4, line=4.8, col="blue")
 
 # --------------------------------------------------------------------------------
 # Alternative legend, with the line plots included:
 # --------------------------------------------------------------------------------
 #legend("bottomright",
-#       c("Active", "Nonactive", "Training time (min)", "1-Efficiency"),
+#       c("Active", "Nonactive", "Training time (min)", "1-ClassAvgObsFuzz"),
 #       pch=c(NA, NA, 1, 1),
 #       col=c(NA, NA, "red", "blue"),
 #       fill=c("white", "#dddddd", NA, NA),
