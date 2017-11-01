@@ -42,10 +42,10 @@ var (
 			"PDE3A",
 		},
 		"smallest3": []string{
-			"GABRA1", "CACNA1C", "CHRNA4",
+			"PDE3A", "SCN5A", "CCKAR",
 		},
 		"smallest4": []string{
-			"GABRA1", "CACNA1C", "CHRNA4", "PDE3A",
+			"PDE3A", "SCN5A", "CCKAR", "ADRB1",
 		},
 	}
 	costVals = []string{
