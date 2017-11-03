@@ -101,6 +101,7 @@ type BestCostGamma struct {
 	OutBestCost            *sp.ParamPort
 	OutBestGamma           *sp.ParamPort
 	OutBestClassAvgObsFuzz *sp.ParamPort
+	OutBestEfficiency      *sp.ParamPort
 	OutBestValidity        *sp.ParamPort
 	Separator              rune
 	Header                 bool
@@ -116,6 +117,7 @@ func NewBestCostGamma(wf *sp.Workflow, procName string, separator rune, header b
 		OutBestCost:            sp.NewParamPort(),
 		OutBestGamma:           sp.NewParamPort(),
 		OutBestClassAvgObsFuzz: sp.NewParamPort(),
+		OutBestEfficiency:      sp.NewParamPort(),
 		OutBestValidity:        sp.NewParamPort(),
 		Separator:              separator,
 		Header:                 header,
@@ -135,6 +137,7 @@ func (p *BestCostGamma) Run() {
 		defer p.OutBestGamma.Close()
 	}
 	defer p.OutBestClassAvgObsFuzz.Close()
+	defer p.OutBestEfficiency.Close()
 	defer p.OutBestValidity.Close()
 
 	go p.InCSVFile.RunMergeInputs()
@@ -150,6 +153,7 @@ func (p *BestCostGamma) Run() {
 
 		var bestCost int64
 		var bestGamma float64 // Only used for libSVM
+		var bestEfficiency float64
 		var bestValidity float64
 
 		i := 0
@@ -184,6 +188,8 @@ func (p *BestCostGamma) Run() {
 					sp.CheckErr(err)
 				}
 
+				bestEfficiency, err = strconv.ParseFloat(rec[fid["efficiency"]], 64)
+				sp.CheckErr(err)
 				bestValidity, err = strconv.ParseFloat(rec[fid["validity"]], 64)
 				sp.CheckErr(err)
 			}
@@ -197,6 +203,7 @@ func (p *BestCostGamma) Run() {
 			p.OutBestGamma.Send(fmt.Sprintf("%.3f", bestGamma))
 		}
 		p.OutBestClassAvgObsFuzz.Send(fmt.Sprintf("%.3f", minClassAvgObsFuzz))
+		p.OutBestEfficiency.Send(fmt.Sprintf("%.3f", bestEfficiency))
 		p.OutBestValidity.Send(fmt.Sprintf("%.3f", bestValidity))
 	}
 }
@@ -328,11 +335,12 @@ func (p *FinalModelSummarizer) Run() {
 		totalCompounds[gene] = activeCnt + nonActiveCnt
 	}
 
-	rows := [][]string{[]string{"Gene", "ClassAvgObsFuzz", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "Active", "Nonactive", "TotalCompounds"}}
+	rows := [][]string{[]string{"Gene", "ClassAvgObsFuzz", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "Active", "Nonactive", "TotalCompounds"}}
 	for iip := range p.InModel.InChan {
 		row := []string{
 			iip.GetParam("gene"),
 			iip.GetParam("clsavgobsfuzz"),
+			iip.GetParam("efficiency"),
 			iip.GetParam("validity"),
 			iip.GetParam("cost"),
 			fmt.Sprintf("%d", iip.GetAuditInfo().ExecTimeMS),

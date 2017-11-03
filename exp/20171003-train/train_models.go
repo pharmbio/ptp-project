@@ -248,7 +248,7 @@ func main() {
 									--nr-models {p:nrmdl} \
 									--cost {p:cost} \
 									--model-out {o:model} \
-									--model-name "{p:gene} target profile" # (Cost-Equalized Observed Fuzziness: {p:clsavgobsfuzz}, Validity: {p:validity})`)
+									--model-name "{p:gene} target profile" # (Cost-Equalized Observed Fuzziness: {p:clsavgobsfuzz}, Efficiency: {p:efficiency}, Validity: {p:validity})`)
 		cpSignTrainPathFunc := func(t *sp.SciTask) string {
 			return fmt.Sprintf("dat/final_models/%s_%s_c%s_nrmdl%s.mdl",
 				str.ToLower(t.Param("gene")),
@@ -263,6 +263,7 @@ func main() {
 		//cpSignTrain.ParamPort("gamma").Connect(selectBest.OutBestGamma)
 		cpSignTrain.ParamPort("gene").ConnectStr(gene)
 		cpSignTrain.ParamPort("clsavgobsfuzz").Connect(selectBest.OutBestClassAvgObsFuzz)
+		cpSignTrain.ParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
 		cpSignTrain.ParamPort("validity").Connect(selectBest.OutBestValidity)
 		cpSignTrain.SetPathCustom("model", cpSignTrainPathFunc)
 		if *runSlurm {
