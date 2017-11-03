@@ -44,7 +44,7 @@ counts <- rbind(d$Active, d$Nonactive)
 options(scipen=1, digits="0");
 
 # Set margins (in inches, thus mai), for the whole plot
-par(mai=c(1.2,1.2,1.2,1.4))
+par(mai=c(1.2,1.2,1.2,1.6))
 
 # Plot active/nonactive compounds
 bp <- barplot(counts,
@@ -59,7 +59,7 @@ bp <- barplot(counts,
         xlab=NA,
         ylab=NA,
         axes=FALSE);
-axis(2, las=2, col.axis="black", at=c(0, 1000, 5000, 100000, 200000, 300000, 400000), labels=c("0", "1 k", "5 k", "100 k", "200 k", "300 k", "400 k"));
+axis(2, las=2, col.axis="black", at=c(0, 1000, 5000, 10000, 100000, 200000, 300000, 400000), labels=c("0", "1 k", "5 k", "10 k", "100 k", "200 k", "300 k", "400 k"));
 mtext("Compounds",
       side=2,
       line=3.6);
@@ -67,18 +67,24 @@ legend("bottomright",
        c("Active", "Nonactive"),
        fill=c("white", "#dddddd"));
 
-par(new=TRUE);
 
 # Plot training time (minutes)
+par(new=TRUE);
 plot(bp,d$ExecTimeMS/(1000*60), type="b", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
 axis(4, las=2, col="white", col.axis="red", col.ticks="red", at=c(1,30,60), labels=c("1 min", "30 min", "1 h"));
 mtext("Training time (min)", side=4, line=3.6, col="red")
-par(new=TRUE)
 
 # Plot 1-ClassAvgObsFuzz
+par(new=TRUE)
 plot(bp,1-d$ClassAvgObsFuzz, type="b", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 axis(4, las=2, col="blue", col.axis="blue", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
 mtext("Class-averaged Observed Fuzziness", side=4, line=4.8, col="blue")
+
+# Plot Efficiency
+par(new=TRUE)
+plot(bp,1-d$Efficiency, type="b", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+axis(4, las=2, col="#007700", col.axis="#007700", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
+mtext("Original CP Efficiency measure", side=4, line=6.0, col="#007700")
 
 # --------------------------------------------------------------------------------
 # Alternative legend, with the line plots included:
