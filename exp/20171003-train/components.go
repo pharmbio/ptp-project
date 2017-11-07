@@ -335,10 +335,11 @@ func (p *FinalModelSummarizer) Run() {
 		totalCompounds[gene] = activeCnt + nonActiveCnt
 	}
 
-	rows := [][]string{[]string{"Gene", "ClassAvgObsFuzz", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "Active", "Nonactive", "TotalCompounds"}}
+	rows := [][]string{[]string{"Gene", "Replicate", "ClassAvgObsFuzz", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "Active", "Nonactive", "TotalCompounds"}}
 	for iip := range p.InModel.InChan {
 		row := []string{
 			iip.GetParam("gene"),
+			iip.GetParam("replicate"),
 			iip.GetParam("clsavgobsfuzz"),
 			iip.GetParam("efficiency"),
 			iip.GetParam("validity"),
