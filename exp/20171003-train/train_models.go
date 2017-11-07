@@ -58,9 +58,15 @@ var (
 		"0.01",
 		"0.001",
 	}
+	replicates = []string{
+		"r1", "r2", "r3",
+	}
 )
 
 func main() {
+	// --------------------------------
+	// Parse flags and stuff
+	// --------------------------------
 	flag.Parse()
 	if *debug {
 		sp.InitLogDebug()
@@ -74,18 +80,19 @@ func main() {
 		}
 		sp.Error.Fatalf("Incorrect gene set %s specified! Only allowed values are: %s\n", *geneSet, str.Join(names, ", "))
 	}
-
-	sp.Info.Printf("Using max %d OS threads to schedule max %d tasks\n", *threads, *maxTasks)
-	sp.Info.Printf("Starting workflow for %s geneset\n", *geneSet)
-
 	runtime.GOMAXPROCS(*threads)
 
-	//sp.InitLogDebug()
-	wf := sp.NewWorkflow("train_models", *maxTasks)
+	// --------------------------------
+	// Show startup messages
+	// --------------------------------
+	sp.Info.Printf("Using max %d OS threads to schedule max %d tasks\n", *threads, *maxTasks)
+	sp.Info.Printf("Starting workflow for %s geneset\n", *geneSet)
 
 	// --------------------------------
 	// Initialize processes and add to runner
 	// --------------------------------
+	wf := sp.NewWorkflow("train_models", *maxTasks)
+
 	dbFileName := "pubchem.chembl.dataset4publication_inchi_smiles.tsv.xz"
 	dlExcapeDB := wf.NewProc("dlDB", fmt.Sprintf("wget https://zenodo.org/record/173258/files/%s -O {o:excapexz}", dbFileName))
 	dlExcapeDB.SetPathStatic("excapexz", "../../raw/"+dbFileName)
@@ -120,85 +127,6 @@ func main() {
 		countTargetDataRows.ParamPort("gene").ConnectStr(gene)
 
 		// --------------------------------------------------------------------------------
-		// Optimize cost/gamma-step
-		// --------------------------------------------------------------------------------
-		includeGamma := false // For liblinear
-		summarize := NewSummarizeCostGammaPerf(wf, "summarize_cost_gamma_perf_"+geneLC, "dat/"+geneLC+"/"+geneLC+"_cost_gamma_perf_stats.tsv", includeGamma)
-
-		for _, cost := range costVals {
-			//for _, gamma := range gammaVals {
-
-			// If Liblinear
-			unique_string := fmt.Sprintf("liblin_%s_%s", geneLC, cost) // A string to make process names unique
-			crossvalCmdLiblin := `java -jar ` + cpSignPath + ` crossvalidate \
-									--license ../../bin/cpsign.lic \
-									--cptype 1 \
-									--trainfile {i:traindata} \
-									--impl liblinear \
-									--labels A, N \
-									--nr-models {p:nrmdl} \
-									--cost {p:cost} \
-									--cv-folds {p:cvfolds} \
-									--output-format json \
-									--confidence {p:confidence} | grep -P "^{" > {o:stats} # {p:gene}`
-			pathFuncLibLin := func(t *sp.SciTask) string {
-				c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
-				sp.CheckErr(err)
-				return t.InPath("traindata") + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
-			}
-			// If LibSVM
-			//unique_string := fmt.Sprintf("libsvm_%s_%s_%s", geneLC, cost, gamma) // A string to make process names unique
-			//crossvalCmdLibSVM := `java -jar ` + cpSignPath + ` crossvalidate \
-			//					--license ../../bin/cpsign.lic \
-			//					--cptype 1 \
-			//					--trainfile {i:traindata} \
-			//					--impl libsvm \
-			//					--labels A, N \
-			//					--nr-models {p:nrmdl} \
-			//					--cost {p:cost} \
-			//					--gamma {p:gamma} \
-			//					--cv-folds {p:cvfolds} \
-			//					--confidence {p:confidence} > {o:stats} # {p:gene}`
-			//pathFuncLibSVM := func(t *sp.SciTask) string {
-			//	c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
-			//	sp.CheckErr(err)
-			//	g, err := strconv.ParseFloat(t.Param("gamma"), 64)
-			//	sp.CheckErr(err)
-			//	return t.InPath("traindata") + fmt.Sprintf(".libsvm_c%03d_g%.3f", c, g) + ".stats.txt"
-			//}
-			evalCostGamma := wf.NewProc("crossval_"+unique_string, crossvalCmdLiblin)
-			evalCostGamma.SetPathCustom("stats", pathFuncLibLin)
-			evalCostGamma.In("traindata").Connect(extractTargetData.Out("target_data"))
-			evalCostGamma.ParamPort("nrmdl").ConnectStr("10")
-			evalCostGamma.ParamPort("cvfolds").ConnectStr("10")
-			evalCostGamma.ParamPort("confidence").ConnectStr("0.9")
-			evalCostGamma.ParamPort("gene").ConnectStr(gene)
-			evalCostGamma.ParamPort("cost").ConnectStr(cost)
-			//evalCostGamma.ParamPort("gamma").ConnectStr(gamma) // Only used with liblinear
-			if *runSlurm {
-				evalCostGamma.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + unique_string // SLURM string
-			}
-
-			extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+unique_string, func(ip *sp.InformationPacket) map[string]string {
-				crossValOut := &cpSignCrossValOutput{}
-				ip.UnMarshalJson(crossValOut)
-				newKeys := map[string]string{}
-				newKeys["validity"] = fmt.Sprintf("%.3f", crossValOut.Validity)
-				newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
-				newKeys["obsfuzz_active"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Active)
-				newKeys["obsfuzz_nonactive"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Nonactive)
-				newKeys["obsfuzz_overall"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Overall)
-				return newKeys
-			})
-			extractCostGammaStats.In.Connect(evalCostGamma.Out("stats"))
-
-			summarize.In.Connect(extractCostGammaStats.Out)
-			//}
-		}
-		selectBest := NewBestCostGamma(wf, "select_best_cost_gamma_"+geneLC, '\t', false, includeGamma)
-		selectBest.InCSVFile.Connect(summarize.OutStats)
-
-		// --------------------------------------------------------------------------------
 		// Pre-compute step
 		// --------------------------------------------------------------------------------
 		cpSignPrecomp := wf.NewProc("cpsign_precomp_"+geneLC,
@@ -215,31 +143,75 @@ func main() {
 			cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLC // SLURM string
 		}
 
-		// --------------------------------------------------------------------------------
-		// Train step
-		// --------------------------------------------------------------------------------
-		// For LibSVM
-		//cpSignTrain:= wf.NewProc("cpsign_train_"+geneLC,
-		//	`java -jar `+cpSignPath+` train \
-		//							--license ../../bin/cpsign.lic \
-		//							--cptype 1 \
-		//							--modelfile {i:model} \
-		//							--labels A, N \
-		//							--impl libsvm \
-		//							--nr-models {p:nrmdl} \
-		//							--cost {p:cost} \
-		//							--gamma {p:gamma} \
-		//							--model-out {o:model} \
-		//							--model-name "{p:gene} target profile" # Efficiency: {p:efficiency}`)
-		//cpSignTrainPathFunc := func(t *sp.SciTask) string {
-		//	return fmt.Sprintf("dat/final_models/%s_c%s_g%s_nrmdl%s.mdl",
-		//		str.ToLower(t.Param("gene")),
-		//		t.Param("cost"),
-		//		t.Param("gamma"),
-		//		t.Param("nrmdl"))
-		//}
-		cpSignTrain := wf.NewProc("cpsign_train_"+geneLC,
-			`java -jar `+cpSignPath+` train \
+		for _, replicate := range replicates {
+			// --------------------------------------------------------------------------------
+			// Optimize cost/gamma-step
+			// --------------------------------------------------------------------------------
+			includeGamma := false // For liblinear
+			summarize := NewSummarizeCostGammaPerf(wf,
+				"summarize_cost_gamma_perf_"+geneLC+"_"+replicate,
+				"dat/"+geneLC+"/"+replicate+"/"+geneLC+"_cost_gamma_perf_stats.tsv",
+				includeGamma)
+
+			for _, cost := range costVals {
+				// If Liblinear
+				unique_string := fmt.Sprintf("liblin_%s_%s_%s", geneLC, cost, replicate) // A string to make process names unique
+				evalCostCmdLiblin := `java -jar ` + cpSignPath + ` crossvalidate \
+									--license ../../bin/cpsign.lic \
+									--cptype 1 \
+									--trainfile {i:traindata} \
+									--impl liblinear \
+									--labels A, N \
+									--nr-models {p:nrmdl} \
+									--cost {p:cost} \
+									--cv-folds {p:cvfolds} \
+									--output-format json \
+									--confidence {p:confidence} | grep -P "^{" > {o:stats} # {p:gene} {p:replicate}`
+				evalCostPathFunc := func(t *sp.SciTask) string {
+					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
+					sp.CheckErr(err)
+					return str.Replace(t.InPath("traindata"), geneLC+".tsv", replicate+"/"+geneLC+".tsv", 1) + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
+				}
+				evalCost := wf.NewProc("crossval_"+unique_string, evalCostCmdLiblin)
+				evalCost.SetPathCustom("stats", evalCostPathFunc)
+				evalCost.In("traindata").Connect(extractTargetData.Out("target_data"))
+				evalCost.ParamPort("nrmdl").ConnectStr("10")
+				evalCost.ParamPort("cvfolds").ConnectStr("10")
+				evalCost.ParamPort("confidence").ConnectStr("0.9")
+				evalCost.ParamPort("gene").ConnectStr(gene)
+				evalCost.ParamPort("replicate").ConnectStr(replicate)
+				evalCost.ParamPort("cost").ConnectStr(cost)
+				if *runSlurm {
+					evalCost.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + unique_string // SLURM string
+				}
+
+				extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+unique_string, func(ip *sp.InformationPacket) map[string]string {
+					crossValOut := &cpSignCrossValOutput{}
+					ip.UnMarshalJson(crossValOut)
+					newKeys := map[string]string{}
+					newKeys["validity"] = fmt.Sprintf("%.3f", crossValOut.Validity)
+					newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
+					newKeys["obsfuzz_active"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Active)
+					newKeys["obsfuzz_nonactive"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Nonactive)
+					newKeys["obsfuzz_overall"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Overall)
+					return newKeys
+				})
+				extractCostGammaStats.In.Connect(evalCost.Out("stats"))
+
+				summarize.In.Connect(extractCostGammaStats.Out)
+				//}
+			}
+			selectBest := NewBestCostGamma(wf,
+				"select_best_cost_gamma_"+geneLC+"_"+replicate,
+				'\t',
+				false,
+				includeGamma)
+			selectBest.InCSVFile.Connect(summarize.OutStats)
+			// --------------------------------------------------------------------------------
+			// Train step
+			// --------------------------------------------------------------------------------
+			cpSignTrain := wf.NewProc("cpsign_train_"+geneLC+"_"+replicate,
+				`java -jar `+cpSignPath+` train \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
 									--modelfile {i:model} \
@@ -248,40 +220,32 @@ func main() {
 									--nr-models {p:nrmdl} \
 									--cost {p:cost} \
 									--model-out {o:model} \
-									--model-name "{p:gene} target profile" # (Cost-Equalized Observed Fuzziness: {p:clsavgobsfuzz}, Efficiency: {p:efficiency}, Validity: {p:validity})`)
-		cpSignTrainPathFunc := func(t *sp.SciTask) string {
-			return fmt.Sprintf("dat/final_models/%s_%s_c%s_nrmdl%s.mdl",
-				str.ToLower(t.Param("gene")),
-				"liblin",
-				t.Param("cost"),
-				t.Param("nrmdl"))
-		}
+									--model-name "{p:gene} target profile" # (Cost-Equalized Observed Fuzziness: {p:clsavgobsfuzz}, Efficiency: {p:efficiency}, Validity: {p:validity}, Replicate: {p:replicate})`)
+			cpSignTrainPathFunc := func(t *sp.SciTask) string {
+				return fmt.Sprintf("dat/final_models/"+replicate+"/%s_%s_c%s_nrmdl%s.mdl",
+					str.ToLower(t.Param("gene")),
+					"liblin",
+					t.Param("cost"),
+					t.Param("nrmdl"))
+			}
 
-		cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
-		cpSignTrain.ParamPort("nrmdl").ConnectStr("10")
-		cpSignTrain.ParamPort("cost").Connect(selectBest.OutBestCost)
-		//cpSignTrain.ParamPort("gamma").Connect(selectBest.OutBestGamma)
-		cpSignTrain.ParamPort("gene").ConnectStr(gene)
-		cpSignTrain.ParamPort("clsavgobsfuzz").Connect(selectBest.OutBestClassAvgObsFuzz)
-		cpSignTrain.ParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
-		cpSignTrain.ParamPort("validity").Connect(selectBest.OutBestValidity)
-		cpSignTrain.SetPathCustom("model", cpSignTrainPathFunc)
-		if *runSlurm {
-			cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + geneLC // SLURM string
-		}
+			cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
+			cpSignTrain.ParamPort("nrmdl").ConnectStr("10")
+			cpSignTrain.ParamPort("cost").Connect(selectBest.OutBestCost)
+			cpSignTrain.ParamPort("gene").ConnectStr(gene)
+			cpSignTrain.ParamPort("replicate").ConnectStr(replicate)
+			cpSignTrain.ParamPort("clsavgobsfuzz").Connect(selectBest.OutBestClassAvgObsFuzz)
+			cpSignTrain.ParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
+			cpSignTrain.ParamPort("validity").Connect(selectBest.OutBestValidity)
+			cpSignTrain.SetPathCustom("model", cpSignTrainPathFunc)
+			if *runSlurm {
+				cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + geneLC // SLURM string
+			}
 
-		//paramPrinter := NewParamPrinter(wf, "param_printer_"+geneLC, "dat/best_cost_gamma_"+geneLC+".txt")
-		//paramPrinter.GetParamPort("cost").Connect(selectBest.OutBestCost)
-		//paramPrinter.GetParamPort("gamma").Connect(selectBest.OutBestGamma)
-		//paramPrinter.GetParamPort("clsavgobsfuzz").Connect(selectBest.OutBestEfficiency)
-
-		//plotStats := NewPlotCreator(wf, "plot_stats_"+geneLC, "plot_"+geneLC+".png")
-		//plotStats.InStatsFile.Connect(cpSignTrain.Out("model"))
-		//wf.ConnectLast(plotStats.OutPlotImage)
-
-		finalModelsSummary.InModel.Connect(cpSignTrain.Out("model"))
-		finalModelsSummary.InTargetDataCount.Connect(countTargetDataRows.Out("count"))
-	}
+			finalModelsSummary.InModel.Connect(cpSignTrain.Out("model"))
+			finalModelsSummary.InTargetDataCount.Connect(countTargetDataRows.Out("count"))
+		} // end for replicate
+	} // end for gene
 
 	sortSummaryOnDataSize := wf.NewProc("sort_summary", "sort -n -k 10 {i:summary} > {o:sorted}")
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
