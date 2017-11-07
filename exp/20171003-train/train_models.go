@@ -156,7 +156,7 @@ func main() {
 			for _, cost := range costVals {
 				// If Liblinear
 				unique_string := fmt.Sprintf("liblin_%s_%s_%s", geneLC, cost, replicate) // A string to make process names unique
-				evalCostCmdLiblin := `java -jar ` + cpSignPath + ` crossvalidate \
+				evalCost := wf.NewProc("crossval_"+unique_string, `java -jar `+cpSignPath+` crossvalidate \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
 									--trainfile {i:traindata} \
@@ -166,14 +166,13 @@ func main() {
 									--cost {p:cost} \
 									--cv-folds {p:cvfolds} \
 									--output-format json \
-									--confidence {p:confidence} | grep -P "^{" > {o:stats} # {p:gene} {p:replicate}`
-				evalCostPathFunc := func(t *sp.SciTask) string {
+									--confidence {p:confidence} | grep -P "^{" > {o:stats} # {p:gene} {p:replicate}`)
+				evalCost.SetPathCustom("stats", func(t *sp.SciTask) string {
 					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
+					geneLC := str.ToLower(t.Param("gene"))
 					sp.CheckErr(err)
-					return str.Replace(t.InPath("traindata"), geneLC+".tsv", replicate+"/"+geneLC+".tsv", 1) + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
-				}
-				evalCost := wf.NewProc("crossval_"+unique_string, evalCostCmdLiblin)
-				evalCost.SetPathCustom("stats", evalCostPathFunc)
+					return str.Replace(t.InPath("traindata"), geneLC+".tsv", t.Param("replicate")+"/"+geneLC+".tsv", 1) + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
+				})
 				evalCost.In("traindata").Connect(extractTargetData.Out("target_data"))
 				evalCost.ParamPort("nrmdl").ConnectStr("10")
 				evalCost.ParamPort("cvfolds").ConnectStr("10")
@@ -221,14 +220,6 @@ func main() {
 									--cost {p:cost} \
 									--model-out {o:model} \
 									--model-name "{p:gene} target profile" # (Cost-Equalized Observed Fuzziness: {p:clsavgobsfuzz}, Efficiency: {p:efficiency}, Validity: {p:validity}, Replicate: {p:replicate})`)
-			cpSignTrainPathFunc := func(t *sp.SciTask) string {
-				return fmt.Sprintf("dat/final_models/"+replicate+"/%s_%s_c%s_nrmdl%s.mdl",
-					str.ToLower(t.Param("gene")),
-					"liblin",
-					t.Param("cost"),
-					t.Param("nrmdl"))
-			}
-
 			cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
 			cpSignTrain.ParamPort("nrmdl").ConnectStr("10")
 			cpSignTrain.ParamPort("cost").Connect(selectBest.OutBestCost)
@@ -237,7 +228,13 @@ func main() {
 			cpSignTrain.ParamPort("clsavgobsfuzz").Connect(selectBest.OutBestClassAvgObsFuzz)
 			cpSignTrain.ParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
 			cpSignTrain.ParamPort("validity").Connect(selectBest.OutBestValidity)
-			cpSignTrain.SetPathCustom("model", cpSignTrainPathFunc)
+			cpSignTrain.SetPathCustom("model", func(t *sp.SciTask) string {
+				return fmt.Sprintf("dat/final_models/"+t.Param("replicate")+"/%s_%s_c%s_nrmdl%s.mdl",
+					str.ToLower(t.Param("gene")),
+					"liblin",
+					t.Param("cost"),
+					t.Param("nrmdl"))
+			})
 			if *runSlurm {
 				cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + geneLC // SLURM string
 			}
