@@ -21,8 +21,10 @@ var fid = map[string]int{
 	"obsFuzzActive":    3,
 	"obsFuzzNonactive": 4,
 	"obsFuzzOverall":   5,
-	"cost":             6,
-	"gamma":            7,
+	"classConfidence":  6,
+	"classCredibility": 7,
+	"cost":             8,
+	"gamma":            9,
 }
 
 // gene, efficiency, validity, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, cost)
@@ -62,10 +64,11 @@ func (p *SummarizeCostGammaPerf) Run() {
 	if outIp.Exists() {
 		sp.Info.Printf("Process %s: Out-target %s already exists, so skipping\n", p.Name(), outIp.GetPath())
 	} else {
-		outStr := "Gene\tEfficiency\tValidity\tObsFuzzActive\tObsFuzzNonactive\tObsFuzzOverall\tCost\n"
+		header := []string{"Gene", "Efficiency", "Validity", "ObsFuzzActive", "ObsFuzzNonactive", "ObsFuzzOverall", "ClassConfidence", "ClassCredibility", "Cost"}
 		if p.IncludeGamma {
-			outStr = "Gene\tEfficiency\tValidity\tObsFuzzActive\tObsFuzzNonactive\tObsFuzzOverall\tCost\tGamma\n"
+			header = append(header, "Gamma")
 		}
+		rows := [][]string{header}
 		for iip := range p.In.InChan {
 			gene := iip.GetParam("gene")
 			efficiency := iip.GetKey("efficiency")
@@ -75,15 +78,23 @@ func (p *SummarizeCostGammaPerf) Run() {
 			obsFuzzActive := iip.GetKey("obsfuzz_active")
 			obsFuzzNonactive := iip.GetKey("obsfuzz_nonactive")
 			obsFuzzOverall := iip.GetKey("obsfuzz_overall")
+			classConfidence := iip.GetKey("class_confidence")
+			classCredibility := iip.GetKey("class_credibility")
 
-			infoString := fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n", gene, efficiency, validity, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, cost)
+			row := []string{gene, efficiency, validity, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, classConfidence, classCredibility, cost}
 			if p.IncludeGamma {
-				gamma := iip.GetParam("gamma")
-				infoString = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", gene, efficiency, validity, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, cost, gamma)
+				row = append(row, iip.GetParam("gamma"))
 			}
-			outStr = outStr + infoString
+			rows = append(rows, row)
 		}
-		outIp.WriteTempFile([]byte(outStr))
+		ofh := outIp.OpenWriteTemp()
+		tsvWriter := csv.NewWriter(ofh)
+		tsvWriter.Comma = '\t'
+		for _, row := range rows {
+			tsvWriter.Write(row)
+		}
+		tsvWriter.Flush()
+		ofh.Close()
 		outIp.Atomize()
 	}
 	p.OutStats.Send(outIp)
@@ -361,6 +372,7 @@ func (p *FinalModelSummarizer) Run() {
 		csvWriter.Write(row)
 	}
 	csvWriter.Flush()
+	fh.Close()
 	oip.Atomize()
 	p.OutSummary.Send(oip)
 }

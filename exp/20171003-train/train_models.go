@@ -190,6 +190,8 @@ func main() {
 					newKeys := map[string]string{}
 					newKeys["validity"] = fmt.Sprintf("%.3f", crossValOut.Validity)
 					newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
+					newKeys["class_confidence"] = fmt.Sprintf("%.3f", crossValOut.ClassConfidence)
+					newKeys["class_credibility"] = fmt.Sprintf("%.3f", crossValOut.ClassCredibility)
 					newKeys["obsfuzz_active"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Active)
 					newKeys["obsfuzz_nonactive"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Nonactive)
 					newKeys["obsfuzz_overall"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Overall)
