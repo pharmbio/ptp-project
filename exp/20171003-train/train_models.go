@@ -233,11 +233,12 @@ func main() {
 			cpSignTrain.ParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
 			cpSignTrain.ParamPort("validity").Connect(selectBest.OutBestValidity)
 			cpSignTrain.SetPathCustom("model", func(t *sp.SciTask) string {
-				return fmt.Sprintf("dat/final_models/"+t.Param("replicate")+"/%s_%s_c%s_nrmdl%s.mdl",
+				return fmt.Sprintf("dat/final_models/%s/%s_c%s_nrmdl%s_%s.mdl",
 					str.ToLower(t.Param("gene")),
 					"liblin",
 					t.Param("cost"),
-					t.Param("nrmdl"))
+					t.Param("nrmdl"),
+					t.Param("replicate"))
 			})
 			if *runSlurm {
 				cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + uniq_repl // SLURM string
