@@ -38,7 +38,7 @@ d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 # d <- read.csv("dat/final_models/summary.sorted.tsv", sep = '\t', header = TRUE);
 # --------------------------------------------------------------------------------
 
-counts <- rbind(d$Active, d$Nonactive)
+counts <- rbind(d$ActiveCnt, d$NonactiveCnt)
 
 # Force to avoid scientific numerical format (sci-penalty)
 options(scipen=1, digits="0");
@@ -76,7 +76,7 @@ mtext("Training time (min)", side=4, line=3.6, col="red")
 
 # Plot 1-ClassAvgObsFuzz
 par(new=TRUE)
-plot(bp,1-d$ClassAvgObsFuzz, type="b", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+plot(bp,1-d$ObsFuzzClassAvg, type="b", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 axis(4, las=2, col="blue", col.axis="blue", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
 mtext("Class-averaged Observed Fuzziness", side=4, line=4.8, col="blue")
 

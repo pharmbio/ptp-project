@@ -14,17 +14,14 @@ import (
 
 // ================================================================================
 
-var fid = map[string]int{
-	"gene":             0,
-	"efficiency":       1,
-	"validity":         2,
-	"obsFuzzActive":    3,
-	"obsFuzzNonactive": 4,
-	"obsFuzzOverall":   5,
-	"classConfidence":  6,
-	"classCredibility": 7,
-	"cost":             8,
-	"gamma":            9,
+func indexOfStr(s string, strs []string) int {
+	for i, _ := range strs {
+		if strs[i] == s {
+			return i
+		}
+	}
+	sp.Error.Fatalf("Did not find index of string %s, in strins: %v\n", s, strs)
+	return -1
 }
 
 // gene, efficiency, validity, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, cost)
@@ -107,32 +104,42 @@ func (p *SummarizeCostGammaPerf) IsConnected() bool {
 // ================================================================================
 
 type BestCostGamma struct {
-	procName               string
-	InCSVFile              *sp.FilePort
-	OutBestCost            *sp.ParamPort
-	OutBestGamma           *sp.ParamPort
-	OutBestClassAvgObsFuzz *sp.ParamPort
-	OutBestEfficiency      *sp.ParamPort
-	OutBestValidity        *sp.ParamPort
-	Separator              rune
-	Header                 bool
-	EfficiencyValColIdx    int // Which column to check for the efficiency value
-	ValidityValColIdx      int // Which column to check for the validity value
-	IncludeGamma           bool
+	procName                string
+	InCSVFile               *sp.FilePort
+	OutBestCost             *sp.ParamPort
+	OutBestGamma            *sp.ParamPort
+	OutBestValidity         *sp.ParamPort
+	OutBestEfficiency       *sp.ParamPort
+	OutBestObsFuzzClassAvg  *sp.ParamPort
+	OutBestObsFuzzOverall   *sp.ParamPort
+	OutBestObsFuzzActive    *sp.ParamPort
+	OutBestObsFuzzNonactive *sp.ParamPort
+	OutBestClassConfidence  *sp.ParamPort
+	OutBestClassCredibility *sp.ParamPort
+	Separator               rune
+	Header                  bool
+	EfficiencyValColIdx     int // Which column to check for the efficiency value
+	ValidityValColIdx       int // Which column to check for the validity value
+	IncludeGamma            bool
 }
 
 func NewBestCostGamma(wf *sp.Workflow, procName string, separator rune, header bool, includeGamma bool) *BestCostGamma {
 	sbcr := &BestCostGamma{
-		procName:               procName,
-		InCSVFile:              sp.NewFilePort(),
-		OutBestCost:            sp.NewParamPort(),
-		OutBestGamma:           sp.NewParamPort(),
-		OutBestClassAvgObsFuzz: sp.NewParamPort(),
-		OutBestEfficiency:      sp.NewParamPort(),
-		OutBestValidity:        sp.NewParamPort(),
-		Separator:              separator,
-		Header:                 header,
-		IncludeGamma:           includeGamma,
+		procName:                procName,
+		InCSVFile:               sp.NewFilePort(),
+		OutBestValidity:         sp.NewParamPort(),
+		OutBestEfficiency:       sp.NewParamPort(),
+		OutBestObsFuzzClassAvg:  sp.NewParamPort(),
+		OutBestObsFuzzOverall:   sp.NewParamPort(),
+		OutBestObsFuzzActive:    sp.NewParamPort(),
+		OutBestObsFuzzNonactive: sp.NewParamPort(),
+		OutBestClassConfidence:  sp.NewParamPort(),
+		OutBestClassCredibility: sp.NewParamPort(),
+		OutBestCost:             sp.NewParamPort(),
+		OutBestGamma:            sp.NewParamPort(),
+		Separator:               separator,
+		Header:                  header,
+		IncludeGamma:            includeGamma,
 	}
 	wf.AddProc(sbcr)
 	return sbcr
@@ -147,9 +154,14 @@ func (p *BestCostGamma) Run() {
 	if p.IncludeGamma {
 		defer p.OutBestGamma.Close()
 	}
-	defer p.OutBestClassAvgObsFuzz.Close()
-	defer p.OutBestEfficiency.Close()
 	defer p.OutBestValidity.Close()
+	defer p.OutBestEfficiency.Close()
+	defer p.OutBestObsFuzzClassAvg.Close()
+	defer p.OutBestObsFuzzOverall.Close()
+	defer p.OutBestObsFuzzActive.Close()
+	defer p.OutBestObsFuzzNonactive.Close()
+	defer p.OutBestClassConfidence.Close()
+	defer p.OutBestClassCredibility.Close()
 
 	go p.InCSVFile.RunMergeInputs()
 
@@ -160,12 +172,19 @@ func (p *BestCostGamma) Run() {
 		csvReader := csv.NewReader(bytesReader)
 		csvReader.Comma = p.Separator
 
-		minClassAvgObsFuzz := 1000000.000 // N.B: The best efficiency in Conformal Prediction is the *minimal* one. Initializing here with an unreasonably large number in order to spot when something is wrong.
+		bestClassAvgObsFuzz := 1000000.000 // N.B: The best efficiency in Conformal Prediction is the *minimal* one. Initializing here with an unreasonably large number in order to spot when something is wrong.
 
-		var bestCost int64
-		var bestGamma float64 // Only used for libSVM
-		var bestEfficiency float64
-		var bestValidity float64
+		var header []string
+
+		var bestCost int64 = -1
+		var bestGamma float64 = -1.0
+		var bestValidity float64 = -1.0
+		var bestEfficiency float64 = -1.0
+		var bestObsFuzzOverall float64 = -1.0
+		var bestObsFuzzActive float64 = -1.0
+		var bestObsFuzzNonactive float64 = -1.0
+		var bestClassConfidence float64 = -1.0
+		var bestClassCredibility float64 = -1.0
 
 		i := 0
 		for {
@@ -174,56 +193,96 @@ func (p *BestCostGamma) Run() {
 				break
 			}
 			i++
-			if i == 1 && !p.Header {
-				continue
+			if i == 1 {
+				header = rec
+				if !p.Header {
+					continue
+				}
 			}
 
-			obsFuzzActive, err := strconv.ParseFloat(rec[fid["obsFuzzActive"]], 64)
+			obsFuzzActive, err := strconv.ParseFloat(rec[indexOfStr("ObsFuzzActive", header)], 64)
 			sp.CheckErr(err)
 
-			obsFuzzNonactive, err := strconv.ParseFloat(rec[fid["obsFuzzNonactive"]], 64)
+			obsFuzzNonactive, err := strconv.ParseFloat(rec[indexOfStr("ObsFuzzNonactive", header)], 64)
 			sp.CheckErr(err)
 
 			classAvgObsFuzz := (obsFuzzActive + obsFuzzNonactive) / 2 // We take the average for the two classes, to get more equal influence of each class
 
-			if classAvgObsFuzz < minClassAvgObsFuzz {
-				minClassAvgObsFuzz = classAvgObsFuzz
+			if classAvgObsFuzz < bestClassAvgObsFuzz { // Smaller is better
+				bestClassAvgObsFuzz = classAvgObsFuzz
 
-				sp.Debug.Printf("Proc:%s Raw cost value: %s\n", p.Name(), rec[fid["cost"]])
-				bestCost, err = strconv.ParseInt(rec[fid["cost"]], 10, 0)
+				sp.Debug.Printf("Proc:%s Raw cost value: %s\n", p.Name(), rec[indexOfStr("Cost", header)])
+				bestCost, err = strconv.ParseInt(rec[indexOfStr("Cost", header)], 10, 0)
 				sp.Debug.Printf("Proc:%s Parsed cost value: %d\n", p.Name(), bestCost)
 				sp.CheckErr(err)
 
 				if p.IncludeGamma {
-					bestGamma, err = strconv.ParseFloat(rec[fid["gamma"]], 64)
+					bestGamma, err = strconv.ParseFloat(rec[indexOfStr("Gamma", header)], 64)
 					sp.CheckErr(err)
 				}
 
-				bestEfficiency, err = strconv.ParseFloat(rec[fid["efficiency"]], 64)
+				bestValidity, err = strconv.ParseFloat(rec[indexOfStr("Validity", header)], 64)
 				sp.CheckErr(err)
-				bestValidity, err = strconv.ParseFloat(rec[fid["validity"]], 64)
+
+				bestEfficiency, err = strconv.ParseFloat(rec[indexOfStr("Efficiency", header)], 64)
+				sp.CheckErr(err)
+
+				bestObsFuzzOverall, err = strconv.ParseFloat(rec[indexOfStr("ObsFuzzOverall", header)], 64)
+				sp.CheckErr(err)
+
+				bestObsFuzzActive = obsFuzzActive
+				bestObsFuzzNonactive = obsFuzzNonactive
+
+				bestClassConfidence, err = strconv.ParseFloat(rec[indexOfStr("ClassConfidence", header)], 64)
+				sp.CheckErr(err)
+
+				bestClassCredibility, err = strconv.ParseFloat(rec[indexOfStr("ClassCredibility", header)], 64)
 				sp.CheckErr(err)
 			}
 		}
-		sp.Debug.Printf("Final optimal (minimal) class-equalized observed fuzziness: %f (For: Cost:%03d)\n", minClassAvgObsFuzz, bestCost)
+		sp.Debug.Printf("Final optimal (minimal) class-equalized observed fuzziness: %f (For: Cost:%03d)\n", bestClassAvgObsFuzz, bestCost)
 		if p.IncludeGamma {
-			sp.Debug.Printf("Final optimal (minimal) class-equalized observed fuzziness: %f (For: Cost:%03d, Gamma:%.3f)\n", minClassAvgObsFuzz, bestCost, bestGamma)
+			sp.Debug.Printf("Final optimal (minimal) class-equalized observed fuzziness: %f (For: Cost:%03d, Gamma:%.3f)\n", bestClassAvgObsFuzz, bestCost, bestGamma)
 		}
 		p.OutBestCost.Send(fmt.Sprintf("%d", bestCost))
 		if p.IncludeGamma {
 			p.OutBestGamma.Send(fmt.Sprintf("%.3f", bestGamma))
 		}
-		p.OutBestClassAvgObsFuzz.Send(fmt.Sprintf("%.3f", minClassAvgObsFuzz))
-		p.OutBestEfficiency.Send(fmt.Sprintf("%.3f", bestEfficiency))
 		p.OutBestValidity.Send(fmt.Sprintf("%.3f", bestValidity))
+		p.OutBestEfficiency.Send(fmt.Sprintf("%.3f", bestEfficiency))
+		p.OutBestObsFuzzClassAvg.Send(fmt.Sprintf("%.3f", bestClassAvgObsFuzz))
+		p.OutBestObsFuzzOverall.Send(fmt.Sprintf("%.3f", bestObsFuzzOverall))
+		p.OutBestObsFuzzActive.Send(fmt.Sprintf("%.3f", bestObsFuzzActive))
+		p.OutBestObsFuzzNonactive.Send(fmt.Sprintf("%.3f", bestObsFuzzNonactive))
+		p.OutBestClassConfidence.Send(fmt.Sprintf("%.3f", bestClassConfidence))
+		p.OutBestClassCredibility.Send(fmt.Sprintf("%.3f", bestClassCredibility))
 	}
 }
 
 func (p *BestCostGamma) IsConnected() bool {
 	if p.IncludeGamma {
-		return p.InCSVFile.IsConnected() && p.OutBestCost.IsConnected() && p.OutBestGamma.IsConnected() && p.OutBestClassAvgObsFuzz.IsConnected() && p.OutBestValidity.IsConnected()
+		return p.InCSVFile.IsConnected() &&
+			p.OutBestValidity.IsConnected() &&
+			p.OutBestEfficiency.IsConnected() &&
+			p.OutBestObsFuzzClassAvg.IsConnected() &&
+			p.OutBestObsFuzzOverall.IsConnected() &&
+			p.OutBestObsFuzzActive.IsConnected() &&
+			p.OutBestObsFuzzNonactive.IsConnected() &&
+			p.OutBestClassConfidence.IsConnected() &&
+			p.OutBestClassCredibility.IsConnected() &&
+			p.OutBestCost.IsConnected() &&
+			p.OutBestGamma.IsConnected()
 	}
-	return p.InCSVFile.IsConnected() && p.OutBestCost.IsConnected() && p.OutBestClassAvgObsFuzz.IsConnected() && p.OutBestValidity.IsConnected()
+	return p.InCSVFile.IsConnected() &&
+		p.OutBestValidity.IsConnected() &&
+		p.OutBestEfficiency.IsConnected() &&
+		p.OutBestObsFuzzClassAvg.IsConnected() &&
+		p.OutBestObsFuzzOverall.IsConnected() &&
+		p.OutBestObsFuzzActive.IsConnected() &&
+		p.OutBestObsFuzzNonactive.IsConnected() &&
+		p.OutBestClassConfidence.IsConnected() &&
+		p.OutBestClassCredibility.IsConnected() &&
+		p.OutBestCost.IsConnected()
 }
 
 // ================================================================================
@@ -346,14 +405,35 @@ func (p *FinalModelSummarizer) Run() {
 		totalCompounds[gene] = activeCnt + nonActiveCnt
 	}
 
-	rows := [][]string{[]string{"Gene", "Replicate", "ClassAvgObsFuzz", "Efficiency", "Validity", "Cost", "ExecTimeMS", "ModelFileSize", "Active", "Nonactive", "TotalCompounds"}}
+	rows := [][]string{[]string{
+		"Gene",
+		"Replicate",
+		"Validity",
+		"Efficiency",
+		"ObsFuzzClassAvg",
+		"ObsFuzzOverall",
+		"ObsFuzzActive",
+		"ObsFuzzNonactive",
+		"ClassConfidence",
+		"ClassCredibility",
+		"Cost",
+		"ExecTimeMS",
+		"SizeBytes",
+		"ActiveCnt",
+		"NonactiveCnt",
+		"TotalCnt"}}
 	for iip := range p.InModel.InChan {
 		row := []string{
 			iip.GetParam("gene"),
 			iip.GetParam("replicate"),
-			iip.GetParam("clsavgobsfuzz"),
-			iip.GetParam("efficiency"),
 			iip.GetParam("validity"),
+			iip.GetParam("efficiency"),
+			iip.GetParam("obsfuzz_classavg"),
+			iip.GetParam("obsfuzz_overall"),
+			iip.GetParam("obsfuzz_active"),
+			iip.GetParam("obsfuzz_nonactive"),
+			iip.GetParam("class_confidence"),
+			iip.GetParam("class_credibility"),
 			iip.GetParam("cost"),
 			fmt.Sprintf("%d", iip.GetAuditInfo().ExecTimeMS),
 			fmt.Sprintf("%d", iip.GetSize()),

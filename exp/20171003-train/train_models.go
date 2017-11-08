@@ -204,6 +204,9 @@ func main() {
 				summarize.In.Connect(extractCostGammaStats.Out)
 			} // end for cost
 
+			// TODO: Let select best operate directly on the stream of IPs, not
+			// via the summarize component, so that we can retain the keys in
+			// the IP!
 			selectBest := NewBestCostGamma(wf,
 				"select_best_cost_gamma_"+uniq_repl,
 				'\t',
@@ -223,15 +226,20 @@ func main() {
 									--nr-models {p:nrmdl} \
 									--cost {p:cost} \
 									--model-out {o:model} \
-									--model-name "{p:gene} target profile" # (Cost-Equalized Observed Fuzziness: {p:clsavgobsfuzz}, Efficiency: {p:efficiency}, Validity: {p:validity}, Replicate: {p:replicate})`)
+									--model-name "{p:gene} target profile" # {p:replicate} Validity: {p:validity} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
 			cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
 			cpSignTrain.ParamPort("nrmdl").ConnectStr("10")
-			cpSignTrain.ParamPort("cost").Connect(selectBest.OutBestCost)
 			cpSignTrain.ParamPort("gene").ConnectStr(gene)
 			cpSignTrain.ParamPort("replicate").ConnectStr(replicate)
-			cpSignTrain.ParamPort("clsavgobsfuzz").Connect(selectBest.OutBestClassAvgObsFuzz)
-			cpSignTrain.ParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
 			cpSignTrain.ParamPort("validity").Connect(selectBest.OutBestValidity)
+			cpSignTrain.ParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
+			cpSignTrain.ParamPort("obsfuzz_classavg").Connect(selectBest.OutBestObsFuzzClassAvg)
+			cpSignTrain.ParamPort("obsfuzz_overall").Connect(selectBest.OutBestObsFuzzOverall)
+			cpSignTrain.ParamPort("obsfuzz_active").Connect(selectBest.OutBestObsFuzzActive)
+			cpSignTrain.ParamPort("obsfuzz_nonactive").Connect(selectBest.OutBestObsFuzzNonactive)
+			cpSignTrain.ParamPort("class_confidence").Connect(selectBest.OutBestClassConfidence)
+			cpSignTrain.ParamPort("class_credibility").Connect(selectBest.OutBestClassCredibility)
+			cpSignTrain.ParamPort("cost").Connect(selectBest.OutBestCost)
 			cpSignTrain.SetPathCustom("model", func(t *sp.SciTask) string {
 				return fmt.Sprintf("dat/final_models/%s/%s_c%s_nrmdl%s_%s.mdl",
 					str.ToLower(t.Param("gene")),
