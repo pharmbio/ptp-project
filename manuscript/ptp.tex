@@ -163,6 +163,29 @@ PTGS2, SLC6A2, ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR,
 SLC6A4, OPRM1, HTR1A, SLC6A3, OPRK1, AVPR1A, ADRB2, DRD2,
 KCNH2, DRD1, HTR2A, CHRM1.
 
+\subsection{Choice of cost value for liblinear}
+
+For each of the 31 targets, we ran a parameter sweep to find the value of the
+cost parameter of liblinear that gave the best efficiency measure. The
+efficiency measure we used, was a slightly modified version of observed
+fuzziness scores as described in [REF]. Instead of using an overall observed
+fuzziness, which would have been been influenced more by values in the larger
+class in case of imbalanced datasets, we first calculated the observed
+fuzziness per class and divided it by the number of examples (compounds) in
+that class, and finally took the mean value of the resulting normalized
+observed fuzziness values for each class. In other words, we could thus call
+our measure a "class-normalized observed fuzziness" (CNOF).
+
+The parameter sweep evaluated three values for the cost parameter, for each
+target; 1, 10 and 100.
+
+for evaluation of the CNOF score mentioned above, we ran cross-validation
+though cpsign's built-in crossvalidate function, with 10 folds.  The training
+approach in the crossvalidation was the same as the one used to build the final
+model: Aggregated Conformal Prediction (ACP) with 10 aggregated models
+(specified to cpsign's crossvalidate and train commands using the
+\texttt{--nr-models flag})
+
 %For \textbf{Original Research} Articles \citep{conference}, Clinical Trial Articles
 %\citep{article}, and Technology Reports \citep{patent}, the introduction should
 %be succinct, with no subheadings \citep{book}. For Case Reports the
