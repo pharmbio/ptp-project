@@ -198,7 +198,16 @@ though cpsign's built-in crossvalidate function, with 10 folds.  The training
 approach in the crossvalidation was the same as the one used to build the final
 model: Aggregated Conformal Prediction (ACP) with 10 aggregated models
 (specified to cpsign's crossvalidate and train commands using the
-\texttt{--nr-models flag})
+\texttt{--nr-models} flag)
+
+\subsection{Building final models}
+
+Before the final training the cpsign precompute command was run, in order to
+generate a sparse representation of the dataset for the final training.
+The final models were then built using the cpsign train command. The cost value
+used is the one obtained from the cross validation, as described above.
+The training type was -- just as in the cross validation for selecting the cosr
+value -- Aggregated Conformal Prediction (ACP), with 10 aggregated models.
 
 %For \textbf{Original Research} Articles \citep{conference}, Clinical Trial Articles
 %\citep{article}, and Technology Reports \citep{patent}, the introduction should
