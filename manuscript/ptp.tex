@@ -23,6 +23,8 @@
 %\setcitestyle{square} % for Physics and Applied Mathematics and Statistics articles
 \usepackage{url,hyperref,lineno,microtype,subcaption}
 \usepackage[onehalfspacing]{setspace}
+\usepackage{todonotes}
+\newcommand{\todoil}[1]{\todo[inline]{#1}}
 
 \linenumbers
 
@@ -32,7 +34,7 @@
 
 \def\keyFont{\fontsize{8}{11}\helveticabold }
 \def\firstAuthorLast{Sample {et~al.}} %use et al only if is more than 1 author
-\def\Authors{Samuel Lampa\,$^{1,*}$, Co-Author\,$^{2}$ and Ola Spjuth\,$^{1,2}$}
+\def\Authors{Samuel Lampa\,$^{1,*}$, Co-Author\,$^{2}$, Co-Author\,$^{2}$ and Ola Spjuth\,$^{1,2}$}
 % Affiliations should be keyed to the author's name with superscript numbers
 % and be listed as follows: Laboratory, Institute, Department, Organization,
 % City, State abbreviation (USA, Canada, Australia), and Country (without
@@ -86,6 +88,24 @@ $^{2}$Laboratory X, Institute X, Department X, Organization X, City X , State XX
 %    your article does not require one, please see
 %    \href{http://www.frontiersin.org/about/AuthorGuidelines#SummaryTable}{Summary
 %    Table} for details according to article type.
+
+Off-target pharmacology and polypharmacology has big implications on drug
+efficacy and safety, and prediction of target binding profiles for ligands
+is an important task that can aid early drug discovery [REF1]. However,
+available methods for ligand-based target profiling do not offer valid
+measures of confidence in predictions or well-calibrated probabilities. We
+present an approach for ligand-based target profiling using probabilistic
+predictions, delivering target profiles with valid predictions of the
+probability for the query \todoil{candidate?} compound to interact with each target. The
+probabilities are calculated using the Cross Venn-Aber\todoil{Cross-Conformal?} methodology [REF2],
+with support vector machines for modeling and chemical structures described
+by the signature descriptor [REF3]. We study profiles for different sets of
+targets, including a subset of the minimal panel of 44 targets for broad early
+hazard assessment suggested by Bowes et al.[REF1], but also the
+applicability of larger as well as focused target sets. The resulting
+method is available as an online Web service via an API, and we also make
+the complete workflow for reproducing the study together with all models
+publicly available.
 
 
 \tiny
