@@ -137,16 +137,31 @@ The dataset used for information about binding association between ligands and
 targets, was ExcapeDB.
 
 As targets, a subset of the panel of 44 targets as suggested in Bowes et al
-[REF] was used.
-
-Specifically, this list of 44 targets was filtered to remove any target for
-which the dataset contained less than 100 data points about either associated
-or non-associated ligands. Thus, only targets with at least 100 associated, and
-at least 100 non-associated ligands, where kept.
+[REF] was used. Specifically, this list of 44 targets was filtered to remove
+any target for which the dataset contained less than 100 data points about
+either associated or non-associated ligands respecitvely. Thus, only targets
+with at least 100 associated, and at least 100 non-associated, compounds, where
+kept.
 
 Some of the gene ids used in Bowes et al was not found in their exact form in
 the ExcapeDB dataset. To resolve this, we did PubMed entrez searches, to find
 synonymous gene IDs. The following replacements of gene ids were done:
+
+KCNE1 was replaced with MINK1 which is available in ExcapeDB. CHRNA1 (coding
+for the $\alpha1$ subunit of the Acetylcholine receptor) is skipped, as it was
+not found in the dataset. CHRNA4 (coding for the $\alpha4$ subunit of the
+Acetylcholine receptor) is included though.
+
+Both MINK1 and CHRNA4 were removed in the filtering step mentioned above, since
+the dataset did not contain more than 100 active and 100 non-active compounds
+for neither MINK1 nor CHRNA4.
+
+The resulting panel consists of 31 targets, represented by the following gene
+IDs in the ExcapeDB dataset, and througout this article: PDE3A,
+SCN5A, CCKAR, ADRB1, PTGS1, CHRM3, CHRM2, EDNRA, MAOA, LCK,
+PTGS2, SLC6A2, ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR,
+SLC6A4, OPRM1, HTR1A, SLC6A3, OPRK1, AVPR1A, ADRB2, DRD2,
+KCNH2, DRD1, HTR2A, CHRM1.
 
 %For \textbf{Original Research} Articles \citep{conference}, Clinical Trial Articles
 %\citep{article}, and Technology Reports \citep{patent}, the introduction should
