@@ -163,6 +163,20 @@ PTGS2, SLC6A2, ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR,
 SLC6A4, OPRM1, HTR1A, SLC6A3, OPRK1, AVPR1A, ADRB2, DRD2,
 KCNH2, DRD1, HTR2A, CHRM1.
 
+\subsection{Software for training and cross-validation}
+
+The software for training and cross-validation was the cpsign software [REF]
+previously developed in the group. Certain modifications were done based on
+needs identified in the project, which have been merged into the latest
+release of the cpsign software. cpsign is a commercial software, available
+from genettasoft.com [LINK].
+
+The computational workflows for orchestrating the extraction of data, running
+cpsign, and the collection of results for summarization and plotting, were
+implemented in the Go programming language, using the SciPipe workflow library
+developed in the group, and which is available as open source software on
+scipipe.org and github.com/scipipe/scipipe [LINK].
+
 \subsection{Choice of cost value for liblinear}
 
 For each of the 31 targets, we ran a parameter sweep to find the value of the
