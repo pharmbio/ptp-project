@@ -38,6 +38,41 @@ var (
 			"OPRM1", "HTR1A", "SLC6A3", "OPRK1", "AVPR1A", "ADRB2", "DRD2", "KCNH2", "DRD1", "HTR2A",
 			"CHRM1",
 		},
+		"bowes44min100percls_small": []string{
+			"PDE3A",
+			"SCN5A",
+			"CCKAR",
+			"ADRB1",
+			"PTGS1",
+			"CHRM3",
+			"CHRM2",
+			"EDNRA",
+			"MAOA",
+			"LCK",
+			"PTGS2",
+			"SLC6A2",
+			"ACHE",
+			"CNR2",
+			"CNR1",
+			"ADORA2A",
+			"OPRD1",
+			"NR3C1",
+			"AR",
+			"SLC6A4",
+			"OPRM1",
+		},
+		"bowes44min100percls_large": []string{
+			"HTR1A",
+			"SLC6A3",
+			"OPRK1",
+			"AVPR1A",
+			"ADRB2",
+			"DRD2",
+			"KCNH2",
+			"DRD1",
+			"HTR2A",
+			"CHRM1",
+		},
 		"smallest1": []string{
 			"PDE3A",
 		},
@@ -125,6 +160,9 @@ func main() {
 		countTargetDataRows.SetPathExtend("targetdata", "count", ".count")
 		countTargetDataRows.In("targetdata").Connect(extractTargetData.Out("target_data"))
 		countTargetDataRows.ParamPort("gene").ConnectStr(gene)
+
+		//fillAssumedNonbinding := wf.NewProc("fill_assu_nonb_"+uniq_gene, ``)
+		//fillAssumedNonbinding.In("count").Connect(countTargetDataRows.ParamPort("count"))
 
 		// --------------------------------------------------------------------------------
 		// Pre-compute step
