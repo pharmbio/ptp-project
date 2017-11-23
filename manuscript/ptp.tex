@@ -116,7 +116,6 @@ models publicly available.
 \section{Introduction}
 
 \todoil{Expand the intro below which is just taken from the abstract}
-
 Off-target pharmacology and polypharmacology has big implications on drug
 efficacy and safety, and prediction of target binding profiles for ligands is
 an important task that can aid early drug discovery [REF1]. However, available
@@ -137,14 +136,14 @@ target sets.
 The dataset used for information about binding association between ligands and
 targets, was ExcapeDB.
 
-As targets, a subset of the panel of 44 targets as suggested in Bowes et al
+As targets, a subset of the panel of 44 targets as suggested in Bowes et al.
 [REF] was used. Specifically, this list of 44 targets was filtered to remove
 any target for which the dataset contained less than 100 data points about
-either associated or non-associated ligands respecitvely. Thus, only targets
+either associated or non-associated ligands respectively. Thus, only targets
 with at least 100 associated, and at least 100 non-associated, compounds, where
 kept.
 
-Some of the gene ids used in Bowes et al was not found in their exact form in
+Some of the gene ids used in Bowes et al. was not found in their exact form in
 the ExcapeDB dataset. To resolve this, we did PubMed entrez searches, to find
 synonymous gene IDs. The following replacements of gene ids were done:
 
@@ -195,7 +194,7 @@ The parameter sweep evaluated three values for the cost parameter, for each
 target; 1, 10 and 100.
 
 for evaluation of the CNOF score mentioned above, we ran cross-validation
-though cpsign's built-in crossvalidate function, with 10 folds.  The training
+through cpsign's built-in crossvalidate function, with 10 folds.  The training
 approach in the crossvalidation was the same as the one used to build the final
 model: Aggregated Conformal Prediction (ACP) with 10 aggregated models
 (specified to cpsign's crossvalidate and train commands using the
@@ -207,7 +206,7 @@ Before the final training the cpsign precompute command was run, in order to
 generate a sparse representation of the dataset for the final training.
 The final models were then built using the cpsign train command. The cost value
 used is the one obtained from the cross validation, as described above.
-The training type was -- just as in the cross validation for selecting the cosr
+The training type was -- just as in the cross validation for selecting the cost
 value -- Aggregated Conformal Prediction (ACP), with 10 aggregated models.
 
 %For \textbf{Original Research} Articles \citep{conference}, Clinical Trial Articles
