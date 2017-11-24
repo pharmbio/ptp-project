@@ -228,7 +228,8 @@ func main() {
 					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 					geneLC := str.ToLower(t.Param("gene"))
 					sp.CheckErr(err)
-					return str.Replace(t.InPath("traindata"), filepath.Base(t.InPath("traindata")), t.Param("replicate")+"/"+geneLC+".tsv", 1) + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
+					trainDataBasePath := filepath.Base(t.InPath("traindata"))
+					return str.Replace(t.InPath("traindata"), trainDataBasePath, t.Param("replicate")+"/"+trainDataBasePath, 1) + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
 				})
 				evalCost.In("traindata").Connect(targetDataPort)
 				evalCost.ParamPort("nrmdl").ConnectStr("10")
