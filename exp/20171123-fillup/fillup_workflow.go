@@ -170,7 +170,7 @@ func main() {
 			createRandomBytes := wf.NewProc("create_random_bytes_"+uniq_gene, "dd if=/dev/urandom of={o:rand} bs=1048576 count=100")
 			createRandomBytes.SetPathStatic("rand", "dat/"+geneLC+"_random_bytes.bin")
 
-			fillAssumedNonbinding := wf.NewProc("fillup_"+uniq_gene, `cat {i:targetdata} > {o:filledup} && let "fillup_lines = "$(wc -l {i:targetdata} | awk '{ printf $1 }')" * 2" && tail -n +2 {i:rawdata} | grep -v {p:gene} | shuf --random-source={i:randsrc} | head -n $fillup_lines >> {o:filledup}`)
+			fillAssumedNonbinding := wf.NewProc("fillup_"+uniq_gene, `cat {i:targetdata} > {o:filledup} && let "fillup_lines_cnt = "$(wc -l {i:targetdata} | awk '{ printf $1 }')" * 2" && tail -n +2 {i:rawdata} | awk -F"\t" '$9 != "{p:gene}" { $12 "\tN" }' | sort | uniq | shuf --random-source={i:randsrc} | head -n $fillup_lines_cnt >> {o:filledup}`)
 			fillAssumedNonbinding.SetPathReplace("targetdata", "filledup", ".tsv", ".filledup.tsv")
 			fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
 			fillAssumedNonbinding.In("rawdata").Connect(unPackDB.Out("unxzed"))
