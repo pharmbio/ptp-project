@@ -191,7 +191,6 @@ func main() {
 									--trainfile {i:traindata} \
 									--labels A, N \
 									--model-out {o:precomp} \
-
 									--model-name "`+gene+` target profile"`)
 		cpSignPrecomp.In("traindata").Connect(targetDataPort)
 		cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
