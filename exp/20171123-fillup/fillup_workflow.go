@@ -226,7 +226,6 @@ func main() {
 									--confidence {p:confidence} | grep -P "^{" > {o:stats} # {p:gene} {p:replicate}`)
 				evalCost.SetPathCustom("stats", func(t *sp.SciTask) string {
 					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
-					geneLC := str.ToLower(t.Param("gene"))
 					sp.CheckErr(err)
 					trainDataBasePath := filepath.Base(t.InPath("traindata"))
 					return str.Replace(t.InPath("traindata"), trainDataBasePath, t.Param("replicate")+"/"+trainDataBasePath, 1) + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
