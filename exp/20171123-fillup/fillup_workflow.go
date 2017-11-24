@@ -4,6 +4,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	str "strings"
@@ -228,7 +229,7 @@ func main() {
 					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 					geneLC := str.ToLower(t.Param("gene"))
 					sp.CheckErr(err)
-					return str.Replace(t.InPath("traindata"), geneLC+".tsv", t.Param("replicate")+"/"+geneLC+".tsv", 1) + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
+					return str.Replace(t.InPath("traindata"), filepath.Base(t.InPath("traindata")), t.Param("replicate")+"/"+geneLC+".tsv", 1) + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
 				})
 				evalCost.In("traindata").Connect(targetDataPort)
 				evalCost.ParamPort("nrmdl").ConnectStr("10")
