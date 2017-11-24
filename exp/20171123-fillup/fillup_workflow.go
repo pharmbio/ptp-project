@@ -169,15 +169,11 @@ func main() {
 			createRandomBytes := wf.NewProc("create_random_bytes_"+uniq_gene, "dd if=/dev/urandom of={o:rand} bs=1048576 count=100")
 			createRandomBytes.SetPathStatic("rand", "dat/"+geneLC+"_random_bytes.bin")
 
-			countIpToParam := spc.NewIpToParamConverter(wf, "count_iptoparam_"+uniq_gene)
-			countIpToParam.InFile.Connect(countTargetDataRows.Out("count"))
-
-			fillAssumedNonbinding := wf.NewProc("fillup_"+uniq_gene, `cat {i:targetdata} > {o:filledup} && let "fillup_lines {p:target_data_count} * 2" && tail -n +2 {i:rawdata} | grep -v {p:gene} | shuf --random-source={i:randsrc} | head -n $fillup_lines >> {o:filledup}`)
+			fillAssumedNonbinding := wf.NewProc("fillup_"+uniq_gene, `cat {i:targetdata} > {o:filledup} && let "fillup_lines = "$(wc -l {i:targetdata} | awk '{ printf $1 }')" * 2" && tail -n +2 {i:rawdata} | grep -v {p:gene} | shuf --random-source={i:randsrc} | head -n $fillup_lines >> {o:filledup}`)
 			fillAssumedNonbinding.SetPathReplace("targetdata", "filledup", ".tsv", ".filledup.tsv")
 			fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
 			fillAssumedNonbinding.In("rawdata").Connect(unPackDB.Out("unxzed"))
 			fillAssumedNonbinding.In("randsrc").Connect(createRandomBytes.Out("rand"))
-			fillAssumedNonbinding.ParamPort("target_data_count").Connect(countIpToParam.OutParam)
 			fillAssumedNonbinding.ParamPort("gene").ConnectStr(gene)
 			targetDataPort = fillAssumedNonbinding.Out("filledup")
 		} else {
