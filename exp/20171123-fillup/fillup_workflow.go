@@ -142,6 +142,8 @@ func main() {
 	// Set up gene-specific workflow branches
 	// --------------------------------
 	for _, gene := range geneSets[*geneSet] {
+		doFillUp := strInSlice(gene, geneSets["bowes44min100percls_small"])
+
 		geneLC := str.ToLower(gene)
 		uniq_gene := geneLC
 
@@ -161,9 +163,11 @@ func main() {
 		countTargetDataRows.In("targetdata").Connect(extractTargetData.Out("target_data"))
 		countTargetDataRows.ParamPort("gene").ConnectStr(gene)
 
-		if strInSlice(gene, geneSets["bowes44min100percls_small"]) {
+		var targetDataPort *sp.FilePort
+
+		if doFillUp {
 			createRandomBytes := wf.NewProc("create_random_bytes_"+uniq_gene, "dd if=/dev/urandom of={o:rand} bs=1048576 count=100")
-			createRandomBytes.SetPathStatic("rand", geneLC+"_random_bytes.bin")
+			createRandomBytes.SetPathStatic("rand", "dat/"+geneLC+"_random_bytes.bin")
 
 			countIpToParam := spc.NewIpToParamConverter(wf, "count_iptoparam_"+uniq_gene)
 			countIpToParam.InFile.Connect(countTargetDataRows.Out("count"))
@@ -175,6 +179,9 @@ func main() {
 			fillAssumedNonbinding.In("randsrc").Connect(createRandomBytes.Out("rand"))
 			fillAssumedNonbinding.ParamPort("target_data_count").Connect(countIpToParam.OutParam)
 			fillAssumedNonbinding.ParamPort("gene").ConnectStr(gene)
+			targetDataPort = fillAssumedNonbinding.Out("filledup")
+		} else {
+			targetDataPort = extractTargetData.Out("target_data")
 		}
 
 		// --------------------------------------------------------------------------------
@@ -187,8 +194,9 @@ func main() {
 									--trainfile {i:traindata} \
 									--labels A, N \
 									--model-out {o:precomp} \
+
 									--model-name "`+gene+` target profile"`)
-		cpSignPrecomp.In("traindata").Connect(extractTargetData.Out("target_data"))
+		cpSignPrecomp.In("traindata").Connect(targetDataPort)
 		cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
 		if *runSlurm {
 			cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLC // SLURM string
@@ -226,7 +234,7 @@ func main() {
 					sp.CheckErr(err)
 					return str.Replace(t.InPath("traindata"), geneLC+".tsv", t.Param("replicate")+"/"+geneLC+".tsv", 1) + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
 				})
-				evalCost.In("traindata").Connect(extractTargetData.Out("target_data"))
+				evalCost.In("traindata").Connect(targetDataPort)
 				evalCost.ParamPort("nrmdl").ConnectStr("10")
 				evalCost.ParamPort("cvfolds").ConnectStr("10")
 				evalCost.ParamPort("confidence").ConnectStr("0.9")
