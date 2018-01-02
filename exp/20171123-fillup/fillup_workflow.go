@@ -138,19 +138,15 @@ func main() {
 	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
-	createSQLiteDB := wf.NewProc("CreateSQLiteDB", `sqlite3 {o:dbfile} 'CREATE TABLE {p:tablename} (Ambit_InchiKey TEXT, Original_Entry_ID TEXT, Entrez_ID INTEGER, Activity_Flag TEXT, DB TEXT, Original_Assay_ID INTEGER, Tax_ID INTEGER, Gene_Symbol TEXT, Ortholog_Group INTEGER, InChI TEXT, SMILES TEXT);'`)
+	createSQLiteDB := wf.NewProc("CreateSQLiteDB", `sqlite3 {o:dbfile} 'CREATE TABLE {p:tablename} (Ambit_InchiKey TEXT, Original_Entry_ID TEXT, Entrez_ID INTEGER, Activity_Flag TEXT, pXC50 REAL, DB TEXT, Original_Assay_ID INTEGER, Tax_ID INTEGER, Gene_Symbol TEXT, Ortholog_Group INTEGER, InChI TEXT, SMILES TEXT);'`)
 	createSQLiteDB.SetPathStatic("dbfile", "../../raw/excapedb.db")
 	createSQLiteDB.ParamPort("tablename").ConnectStr("excapedb")
-
-	extractColumns := wf.NewProc("extractCols", `awk -F'\t' '{ print $1 "\t" $2 "\t" $3 "\t" $4 "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $10 "\t" $11 "\t" $12 }' {i:tsvfile} > {o:tsvfile}`)
-	extractColumns.SetPathExtend("tsvfile", "tsvfile", ".extracted.tsv")
-	extractColumns.In("tsvfile").Connect(unPackDB.Out("unxzed"))
 
 	importIntoSQLite := wf.NewProc("importIntoSQLite", `(echo '.mode tabs'; echo '.import {i:tsvfile} {p:tablename}') | sqlite3 {i:dbfile} && echo done > {o:doneflagfile};`)
 	importIntoSQLite.SetPathExtend("tsvfile", "doneflagfile", ".importdone")
 	importIntoSQLite.ParamPort("tablename").ConnectStr("excapedb")
 	importIntoSQLite.In("dbfile").Connect(createSQLiteDB.Out("dbfile"))
-	importIntoSQLite.In("tsvfile").Connect(extractColumns.Out("tsvfile"))
+	importIntoSQLite.In("tsvfile").Connect(unPackDB.Out("unxzed"))
 
 	finalModelsSummary := NewFinalModelSummarizer(wf, "finalmodels_summary_creator", "res/final_models_summary.tsv", '\t')
 	// --------------------------------
