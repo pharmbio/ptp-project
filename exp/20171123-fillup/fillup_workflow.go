@@ -138,6 +138,10 @@ func main() {
 	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
+	extrGeneSmiActiv := wf.NewProc("extr_gene_smi_activ", `awk -F"\t" '{ print $9 "\t" $12 "\t" $4 }' {i:excapedb_tsv} > {o:gene_smi_activ}`)
+	extrGeneSmiActiv.SetPathReplace("excapedb_tsv", "gene_smi_activ", ".tsv", ".ext_gsa.tsv")
+	extrGeneSmiActiv.In("excapedb_tsv").Connect(unPackDB.Out("unxzed"))
+
 	createSQLiteDB := wf.NewProc("CreateSQLiteDB", `sqlite3 {o:dbfile} 'CREATE TABLE {p:tablename} (Ambit_InchiKey TEXT, Original_Entry_ID TEXT, Entrez_ID INTEGER, Activity_Flag TEXT, pXC50 REAL, DB TEXT, Original_Assay_ID INTEGER, Tax_ID INTEGER, Gene_Symbol TEXT, Ortholog_Group INTEGER, InChI TEXT, SMILES TEXT);'`)
 	createSQLiteDB.SetPathStatic("dbfile", "../../raw/excapedb.db")
 	createSQLiteDB.ParamPort("tablename").ConnectStr("excapedb")
@@ -335,10 +339,11 @@ func main() {
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
 	sortSummaryOnDataSize.In("summary").Connect(finalModelsSummary.OutSummary)
 
-	plotSummary := wf.NewProc("plot_summary", "Rscript bin/plot_summary.r -i {i:summary} -o {o:plot} -f png # {i:importedflagfile}")
+	plotSummary := wf.NewProc("plot_summary", "Rscript bin/plot_summary.r -i {i:summary} -o {o:plot} -f png # {i:importedflagfile} {i:gene_smi_activ}")
 	plotSummary.SetPathExtend("summary", "plot", ".plot.png")
 	plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
 	plotSummary.In("importedflagfile").Connect(importIntoSQLite.Out("doneflagfile"))
+	plotSummary.In("gene_smi_activ").Connect(extrGeneSmiActiv.Out("gene_smi_activ"))
 
 	wf.ConnectLast(plotSummary.Out("plot"))
 
