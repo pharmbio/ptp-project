@@ -142,7 +142,7 @@ func main() {
 	createSQLiteDB.SetPathStatic("dbfile", "../../raw/excapedb.db")
 	createSQLiteDB.ParamPort("tablename").ConnectStr("excapedb")
 
-	importIntoSQLite := wf.NewProc("importIntoSQLite", `(echo '.mode tabs'; echo '.import {i:tsvfile} {p:tablename}') | sqlite3 {i:dbfile} && echo done > {o:doneflagfile};`)
+	importIntoSQLite := wf.NewProc("importIntoSQLite", `(echo '.mode tabs'; echo '.import {i:tsvfile} {p:tablename}'; echo 'CREATE INDEX Gene_Symbol ON excapedb(Gene_Symbol);'; echo 'CREATE INDEX Activity_Flag ON excapedb(Activity_Flag);') | sqlite3 {i:dbfile} && echo done > {o:doneflagfile};`)
 	importIntoSQLite.SetPathExtend("tsvfile", "doneflagfile", ".importdone")
 	importIntoSQLite.ParamPort("tablename").ConnectStr("excapedb")
 	importIntoSQLite.In("dbfile").Connect(createSQLiteDB.Out("dbfile"))
