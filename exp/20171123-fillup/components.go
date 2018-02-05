@@ -30,57 +30,54 @@ func indexOfStr(s string, strs []string) int {
 // from cpSign status output to extract information about the efficiency and
 // validity of generated models for given cost and gamma values
 type SummarizeCostGammaPerf struct {
-	In           *sp.FilePort
-	OutStats     *sp.FilePort
+	sp.BaseProcess
 	procName     string
 	FileName     string
 	IncludeGamma bool
 }
 
 func NewSummarizeCostGammaPerf(wf *sp.Workflow, name string, filename string, includeGamma bool) *SummarizeCostGammaPerf {
-	bcgs := &SummarizeCostGammaPerf{
-		In:           sp.NewFilePort(),
-		OutStats:     sp.NewFilePort(),
-		procName:     name,
+	p := &SummarizeCostGammaPerf{
+		BaseProcess:  sp.NewBaseProcess(wf, name),
 		FileName:     filename,
 		IncludeGamma: includeGamma,
 	}
-	wf.AddProc(bcgs)
-	return bcgs
+	p.InitInPort(p, "in")
+	p.InitOutPort(p, "out_stats")
+	wf.AddProc(p)
+	return p
 }
 
-func (p *SummarizeCostGammaPerf) Name() string {
-	return p.procName
-}
+func (p *SummarizeCostGammaPerf) In() *sp.InPort        { return p.InPort("in") }
+func (p *SummarizeCostGammaPerf) OutStats() *sp.OutPort { return p.OutPort("out_stats") }
 
 func (p *SummarizeCostGammaPerf) Run() {
-	defer p.OutStats.Close()
-	go p.In.RunMergeInputs()
+	defer p.OutStats().Close()
 
-	outIp := sp.NewInformationPacket(p.FileName)
+	outIp := sp.NewIP(p.FileName)
 	if outIp.Exists() {
-		sp.Info.Printf("Process %s: Out-target %s already exists, so skipping\n", p.Name(), outIp.GetPath())
+		sp.Info.Printf("Process %s: Out-target %s already exists, so skipping\n", p.Name(), outIp.Path())
 	} else {
 		header := []string{"Gene", "Efficiency", "Validity", "ObsFuzzActive", "ObsFuzzNonactive", "ObsFuzzOverall", "ClassConfidence", "ClassCredibility", "Cost"}
 		if p.IncludeGamma {
 			header = append(header, "Gamma")
 		}
 		rows := [][]string{header}
-		for iip := range p.In.InChan {
-			gene := iip.GetParam("gene")
-			efficiency := iip.GetKey("efficiency")
-			validity := iip.GetKey("validity")
-			cost := iip.GetParam("cost")
+		for iip := range p.In().Chan {
+			gene := iip.Param("gene")
+			efficiency := iip.Key("efficiency")
+			validity := iip.Key("validity")
+			cost := iip.Param("cost")
 
-			obsFuzzActive := iip.GetKey("obsfuzz_active")
-			obsFuzzNonactive := iip.GetKey("obsfuzz_nonactive")
-			obsFuzzOverall := iip.GetKey("obsfuzz_overall")
-			classConfidence := iip.GetKey("class_confidence")
-			classCredibility := iip.GetKey("class_credibility")
+			obsFuzzActive := iip.Key("obsfuzz_active")
+			obsFuzzNonactive := iip.Key("obsfuzz_nonactive")
+			obsFuzzOverall := iip.Key("obsfuzz_overall")
+			classConfidence := iip.Key("class_confidence")
+			classCredibility := iip.Key("class_credibility")
 
 			row := []string{gene, efficiency, validity, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, classConfidence, classCredibility, cost}
 			if p.IncludeGamma {
-				row = append(row, iip.GetParam("gamma"))
+				row = append(row, iip.Param("gamma"))
 			}
 			rows = append(rows, row)
 		}
@@ -94,78 +91,92 @@ func (p *SummarizeCostGammaPerf) Run() {
 		ofh.Close()
 		outIp.Atomize()
 	}
-	p.OutStats.Send(outIp)
-}
-
-func (p *SummarizeCostGammaPerf) IsConnected() bool {
-	return p.In.IsConnected() && p.OutStats.IsConnected()
+	p.OutStats().Send(outIp)
 }
 
 // ================================================================================
 
 type BestCostGamma struct {
-	procName                string
-	InCSVFile               *sp.FilePort
-	OutBestCost             *sp.ParamPort
-	OutBestGamma            *sp.ParamPort
-	OutBestValidity         *sp.ParamPort
-	OutBestEfficiency       *sp.ParamPort
-	OutBestObsFuzzClassAvg  *sp.ParamPort
-	OutBestObsFuzzOverall   *sp.ParamPort
-	OutBestObsFuzzActive    *sp.ParamPort
-	OutBestObsFuzzNonactive *sp.ParamPort
-	OutBestClassConfidence  *sp.ParamPort
-	OutBestClassCredibility *sp.ParamPort
-	Separator               rune
-	Header                  bool
-	EfficiencyValColIdx     int // Which column to check for the efficiency value
-	ValidityValColIdx       int // Which column to check for the validity value
-	IncludeGamma            bool
+	sp.BaseProcess
+	procName            string
+	Separator           rune
+	Header              bool
+	EfficiencyValColIdx int // Which column to check for the efficiency value
+	ValidityValColIdx   int // Which column to check for the validity value
+	IncludeGamma        bool
 }
 
 func NewBestCostGamma(wf *sp.Workflow, procName string, separator rune, header bool, includeGamma bool) *BestCostGamma {
 	sbcr := &BestCostGamma{
-		procName:                procName,
-		InCSVFile:               sp.NewFilePort(),
-		OutBestValidity:         sp.NewParamPort(),
-		OutBestEfficiency:       sp.NewParamPort(),
-		OutBestObsFuzzClassAvg:  sp.NewParamPort(),
-		OutBestObsFuzzOverall:   sp.NewParamPort(),
-		OutBestObsFuzzActive:    sp.NewParamPort(),
-		OutBestObsFuzzNonactive: sp.NewParamPort(),
-		OutBestClassConfidence:  sp.NewParamPort(),
-		OutBestClassCredibility: sp.NewParamPort(),
-		OutBestCost:             sp.NewParamPort(),
-		OutBestGamma:            sp.NewParamPort(),
-		Separator:               separator,
-		Header:                  header,
-		IncludeGamma:            includeGamma,
+		BaseProcess:  sp.NewBaseProcess(wf, procName),
+		Separator:    separator,
+		Header:       header,
+		IncludeGamma: includeGamma,
 	}
+	sbcr.InitInPort(sbcr, "csv_file")
+	sbcr.InitParamOutPort(sbcr, "best_validity")
+	sbcr.InitParamOutPort(sbcr, "best_eff")
+	sbcr.InitParamOutPort(sbcr, "best_obsfuzz_classavg")
+	sbcr.InitParamOutPort(sbcr, "best_obsfuzz_overall")
+	sbcr.InitParamOutPort(sbcr, "best_obsfuzz_active")
+	sbcr.InitParamOutPort(sbcr, "best_obsfuzz_nonactive")
+	sbcr.InitParamOutPort(sbcr, "best_class_confidence")
+	sbcr.InitParamOutPort(sbcr, "best_class_credibility")
+	sbcr.InitParamOutPort(sbcr, "best_cost")
+	sbcr.InitParamOutPort(sbcr, "best_gamma")
 	wf.AddProc(sbcr)
 	return sbcr
 }
 
-func (p *BestCostGamma) Name() string {
-	return p.procName
+func (p BestCostGamma) InCSVFile() *sp.InPort {
+	return p.InPort("csv_file")
+}
+func (p *BestCostGamma) OutBestValidity() *sp.ParamOutPort {
+	return p.ParamOutPort("best_validity")
+}
+func (p *BestCostGamma) OutBestEfficiency() *sp.ParamOutPort {
+	return p.ParamOutPort("best_eff")
+}
+func (p *BestCostGamma) OutBestObsFuzzClassAvg() *sp.ParamOutPort {
+	return p.ParamOutPort("best_obsfuzz_classavg")
+}
+func (p *BestCostGamma) OutBestObsFuzzOverall() *sp.ParamOutPort {
+	return p.ParamOutPort("best_obsfuzz_overall")
+}
+func (p *BestCostGamma) OutBestObsFuzzActive() *sp.ParamOutPort {
+	return p.ParamOutPort("best_obsfuzz_active")
+}
+func (p *BestCostGamma) OutBestObsFuzzNonactive() *sp.ParamOutPort {
+	return p.ParamOutPort("best_obsfuzz_nonactive")
+}
+func (p *BestCostGamma) OutBestClassConfidence() *sp.ParamOutPort {
+	return p.ParamOutPort("best_class_confidence")
+}
+func (p *BestCostGamma) OutBestClassCredibility() *sp.ParamOutPort {
+	return p.ParamOutPort("best_class_credibility")
+}
+func (p *BestCostGamma) OutBestCost() *sp.ParamOutPort {
+	return p.ParamOutPort("best_cost")
+}
+func (p *BestCostGamma) OutBestGamma() *sp.ParamOutPort {
+	return p.ParamOutPort("best_gamma")
 }
 
 func (p *BestCostGamma) Run() {
-	defer p.OutBestCost.Close()
+	defer p.OutBestCost().Close()
 	if p.IncludeGamma {
-		defer p.OutBestGamma.Close()
+		defer p.OutBestGamma().Close()
 	}
-	defer p.OutBestValidity.Close()
-	defer p.OutBestEfficiency.Close()
-	defer p.OutBestObsFuzzClassAvg.Close()
-	defer p.OutBestObsFuzzOverall.Close()
-	defer p.OutBestObsFuzzActive.Close()
-	defer p.OutBestObsFuzzNonactive.Close()
-	defer p.OutBestClassConfidence.Close()
-	defer p.OutBestClassCredibility.Close()
+	defer p.OutBestValidity().Close()
+	defer p.OutBestEfficiency().Close()
+	defer p.OutBestObsFuzzClassAvg().Close()
+	defer p.OutBestObsFuzzOverall().Close()
+	defer p.OutBestObsFuzzActive().Close()
+	defer p.OutBestObsFuzzNonactive().Close()
+	defer p.OutBestClassConfidence().Close()
+	defer p.OutBestClassCredibility().Close()
 
-	go p.InCSVFile.RunMergeInputs()
-
-	for iip := range p.InCSVFile.InChan {
+	for iip := range p.InCSVFile().Chan {
 		csvData := iip.Read()
 
 		bytesReader := bytes.NewReader(csvData)
@@ -244,91 +255,63 @@ func (p *BestCostGamma) Run() {
 		if p.IncludeGamma {
 			sp.Debug.Printf("Final optimal (minimal) class-equalized observed fuzziness: %f (For: Cost:%03d, Gamma:%.3f)\n", bestClassAvgObsFuzz, bestCost, bestGamma)
 		}
-		p.OutBestCost.Send(fmt.Sprintf("%d", bestCost))
+		p.OutBestCost().Send(fmt.Sprintf("%d", bestCost))
 		if p.IncludeGamma {
-			p.OutBestGamma.Send(fmt.Sprintf("%.3f", bestGamma))
+			p.OutBestGamma().Send(fmt.Sprintf("%.3f", bestGamma))
 		}
-		p.OutBestValidity.Send(fmt.Sprintf("%.3f", bestValidity))
-		p.OutBestEfficiency.Send(fmt.Sprintf("%.3f", bestEfficiency))
-		p.OutBestObsFuzzClassAvg.Send(fmt.Sprintf("%.3f", bestClassAvgObsFuzz))
-		p.OutBestObsFuzzOverall.Send(fmt.Sprintf("%.3f", bestObsFuzzOverall))
-		p.OutBestObsFuzzActive.Send(fmt.Sprintf("%.3f", bestObsFuzzActive))
-		p.OutBestObsFuzzNonactive.Send(fmt.Sprintf("%.3f", bestObsFuzzNonactive))
-		p.OutBestClassConfidence.Send(fmt.Sprintf("%.3f", bestClassConfidence))
-		p.OutBestClassCredibility.Send(fmt.Sprintf("%.3f", bestClassCredibility))
+		p.OutBestValidity().Send(fmt.Sprintf("%.3f", bestValidity))
+		p.OutBestEfficiency().Send(fmt.Sprintf("%.3f", bestEfficiency))
+		p.OutBestObsFuzzClassAvg().Send(fmt.Sprintf("%.3f", bestClassAvgObsFuzz))
+		p.OutBestObsFuzzOverall().Send(fmt.Sprintf("%.3f", bestObsFuzzOverall))
+		p.OutBestObsFuzzActive().Send(fmt.Sprintf("%.3f", bestObsFuzzActive))
+		p.OutBestObsFuzzNonactive().Send(fmt.Sprintf("%.3f", bestObsFuzzNonactive))
+		p.OutBestClassConfidence().Send(fmt.Sprintf("%.3f", bestClassConfidence))
+		p.OutBestClassCredibility().Send(fmt.Sprintf("%.3f", bestClassCredibility))
 	}
-}
-
-func (p *BestCostGamma) IsConnected() bool {
-	if p.IncludeGamma {
-		return p.InCSVFile.IsConnected() &&
-			p.OutBestValidity.IsConnected() &&
-			p.OutBestEfficiency.IsConnected() &&
-			p.OutBestObsFuzzClassAvg.IsConnected() &&
-			p.OutBestObsFuzzOverall.IsConnected() &&
-			p.OutBestObsFuzzActive.IsConnected() &&
-			p.OutBestObsFuzzNonactive.IsConnected() &&
-			p.OutBestClassConfidence.IsConnected() &&
-			p.OutBestClassCredibility.IsConnected() &&
-			p.OutBestCost.IsConnected() &&
-			p.OutBestGamma.IsConnected()
-	}
-	return p.InCSVFile.IsConnected() &&
-		p.OutBestValidity.IsConnected() &&
-		p.OutBestEfficiency.IsConnected() &&
-		p.OutBestObsFuzzClassAvg.IsConnected() &&
-		p.OutBestObsFuzzOverall.IsConnected() &&
-		p.OutBestObsFuzzActive.IsConnected() &&
-		p.OutBestObsFuzzNonactive.IsConnected() &&
-		p.OutBestClassConfidence.IsConnected() &&
-		p.OutBestClassCredibility.IsConnected() &&
-		p.OutBestCost.IsConnected()
 }
 
 // ================================================================================
 
 type ParamPrinter struct {
-	sp.SciProcess
+	sp.BaseProcess
 	procName           string
-	InParamPorts       map[string]*sp.ParamPort
-	OutBestParamsFile  *sp.FilePort
 	BestParamsFileName string
 }
 
 func NewParamPrinter(wf *sp.Workflow, procName string, fileName string) *ParamPrinter {
-	pp := &ParamPrinter{
+	p := &ParamPrinter{
+		BaseProcess:        sp.NewBaseProcess(wf, procName),
 		procName:           procName,
-		InParamPorts:       make(map[string]*sp.ParamPort),
-		OutBestParamsFile:  sp.NewFilePort(),
 		BestParamsFileName: fileName,
 	}
-	wf.AddProc(pp)
-	return pp
+	p.InitOutPort(p, "best_param")
+	wf.AddProc(p)
+	return p
 }
 
-func (p *ParamPrinter) GetParamPort(portName string) *sp.ParamPort {
-	if p.InParamPorts[portName] == nil {
-		p.InParamPorts[portName] = sp.NewParamPort()
+func (p *ParamPrinter) OutBestParamsFile() *sp.OutPort {
+	return p.OutPort("best_param")
+}
+
+func (p *ParamPrinter) GetNewParamInPort(portName string) *sp.ParamInPort {
+	if _, ok := p.ParamInPorts()[portName]; !ok {
+		p.InitParamInPort(p, portName)
 	}
-	return p.InParamPorts[portName]
-}
-
-func (p *ParamPrinter) Name() string {
-	return p.procName
+	return p.ParamInPort(portName)
 }
 
 func (p *ParamPrinter) Run() {
-	defer p.OutBestParamsFile.Close()
+	defer p.OutBestParamsFile().Close()
 
-	oip := sp.NewInformationPacket(p.BestParamsFileName)
+	oip := sp.NewIP(p.BestParamsFileName)
 	if !oip.Exists() && !oip.TempFileExists() {
 		rows := []map[string]string{}
-		for len(p.InParamPorts) > 0 {
+		for len(p.ParamInPorts()) > 0 {
 			row := map[string]string{}
-			for pname, pport := range p.InParamPorts {
+			for pname, pport := range p.ParamInPorts() {
 				param, ok := <-pport.Chan
 				if !ok {
-					delete(p.InParamPorts, pname)
+					p.DeleteParamInPort(pname) // This we should implement in the BaseProcess instead!
 					continue
 				}
 				row[pname] = param
@@ -346,54 +329,48 @@ func (p *ParamPrinter) Run() {
 		oip.WriteTempFile([]byte(outContent))
 		oip.Atomize()
 	} else {
-		sp.Info.Printf("Target file (or temp file) exists for: %s, so skipping\n", oip.GetPath())
+		sp.Info.Printf("Target file (or temp file) exists for: %s, so skipping\n", oip.Path())
 	}
 
-	p.OutBestParamsFile.Send(oip)
+	p.OutBestParamsFile().Send(oip)
 }
 
 // ================================================================================
 
 type FinalModelSummarizer struct {
-	procName          string
-	SummaryFileName   string
-	Separator         rune
-	InModel           *sp.FilePort
-	InTargetDataCount *sp.FilePort
-	OutSummary        *sp.FilePort
+	sp.BaseProcess
+	SummaryFileName string
+	Separator       rune
 }
 
-func NewFinalModelSummarizer(wf *sp.Workflow, name string, fileName string, separator rune) *FinalModelSummarizer {
-	fms := &FinalModelSummarizer{
-		procName:          name,
-		SummaryFileName:   fileName,
-		InModel:           sp.NewFilePort(),
-		InTargetDataCount: sp.NewFilePort(),
-		OutSummary:        sp.NewFilePort(),
-		Separator:         separator,
+func NewFinalModelSummarizer(wf *sp.Workflow, procName string, fileName string, separator rune) *FinalModelSummarizer {
+	p := &FinalModelSummarizer{
+		BaseProcess:     sp.NewBaseProcess(wf, procName),
+		SummaryFileName: fileName,
+		Separator:       separator,
 	}
-	wf.AddProc(fms)
-	return fms
+	p.InitInPort(p, "model")
+	p.InitInPort(p, "target_data_count")
+	p.InitOutPort(p, "summary")
+	// InModel:           sp.NewInPort(),
+	// InTargetDataCount: sp.NewInPort(),
+	// OutSummary:        sp.NewOutPort(),
+	wf.AddProc(p)
+	return p
 }
 
-func (p *FinalModelSummarizer) Name() string {
-	return p.procName
-}
-
-func (p *FinalModelSummarizer) IsConnected() bool {
-	return p.InModel.IsConnected() && p.OutSummary.IsConnected()
-}
+func (p *FinalModelSummarizer) InModel() *sp.InPort           { return p.InPort("model") }
+func (p *FinalModelSummarizer) InTargetDataCount() *sp.InPort { return p.InPort("target_data_count") }
+func (p *FinalModelSummarizer) OutSummary() *sp.OutPort       { return p.OutPort("summary") }
 
 func (p *FinalModelSummarizer) Run() {
-	defer p.OutSummary.Close()
-	go p.InModel.RunMergeInputs()
-	go p.InTargetDataCount.RunMergeInputs()
+	defer p.OutSummary().Close()
 
 	activeCounts := map[string]int64{}
 	nonActiveCounts := map[string]int64{}
 	totalCompounds := map[string]int64{}
-	for tdip := range p.InTargetDataCount.InChan {
-		gene := tdip.GetParam("gene")
+	for tdip := range p.InTargetDataCount().Chan {
+		gene := tdip.Param("gene")
 		strs := str.Split(string(tdip.Read()), "\t")
 		activeStr := str.TrimSuffix(strs[0], "\n")
 		activeCnt, err := strconv.ParseInt(activeStr, 10, 64)
@@ -422,29 +399,29 @@ func (p *FinalModelSummarizer) Run() {
 		"ActiveCnt",
 		"NonactiveCnt",
 		"TotalCnt"}}
-	for iip := range p.InModel.InChan {
+	for iip := range p.InModel().Chan {
 		row := []string{
-			iip.GetParam("gene"),
-			iip.GetParam("replicate"),
-			iip.GetParam("validity"),
-			iip.GetParam("efficiency"),
-			iip.GetParam("obsfuzz_classavg"),
-			iip.GetParam("obsfuzz_overall"),
-			iip.GetParam("obsfuzz_active"),
-			iip.GetParam("obsfuzz_nonactive"),
-			iip.GetParam("class_confidence"),
-			iip.GetParam("class_credibility"),
-			iip.GetParam("cost"),
-			fmt.Sprintf("%d", iip.GetAuditInfo().ExecTimeMS),
-			fmt.Sprintf("%d", iip.GetSize()),
-			fmt.Sprintf("%d", activeCounts[iip.GetParam("gene")]),
-			fmt.Sprintf("%d", nonActiveCounts[iip.GetParam("gene")]),
-			fmt.Sprintf("%d", totalCompounds[iip.GetParam("gene")]),
+			iip.Param("gene"),
+			iip.Param("replicate"),
+			iip.Param("validity"),
+			iip.Param("efficiency"),
+			iip.Param("obsfuzz_classavg"),
+			iip.Param("obsfuzz_overall"),
+			iip.Param("obsfuzz_active"),
+			iip.Param("obsfuzz_nonactive"),
+			iip.Param("class_confidence"),
+			iip.Param("class_credibility"),
+			iip.Param("cost"),
+			fmt.Sprintf("%d", iip.AuditInfo().ExecTimeMS),
+			fmt.Sprintf("%d", iip.Size()),
+			fmt.Sprintf("%d", activeCounts[iip.Param("gene")]),
+			fmt.Sprintf("%d", nonActiveCounts[iip.Param("gene")]),
+			fmt.Sprintf("%d", totalCompounds[iip.Param("gene")]),
 		}
 		rows = append(rows, row)
 	}
 
-	oip := sp.NewInformationPacket(p.SummaryFileName)
+	oip := sp.NewIP(p.SummaryFileName)
 	fh := oip.OpenWriteTemp()
 	csvWriter := csv.NewWriter(fh)
 	csvWriter.Comma = p.Separator
@@ -454,5 +431,5 @@ func (p *FinalModelSummarizer) Run() {
 	csvWriter.Flush()
 	fh.Close()
 	oip.Atomize()
-	p.OutSummary.Send(oip)
+	p.OutSummary().Send(oip)
 }

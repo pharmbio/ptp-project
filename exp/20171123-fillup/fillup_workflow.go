@@ -121,8 +121,8 @@ func main() {
 	// --------------------------------
 	// Show startup messages
 	// --------------------------------
-	sp.Info.Printf("Using max %d OS threads to schedule max %d tasks\n", *threads, *maxTasks)
-	sp.Info.Printf("Starting workflow for %s geneset\n", *geneSet)
+	sp.Audit.Printf("Using max %d OS threads to schedule max %d tasks\n", *threads, *maxTasks)
+	sp.Audit.Printf("Starting workflow for %s geneset\n", *geneSet)
 
 	// --------------------------------
 	// Initialize processes and add to runner
@@ -138,11 +138,14 @@ func main() {
 	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
+	// extractGSA extracts a file with only Gene symbol, SMILES and the
+	// Activity flag, into a .tsv file, for easier subsequent parsing
 	extractGSA := wf.NewProc("extract_gene_smiles_activity", `awk -F "\t" '{ print $9 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {os:gene_smiles_activity}`) // os = output (streaming) ... stream output via a fifo file
 	extractGSA.SetPathReplace("excapedb", "gene_smiles_activity", ".tsv", ".ext_gene_smiles_activity.tsv")
 	extractGSA.In("excapedb").Connect(unPackDB.Out("unxzed"))
 
-	removeConflicting := wf.NewProc("rem_dupl_col1and2", `awk -F"\t" '(( $1 != p1 ) || ( $2 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print p1 "\t" p2 "\t" p3 }
+	// removeConflicting removes (or, SHOULD remove) rows which have the same values on both row 1 and 2 (I think ...)
+	removeConflicting := wf.NewProc("remove_conflicting", `awk -F"\t" '(( $1 != p1 ) || ( $2 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print p1 "\t" p2 "\t" p3 }
 																	  { c[$1,$2]++; p1 = $1; p2 = $2; p3 = $3 }
 																	  END { print $1 "\t" $2 "\t" $3 }' \
 																	  {i:gene_smiles_activity} > {o:gene_smiles_activity}`)
@@ -151,11 +154,11 @@ func main() {
 
 	//createSQLiteDB := wf.NewProc("CreateSQLiteDB", `sqlite3 {o:dbfile} 'CREATE TABLE {p:tablename} (Ambit_InchiKey TEXT, Original_Entry_ID TEXT, Entrez_ID INTEGER, Activity_Flag TEXT, pXC50 REAL, DB TEXT, Original_Assay_ID INTEGER, Tax_ID INTEGER, Gene_Symbol TEXT, Ortholog_Group INTEGER, InChI TEXT, SMILES TEXT);'`)
 	//createSQLiteDB.SetPathStatic("dbfile", "../../raw/excapedb.db")
-	//createSQLiteDB.ParamPort("tablename").ConnectStr("excapedb")
+	//createSQLiteDB.ParamInPort("tablename").ConnectStr("excapedb")
 
 	//importIntoSQLite := wf.NewProc("importIntoSQLite", `(echo '.mode tabs'; echo '.import {i:tsvfile} {p:tablename}'; echo 'CREATE INDEX Gene_Symbol ON excapedb(Gene_Symbol);'; echo 'CREATE INDEX Activity_Flag ON excapedb(Activity_Flag);') | sqlite3 {i:dbfile} && echo done > {o:doneflagfile};`)
 	//importIntoSQLite.SetPathExtend("tsvfile", "doneflagfile", ".importdone")
-	//importIntoSQLite.ParamPort("tablename").ConnectStr("excapedb")
+	//importIntoSQLite.ParamInPort("tablename").ConnectStr("excapedb")
 	//importIntoSQLite.In("dbfile").Connect(createSQLiteDB.Out("dbfile"))
 	//importIntoSQLite.In("tsvfile").Connect(unPackDB.Out("unxzed"))
 
@@ -174,7 +177,7 @@ func main() {
 		// Extract target data step
 		// --------------------------------------------------------------------------------
 		extractTargetData := wf.NewProc("extract_target_data_"+uniq_gene, `awk -F"\t" '$9 == "{p:gene}" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`)
-		extractTargetData.ParamPort("gene").ConnectStr(gene)
+		extractTargetData.ParamInPort("gene").ConnectStr(gene)
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLC, geneLC))
 		extractTargetData.In("raw_data").Connect(unPackDB.Out("unxzed"))
 		if *runSlurm {
@@ -184,9 +187,9 @@ func main() {
 		countTargetDataRows := wf.NewProc("cnt_targetdata_rows_"+uniq_gene, `awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' {i:targetdata} > {o:count} # {p:gene}`)
 		countTargetDataRows.SetPathExtend("targetdata", "count", ".count")
 		countTargetDataRows.In("targetdata").Connect(extractTargetData.Out("target_data"))
-		countTargetDataRows.ParamPort("gene").ConnectStr(gene)
+		countTargetDataRows.ParamInPort("gene").ConnectStr(gene)
 
-		var targetDataPort *sp.FilePort
+		var targetDataPort *sp.OutPort
 
 		if doFillUp {
 			createRandomBytes := wf.NewProc("create_random_bytes_"+uniq_gene, "dd if=/dev/urandom of={o:rand} bs=1048576 count=100")
@@ -206,7 +209,7 @@ func main() {
 			fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
 			fillAssumedNonbinding.In("rawdata").Connect(unPackDB.Out("unxzed"))
 			fillAssumedNonbinding.In("randsrc").Connect(createRandomBytes.Out("rand"))
-			fillAssumedNonbinding.ParamPort("gene").ConnectStr(gene)
+			fillAssumedNonbinding.ParamInPort("gene").ConnectStr(gene)
 			targetDataPort = fillAssumedNonbinding.Out("filledup")
 		} else {
 			targetDataPort = extractTargetData.Out("target_data")
@@ -255,26 +258,26 @@ func main() {
 									--cv-folds {p:cvfolds} \
 									--output-format json \
 									--confidence {p:confidence} | grep -P "^{" > {o:stats} # {p:gene} {p:replicate}`)
-				evalCost.SetPathCustom("stats", func(t *sp.SciTask) string {
+				evalCost.SetPathCustom("stats", func(t *sp.Task) string {
 					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 					sp.CheckErr(err)
 					trainDataBasePath := filepath.Base(t.InPath("traindata"))
 					return str.Replace(t.InPath("traindata"), trainDataBasePath, t.Param("replicate")+"/"+trainDataBasePath, 1) + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
 				})
 				evalCost.In("traindata").Connect(targetDataPort)
-				evalCost.ParamPort("nrmdl").ConnectStr("10")
-				evalCost.ParamPort("cvfolds").ConnectStr("10")
-				evalCost.ParamPort("confidence").ConnectStr("0.9")
-				evalCost.ParamPort("gene").ConnectStr(gene)
-				evalCost.ParamPort("replicate").ConnectStr(replicate)
-				evalCost.ParamPort("cost").ConnectStr(cost)
+				evalCost.ParamInPort("nrmdl").ConnectStr("10")
+				evalCost.ParamInPort("cvfolds").ConnectStr("10")
+				evalCost.ParamInPort("confidence").ConnectStr("0.9")
+				evalCost.ParamInPort("gene").ConnectStr(gene)
+				evalCost.ParamInPort("replicate").ConnectStr(replicate)
+				evalCost.ParamInPort("cost").ConnectStr(cost)
 				if *runSlurm {
 					evalCost.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + uniq_cost // SLURM string
 				}
 
-				extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniq_cost, func(ip *sp.InformationPacket) map[string]string {
+				extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniq_cost, func(ip *sp.IP) map[string]string {
 					crossValOut := &cpSignCrossValOutput{}
-					ip.UnMarshalJson(crossValOut)
+					ip.UnMarshalJSON(crossValOut)
 					newKeys := map[string]string{}
 					newKeys["validity"] = fmt.Sprintf("%.3f", crossValOut.Validity)
 					newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
@@ -285,9 +288,9 @@ func main() {
 					newKeys["obsfuzz_overall"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Overall)
 					return newKeys
 				})
-				extractCostGammaStats.In.Connect(evalCost.Out("stats"))
+				extractCostGammaStats.In().Connect(evalCost.Out("stats"))
 
-				summarize.In.Connect(extractCostGammaStats.Out)
+				summarize.In().Connect(extractCostGammaStats.Out())
 			} // end for cost
 
 			// TODO: Let select best operate directly on the stream of IPs, not
@@ -298,7 +301,7 @@ func main() {
 				'\t',
 				false,
 				includeGamma)
-			selectBest.InCSVFile.Connect(summarize.OutStats)
+			selectBest.InCSVFile().Connect(summarize.OutStats())
 
 			// --------------------------------------------------------------------------------
 			// Train step
@@ -315,19 +318,19 @@ func main() {
 									--model-out {o:model} \
 									--model-name "{p:gene} target profile" # {p:replicate} Validity: {p:validity} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
 			cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
-			cpSignTrain.ParamPort("nrmdl").ConnectStr("10")
-			cpSignTrain.ParamPort("gene").ConnectStr(gene)
-			cpSignTrain.ParamPort("replicate").ConnectStr(replicate)
-			cpSignTrain.ParamPort("validity").Connect(selectBest.OutBestValidity)
-			cpSignTrain.ParamPort("efficiency").Connect(selectBest.OutBestEfficiency)
-			cpSignTrain.ParamPort("obsfuzz_classavg").Connect(selectBest.OutBestObsFuzzClassAvg)
-			cpSignTrain.ParamPort("obsfuzz_overall").Connect(selectBest.OutBestObsFuzzOverall)
-			cpSignTrain.ParamPort("obsfuzz_active").Connect(selectBest.OutBestObsFuzzActive)
-			cpSignTrain.ParamPort("obsfuzz_nonactive").Connect(selectBest.OutBestObsFuzzNonactive)
-			cpSignTrain.ParamPort("class_confidence").Connect(selectBest.OutBestClassConfidence)
-			cpSignTrain.ParamPort("class_credibility").Connect(selectBest.OutBestClassCredibility)
-			cpSignTrain.ParamPort("cost").Connect(selectBest.OutBestCost)
-			cpSignTrain.SetPathCustom("model", func(t *sp.SciTask) string {
+			cpSignTrain.ParamInPort("nrmdl").ConnectStr("10")
+			cpSignTrain.ParamInPort("gene").ConnectStr(gene)
+			cpSignTrain.ParamInPort("replicate").ConnectStr(replicate)
+			cpSignTrain.ParamInPort("validity").Connect(selectBest.OutBestValidity())
+			cpSignTrain.ParamInPort("efficiency").Connect(selectBest.OutBestEfficiency())
+			cpSignTrain.ParamInPort("obsfuzz_classavg").Connect(selectBest.OutBestObsFuzzClassAvg())
+			cpSignTrain.ParamInPort("obsfuzz_overall").Connect(selectBest.OutBestObsFuzzOverall())
+			cpSignTrain.ParamInPort("obsfuzz_active").Connect(selectBest.OutBestObsFuzzActive())
+			cpSignTrain.ParamInPort("obsfuzz_nonactive").Connect(selectBest.OutBestObsFuzzNonactive())
+			cpSignTrain.ParamInPort("class_confidence").Connect(selectBest.OutBestClassConfidence())
+			cpSignTrain.ParamInPort("class_credibility").Connect(selectBest.OutBestClassCredibility())
+			cpSignTrain.ParamInPort("cost").Connect(selectBest.OutBestCost())
+			cpSignTrain.SetPathCustom("model", func(t *sp.Task) string {
 				return fmt.Sprintf("dat/final_models/%s/%s_c%s_nrmdl%s_%s.mdl",
 					str.ToLower(t.Param("gene")),
 					"liblin",
@@ -339,14 +342,14 @@ func main() {
 				cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + uniq_repl // SLURM string
 			}
 
-			finalModelsSummary.InModel.Connect(cpSignTrain.Out("model"))
-			finalModelsSummary.InTargetDataCount.Connect(countTargetDataRows.Out("count"))
+			finalModelsSummary.InModel().Connect(cpSignTrain.Out("model"))
 		} // end for replicate
+		finalModelsSummary.InTargetDataCount().Connect(countTargetDataRows.Out("count"))
 	} // end for gene
 
 	sortSummaryOnDataSize := wf.NewProc("sort_summary", "head -n 1 {i:summary} > {o:sorted} && tail -n +2 {i:summary} | sort -nk 16 >> {o:sorted}")
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
-	sortSummaryOnDataSize.In("summary").Connect(finalModelsSummary.OutSummary)
+	sortSummaryOnDataSize.In("summary").Connect(finalModelsSummary.OutSummary())
 
 	plotSummary := wf.NewProc("plot_summary", "Rscript bin/plot_summary.r -i {i:summary} -o {o:plot} -f png # {i:gene_smiles_activity}")
 	plotSummary.SetPathExtend("summary", "plot", ".plot.png")
@@ -354,12 +357,11 @@ func main() {
 	//plotSummary.In("importedflagfile").Connect(importIntoSQLite.Out("doneflagfile"))
 	plotSummary.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_smiles_activity"))
 
-	wf.ConnectLast(plotSummary.Out("plot"))
-
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
-	wf.Run()
+
+	wf.RunToProcName("remove_conflicting")
 }
 
 // --------------------------------------------------------------------------------
