@@ -39,7 +39,7 @@ var (
 			"OPRM1", "HTR1A", "SLC6A3", "OPRK1", "AVPR1A", "ADRB2", "DRD2", "KCNH2", "DRD1", "HTR2A",
 			"CHRM1",
 		},
-		"bowes44min100percls_small": []string{
+		"bowes44min100percls_small": []string{ // These are the ones for which we want to fill up with assumed negative
 			"PDE3A",
 			"SCN5A",
 			"CCKAR",
@@ -142,7 +142,10 @@ func main() {
 	extractGSA.SetPathReplace("excapedb", "gene_smiles_activity", ".tsv", ".ext_gene_smiles_activity.tsv")
 	extractGSA.In("excapedb").Connect(unPackDB.Out("unxzed"))
 
-	removeConflicting := wf.NewProc("rem_dupl_col1and2", `awk -F"\t" '(( $1 != p1 ) || ( $2 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print p1 "\t" p2 "\t" p3 } { c[$1,$2]++; p1 = $1; p2 = $2; p3 = $3 } END { print $1 "\t" $2 "\t" $3 }' {i:gene_smiles_activity} > {o:gene_smiles_activity}`)
+	removeConflicting := wf.NewProc("rem_dupl_col1and2", `awk -F"\t" '(( $1 != p1 ) || ( $2 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print p1 "\t" p2 "\t" p3 }
+																	  { c[$1,$2]++; p1 = $1; p2 = $2; p3 = $3 }
+																	  END { print $1 "\t" $2 "\t" $3 }' \
+																	  {i:gene_smiles_activity} > {o:gene_smiles_activity}`)
 	removeConflicting.SetPathReplace("gene_smiles_activity", "gene_smiles_activity", ".tsv", ".dedup.tsv")
 	removeConflicting.In("gene_smiles_activity").Connect(extractGSA.Out("gene_smiles_activity"))
 
