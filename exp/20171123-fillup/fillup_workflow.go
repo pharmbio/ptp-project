@@ -174,7 +174,7 @@ func main() {
 		uniqStrGene := geneLowerCase
 
 		// extractTargetData extract all data for the specific target, into a separate file
-		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk -F"\t" '$9 == "{p:gene}" { print $2"\t"$3 }' {i:raw_data} > {o:target_data}`)
+		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk -F"\t" '$1 == "{p:gene}" { print $2"\t"$3 }' {i:raw_data} > {o:target_data}`)
 		extractTargetData.ParamInPort("gene").ConnectStr(geneUppercase)
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLowerCase, geneLowerCase))
 		extractTargetData.In("raw_data").Connect(removeConflicting.Out("gene_smiles_activity"))
