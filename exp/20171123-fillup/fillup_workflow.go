@@ -167,35 +167,35 @@ func main() {
 	// --------------------------------
 	// Set up gene-specific workflow branches
 	// --------------------------------
-	for _, gene := range geneSets[*geneSet] {
-		doFillUp := strInSlice(gene, geneSets["bowes44min100percls_small"])
+	for _, geneUppercase := range geneSets[*geneSet] {
+		doFillUp := strInSlice(geneUppercase, geneSets["bowes44min100percls_small"])
 
-		geneLC := str.ToLower(gene)
-		uniq_gene := geneLC
+		geneLowerCase := str.ToLower(geneUppercase)
+		uniqStrGene := geneLowerCase
 
 		// --------------------------------------------------------------------------------
 		// Extract target data step
 		// --------------------------------------------------------------------------------
-		extractTargetData := wf.NewProc("extract_target_data_"+uniq_gene, `awk -F"\t" '$9 == "{p:gene}" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`)
-		extractTargetData.ParamInPort("gene").ConnectStr(gene)
-		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLC, geneLC))
+		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk -F"\t" '$9 == "{p:gene}" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`)
+		extractTargetData.ParamInPort("gene").ConnectStr(geneUppercase)
+		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLowerCase, geneLowerCase))
 		extractTargetData.In("raw_data").Connect(unPackDB.Out("unxzed"))
 		if *runSlurm {
-			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLC // SLURM string
+			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLowerCase // SLURM string
 		}
 
-		countTargetDataRows := wf.NewProc("cnt_targetdata_rows_"+uniq_gene, `awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' {i:targetdata} > {o:count} # {p:gene}`)
+		countTargetDataRows := wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, `awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' {i:targetdata} > {o:count} # {p:gene}`)
 		countTargetDataRows.SetPathExtend("targetdata", "count", ".count")
 		countTargetDataRows.In("targetdata").Connect(extractTargetData.Out("target_data"))
-		countTargetDataRows.ParamInPort("gene").ConnectStr(gene)
+		countTargetDataRows.ParamInPort("gene").ConnectStr(geneUppercase)
 
 		var targetDataPort *sp.OutPort
 
 		if doFillUp {
-			createRandomBytes := wf.NewProc("create_random_bytes_"+uniq_gene, "dd if=/dev/urandom of={o:rand} bs=1048576 count=100")
-			createRandomBytes.SetPathStatic("rand", "dat/"+geneLC+"_random_bytes.bin")
+			createRandomBytes := wf.NewProc("create_random_bytes_"+uniqStrGene, "dd if=/dev/urandom of={o:rand} bs=1048576 count=100")
+			createRandomBytes.SetPathStatic("rand", "dat/"+geneLowerCase+"_random_bytes.bin")
 
-			fillAssumedNonbinding := wf.NewProc("fillup_"+uniq_gene, `
+			fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGene, `
 			cat {i:targetdata} > {o:filledup} && \
 				let "fillup_lines_cnt = "$(wc -l {i:targetdata} | awk '{ printf $1 }')" * 2" \
 				&& tail -n +2 {i:rawdata} \
@@ -209,7 +209,7 @@ func main() {
 			fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
 			fillAssumedNonbinding.In("rawdata").Connect(unPackDB.Out("unxzed"))
 			fillAssumedNonbinding.In("randsrc").Connect(createRandomBytes.Out("rand"))
-			fillAssumedNonbinding.ParamInPort("gene").ConnectStr(gene)
+			fillAssumedNonbinding.ParamInPort("gene").ConnectStr(geneUppercase)
 			targetDataPort = fillAssumedNonbinding.Out("filledup")
 		} else {
 			targetDataPort = extractTargetData.Out("target_data")
@@ -218,36 +218,36 @@ func main() {
 		// --------------------------------------------------------------------------------
 		// Pre-compute step
 		// --------------------------------------------------------------------------------
-		cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniq_gene,
+		cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrGene,
 			`java -jar `+cpSignPath+` precompute \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
 									--trainfile {i:traindata} \
 									--labels A, N \
 									--model-out {o:precomp} \
-									--model-name "`+gene+` target profile"`)
+									--model-name "`+geneUppercase+` target profile"`)
 		cpSignPrecomp.In("traindata").Connect(targetDataPort)
 		cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
 		if *runSlurm {
-			cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLC // SLURM string
+			cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLowerCase // SLURM string
 		}
 
 		for _, replicate := range replicates {
-			uniq_repl := uniq_gene + "_" + replicate
+			uniqStrRepl := uniqStrGene + "_" + replicate
 
 			// --------------------------------------------------------------------------------
 			// Optimize cost/gamma-step
 			// --------------------------------------------------------------------------------
 			includeGamma := false // For liblinear
 			summarize := NewSummarizeCostGammaPerf(wf,
-				"summarize_cost_gamma_perf_"+uniq_repl,
-				"dat/"+geneLC+"/"+replicate+"/"+geneLC+"_cost_gamma_perf_stats.tsv",
+				"summarize_cost_gamma_perf_"+uniqStrRepl,
+				"dat/"+geneLowerCase+"/"+replicate+"/"+geneLowerCase+"_cost_gamma_perf_stats.tsv",
 				includeGamma)
 
 			for _, cost := range costVals {
-				uniq_cost := uniq_repl + "_" + cost
+				uniqStrCost := uniqStrRepl + "_" + cost
 				// If Liblinear
-				evalCost := wf.NewProc("crossval_"+uniq_cost, `java -jar `+cpSignPath+` crossvalidate \
+				evalCost := wf.NewProc("crossval_"+uniqStrCost, `java -jar `+cpSignPath+` crossvalidate \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
 									--trainfile {i:traindata} \
@@ -268,14 +268,14 @@ func main() {
 				evalCost.ParamInPort("nrmdl").ConnectStr("10")
 				evalCost.ParamInPort("cvfolds").ConnectStr("10")
 				evalCost.ParamInPort("confidence").ConnectStr("0.9")
-				evalCost.ParamInPort("gene").ConnectStr(gene)
+				evalCost.ParamInPort("gene").ConnectStr(geneUppercase)
 				evalCost.ParamInPort("replicate").ConnectStr(replicate)
 				evalCost.ParamInPort("cost").ConnectStr(cost)
 				if *runSlurm {
-					evalCost.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + uniq_cost // SLURM string
+					evalCost.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + uniqStrCost // SLURM string
 				}
 
-				extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniq_cost, func(ip *sp.IP) map[string]string {
+				extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniqStrCost, func(ip *sp.IP) map[string]string {
 					crossValOut := &cpSignCrossValOutput{}
 					ip.UnMarshalJSON(crossValOut)
 					newKeys := map[string]string{}
@@ -297,7 +297,7 @@ func main() {
 			// via the summarize component, so that we can retain the keys in
 			// the IP!
 			selectBest := NewBestCostGamma(wf,
-				"select_best_cost_gamma_"+uniq_repl,
+				"select_best_cost_gamma_"+uniqStrRepl,
 				'\t',
 				false,
 				includeGamma)
@@ -306,7 +306,7 @@ func main() {
 			// --------------------------------------------------------------------------------
 			// Train step
 			// --------------------------------------------------------------------------------
-			cpSignTrain := wf.NewProc("cpsign_train_"+uniq_repl,
+			cpSignTrain := wf.NewProc("cpsign_train_"+uniqStrRepl,
 				`java -jar `+cpSignPath+` train \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
@@ -319,7 +319,7 @@ func main() {
 									--model-name "{p:gene} target profile" # {p:replicate} Validity: {p:validity} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
 			cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
 			cpSignTrain.ParamInPort("nrmdl").ConnectStr("10")
-			cpSignTrain.ParamInPort("gene").ConnectStr(gene)
+			cpSignTrain.ParamInPort("gene").ConnectStr(geneUppercase)
 			cpSignTrain.ParamInPort("replicate").ConnectStr(replicate)
 			cpSignTrain.ParamInPort("validity").Connect(selectBest.OutBestValidity())
 			cpSignTrain.ParamInPort("efficiency").Connect(selectBest.OutBestEfficiency())
@@ -339,7 +339,7 @@ func main() {
 					t.Param("replicate"))
 			})
 			if *runSlurm {
-				cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + uniq_repl // SLURM string
+				cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + uniqStrRepl // SLURM string
 			}
 
 			finalModelsSummary.InModel().Connect(cpSignTrain.Out("model"))
