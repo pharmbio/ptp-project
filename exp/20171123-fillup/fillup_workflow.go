@@ -190,24 +190,21 @@ func main() {
 		var targetDataPort *sp.OutPort
 
 		if doFillUp {
-			createRandomBytes := wf.NewProc("create_random_bytes_"+uniqStrGene, "dd if=/dev/urandom of={o:rand} bs=1048576 count=100")
+			createRandomBytes := wf.NewProc("create_random_bytes_"+uniqStrGene, "dd if=/dev/urandom of={o:rand} bs=1048576 count=1024")
 			createRandomBytes.SetPathStatic("rand", "dat/"+geneLowerCase+"_random_bytes.bin")
 
 			fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGene, `
 			cat {i:targetdata} > {o:filledup} && \
 				let "fillup_lines_cnt = "$(wc -l {i:targetdata} | awk '{ printf $1 }')" * 2" \
-				&& tail -n +2 {i:rawdata} \
-				| awk -F"\t" '$9 != "{p:gene}" { $12 "\tN" }' \
-				| sort \
-				| uniq \
-				| shuf --random-source={i:randsrc} \
-				| head -n $fillup_lines_cnt >> {o:filledup}
+				&& cat {i:rawdata} \
+				| awk -F"\t" '$1 != "{p:gene}" { print $2 "\tN" }' \
+				| shuf --random-source={i:randsrc} -n $fillup_lines_cnt >> {o:filledup}
 			`)
-			fillAssumedNonbinding.SetPathReplace("targetdata", "filledup", ".tsv", ".filledup.tsv")
+			fillAssumedNonbinding.SetPathReplace("targetdata", "filledup", ".tsv", ".incl_assumed_neg.tsv")
 			fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
-			fillAssumedNonbinding.In("rawdata").Connect(unPackDB.Out("unxzed"))
-			fillAssumedNonbinding.In("randsrc").Connect(createRandomBytes.Out("rand"))
+			fillAssumedNonbinding.In("rawdata").Connect(removeConflicting.Out("gene_smiles_activity"))
 			fillAssumedNonbinding.ParamInPort("gene").ConnectStr(geneUppercase)
+			fillAssumedNonbinding.In("randsrc").Connect(createRandomBytes.Out("rand"))
 			targetDataPort = fillAssumedNonbinding.Out("filledup")
 		} else {
 			targetDataPort = extractTargetData.Out("target_data")
@@ -361,7 +358,7 @@ func main() {
 
 	procsToRun := []string{}
 	for _, gene := range geneSets[*geneSet] {
-		procsToRun = append(procsToRun, "extract_target_data_"+str.ToLower(gene))
+		procsToRun = append(procsToRun, "fillup_"+str.ToLower(gene))
 	}
 	wf.RunToProcNames(procsToRun...)
 }
