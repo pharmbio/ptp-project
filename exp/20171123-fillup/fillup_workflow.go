@@ -173,15 +173,13 @@ func main() {
 		geneLowerCase := str.ToLower(geneUppercase)
 		uniqStrGene := geneLowerCase
 
-		// --------------------------------------------------------------------------------
-		// Extract target data step
-		// --------------------------------------------------------------------------------
-		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk -F"\t" '$9 == "{p:gene}" { print $12"\t"$4 }' {i:raw_data} > {o:target_data}`)
+		// extractTargetData extract all data for the specific target, into a separate file
+		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk -F"\t" '$9 == "{p:gene}" { print $2"\t"$3 }' {i:raw_data} > {o:target_data}`)
 		extractTargetData.ParamInPort("gene").ConnectStr(geneUppercase)
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLowerCase, geneLowerCase))
-		extractTargetData.In("raw_data").Connect(unPackDB.Out("unxzed"))
+		extractTargetData.In("raw_data").Connect(removeConflicting.Out("gene_smiles_activity"))
 		if *runSlurm {
-			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_cnt_comp_" + geneLowerCase // SLURM string
+			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_extract_" + geneLowerCase // SLURM string
 		}
 
 		countTargetDataRows := wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, `awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' {i:targetdata} > {o:count} # {p:gene}`)
@@ -361,7 +359,11 @@ func main() {
 	// Run the pipeline!
 	// --------------------------------
 
-	wf.RunToProcName("remove_conflicting")
+	procsToRun := []string{}
+	for _, gene := range geneSets[*geneSet] {
+		procsToRun = append(procsToRun, "extract_target_data_"+str.ToLower(gene))
+	}
+	wf.RunToProcNames(procsToRun...)
 }
 
 // --------------------------------------------------------------------------------
