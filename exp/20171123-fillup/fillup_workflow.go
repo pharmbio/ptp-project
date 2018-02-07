@@ -85,7 +85,7 @@ func main() {
 	}
 	if len(geneSets[*geneSet]) == 0 {
 		names := []string{}
-		for n, _ := range geneSets {
+		for n := range geneSets {
 			names = append(names, n)
 		}
 		sp.Error.Fatalf("Incorrect gene set %s specified! Only allowed values are: %s\n", *geneSet, str.Join(names, ", "))
@@ -126,19 +126,10 @@ func main() {
 	removeConflicting.SetPathReplace("gene_smiles_activity", "gene_smiles_activity", ".tsv", ".dedup.tsv")
 	removeConflicting.In("gene_smiles_activity").Connect(extractGSA.Out("gene_smiles_activity"))
 
-	//createSQLiteDB := wf.NewProc("CreateSQLiteDB", `sqlite3 {o:dbfile} 'CREATE TABLE {p:tablename} (Ambit_InchiKey TEXT, Original_Entry_ID TEXT, Entrez_ID INTEGER, Activity_Flag TEXT, pXC50 REAL, DB TEXT, Original_Assay_ID INTEGER, Tax_ID INTEGER, Gene_Symbol TEXT, Ortholog_Group INTEGER, InChI TEXT, SMILES TEXT);'`)
-	//createSQLiteDB.SetPathStatic("dbfile", "../../raw/excapedb.db")
-	//createSQLiteDB.ParamInPort("tablename").ConnectStr("excapedb")
-
-	//importIntoSQLite := wf.NewProc("importIntoSQLite", `(echo '.mode tabs'; echo '.import {i:tsvfile} {p:tablename}'; echo 'CREATE INDEX Gene_Symbol ON excapedb(Gene_Symbol);'; echo 'CREATE INDEX Activity_Flag ON excapedb(Activity_Flag);') | sqlite3 {i:dbfile} && echo done > {o:doneflagfile};`)
-	//importIntoSQLite.SetPathExtend("tsvfile", "doneflagfile", ".importdone")
-	//importIntoSQLite.ParamInPort("tablename").ConnectStr("excapedb")
-	//importIntoSQLite.In("dbfile").Connect(createSQLiteDB.Out("dbfile"))
-	//importIntoSQLite.In("tsvfile").Connect(unPackDB.Out("unxzed"))
-
 	finalModelsSummary := NewFinalModelSummarizer(wf, "finalmodels_summary_creator", "res/final_models_summary.tsv", '\t')
 
 	genRandomProcs := map[string]*sp.Process{}
+
 	// --------------------------------
 	// Set up gene-specific workflow branches
 	// --------------------------------
@@ -319,9 +310,9 @@ func main() {
 			}
 
 			finalModelsSummary.InModel().Connect(cpSignTrain.Out("model"))
-		} // end for replicate
+		} // end: for replicate
 		finalModelsSummary.InTargetDataCount().Connect(countTargetDataRows.Out("count"))
-	} // end for gene
+	} // end: for gene
 
 	sortSummaryOnDataSize := wf.NewProc("sort_summary", "head -n 1 {i:summary} > {o:sorted} && tail -n +2 {i:summary} | sort -nk 16 >> {o:sorted}")
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
@@ -330,20 +321,18 @@ func main() {
 	plotSummary := wf.NewProc("plot_summary", "Rscript bin/plot_summary.r -i {i:summary} -o {o:plot} -f png # {i:gene_smiles_activity}")
 	plotSummary.SetPathExtend("summary", "plot", ".plot.png")
 	plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
-	//plotSummary.In("importedflagfile").Connect(importIntoSQLite.Out("doneflagfile"))
 	plotSummary.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_smiles_activity"))
 
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
-
 	procsToRun := []string{}
 	for _, gene := range geneSets[*geneSet] {
 		if strInSlice(gene, geneSets["bowes44min100percls_small"]) {
 			procsToRun = append(procsToRun, "fillup_"+str.ToLower(gene)+"_r1")
 		}
 	}
-	wf.RunToProcNames(procsToRun...)
+	wf.RunTo(procsToRun...)
 }
 
 // --------------------------------------------------------------------------------
@@ -385,3 +374,16 @@ func strInSlice(searchStr string, strings []string) bool {
 	}
 	return false
 }
+
+// ------------------------------------------------------------------------
+// CURRENTLY INACTIVE PROCESSES
+// ------------------------------------------------------------------------
+//createSQLiteDB := wf.NewProc("CreateSQLiteDB", `sqlite3 {o:dbfile} 'CREATE TABLE {p:tablename} (Ambit_InchiKey TEXT, Original_Entry_ID TEXT, Entrez_ID INTEGER, Activity_Flag TEXT, pXC50 REAL, DB TEXT, Original_Assay_ID INTEGER, Tax_ID INTEGER, Gene_Symbol TEXT, Ortholog_Group INTEGER, InChI TEXT, SMILES TEXT);'`)
+//createSQLiteDB.SetPathStatic("dbfile", "../../raw/excapedb.db")
+//createSQLiteDB.ParamInPort("tablename").ConnectStr("excapedb")
+
+//importIntoSQLite := wf.NewProc("importIntoSQLite", `(echo '.mode tabs'; echo '.import {i:tsvfile} {p:tablename}'; echo 'CREATE INDEX Gene_Symbol ON excapedb(Gene_Symbol);'; echo 'CREATE INDEX Activity_Flag ON excapedb(Activity_Flag);') | sqlite3 {i:dbfile} && echo done > {o:doneflagfile};`)
+//importIntoSQLite.SetPathExtend("tsvfile", "doneflagfile", ".importdone")
+//importIntoSQLite.ParamInPort("tablename").ConnectStr("excapedb")
+//importIntoSQLite.In("dbfile").Connect(createSQLiteDB.Out("dbfile"))
+//importIntoSQLite.In("tsvfile").Connect(unPackDB.Out("unxzed"))
