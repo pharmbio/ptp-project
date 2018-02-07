@@ -138,6 +138,7 @@ func main() {
 
 	finalModelsSummary := NewFinalModelSummarizer(wf, "finalmodels_summary_creator", "res/final_models_summary.tsv", '\t')
 
+	genRandomProcs := map[string]*sp.Process{}
 	// --------------------------------
 	// Set up gene-specific workflow branches
 	// --------------------------------
@@ -161,63 +162,66 @@ func main() {
 		countTargetDataRows.In("targetdata").Connect(extractTargetData.Out("target_data"))
 		countTargetDataRows.ParamInPort("gene").ConnectStr(geneUppercase)
 
-		var targetDataPort *sp.OutPort
+		for _, replicate := range replicates {
+			uniqStrGeneRepl := uniqStrGene + "_" + replicate
 
-		if doFillUp {
-			createRandomBytes := wf.NewProc("create_random_bytes_"+uniqStrGene, "dd if=/dev/urandom of={o:rand} bs=1048576 count=1024")
-			createRandomBytes.SetPathStatic("rand", "dat/"+geneLowerCase+"_random_bytes.bin")
+			var targetDataPort *sp.OutPort
 
-			fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGene, `
-			cat {i:targetdata} > {o:filledup} && \
+			if doFillUp {
+				genRandomID := "create_random_bytes_" + replicate
+				if _, ok := genRandomProcs[genRandomID]; !ok {
+					genRandomProcs[genRandomID] = wf.NewProc(genRandomID, "dd if=/dev/urandom of={o:rand} bs=1048576 count=1024")
+				}
+				genRandomProcs[genRandomID].SetPathStatic("rand", "dat/"+replicate+"_random_bytes.bin")
+
+				fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGeneRepl, `
+				cat {i:targetdata} > {o:filledup} && \
 				let "fillup_lines_cnt = "$(wc -l {i:targetdata} | awk '{ printf $1 }')" * 2" \
 				&& cat {i:rawdata} \
 				| awk -F"\t" '$1 != "{p:gene}" { print $2 "\tN" }' \
-				| shuf --random-source={i:randsrc} -n $fillup_lines_cnt >> {o:filledup}
-			`) // FIXME: We must also make sure that the SMILES picked as
-			// assumed negative is not contained in the target data file already
-			// ... and that unique SMILES strings are picked.
-			// After this is done, this workflow needs to be re-run.
-			fillAssumedNonbinding.SetPathReplace("targetdata", "filledup", ".tsv", ".incl_assumed_neg.tsv")
-			fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
-			fillAssumedNonbinding.In("rawdata").Connect(removeConflicting.Out("gene_smiles_activity"))
-			fillAssumedNonbinding.ParamInPort("gene").ConnectStr(geneUppercase)
-			fillAssumedNonbinding.In("randsrc").Connect(createRandomBytes.Out("rand"))
-			targetDataPort = fillAssumedNonbinding.Out("filledup")
-		} else {
-			targetDataPort = extractTargetData.Out("target_data")
-		}
+				| shuf --random-source={i:randsrc} -n $fillup_lines_cnt >> {o:filledup}`)
+				// FIXME: We must also make sure that the SMILES picked as
+				// assumed negative is not contained in the target data file already
+				// ... and that unique SMILES strings are picked.
+				// After this is done, this workflow needs to be re-run.
+				fillAssumedNonbinding.SetPathReplace("targetdata", "filledup", ".tsv", ".incl_assumed_neg.tsv")
+				fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
+				fillAssumedNonbinding.In("rawdata").Connect(removeConflicting.Out("gene_smiles_activity"))
+				fillAssumedNonbinding.ParamInPort("gene").ConnectStr(geneUppercase)
+				fillAssumedNonbinding.In("randsrc").Connect(genRandomProcs[genRandomID].Out("rand"))
+				targetDataPort = fillAssumedNonbinding.Out("filledup")
+			} else {
+				targetDataPort = extractTargetData.Out("target_data")
+			}
 
-		// --------------------------------------------------------------------------------
-		// Pre-compute step
-		// --------------------------------------------------------------------------------
-		cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrGene,
-			`java -jar `+cpSignPath+` precompute \
+			// --------------------------------------------------------------------------------
+			// Pre-compute step
+			// --------------------------------------------------------------------------------
+			cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrGeneRepl,
+				`java -jar `+cpSignPath+` precompute \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
 									--trainfile {i:traindata} \
 									--labels A, N \
 									--model-out {o:precomp} \
 									--model-name "`+geneUppercase+` target profile"`)
-		cpSignPrecomp.In("traindata").Connect(targetDataPort)
-		cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
-		if *runSlurm {
-			cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLowerCase // SLURM string
-		}
-
-		for _, replicate := range replicates {
-			uniqStrRepl := uniqStrGene + "_" + replicate
+			cpSignPrecomp.In("traindata").Connect(targetDataPort)
+			cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
+			if *runSlurm {
+				cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLowerCase // SLURM string
+			}
 
 			// --------------------------------------------------------------------------------
 			// Optimize cost/gamma-step
 			// --------------------------------------------------------------------------------
 			includeGamma := false // For liblinear
 			summarize := NewSummarizeCostGammaPerf(wf,
-				"summarize_cost_gamma_perf_"+uniqStrRepl,
+				"summarize_cost_gamma_perf_"+uniqStrGeneRepl,
 				"dat/"+geneLowerCase+"/"+replicate+"/"+geneLowerCase+"_cost_gamma_perf_stats.tsv",
 				includeGamma)
 
 			for _, cost := range costVals {
-				uniqStrCost := uniqStrRepl + "_" + cost
+				uniqStrCost := uniqStrGeneRepl + "_" + cost
 				// If Liblinear
 				evalCost := wf.NewProc("crossval_"+uniqStrCost, `java -jar `+cpSignPath+` crossvalidate \
 									--license ../../bin/cpsign.lic \
@@ -269,7 +273,7 @@ func main() {
 			// via the summarize component, so that we can retain the keys in
 			// the IP!
 			selectBest := NewBestCostGamma(wf,
-				"select_best_cost_gamma_"+uniqStrRepl,
+				"select_best_cost_gamma_"+uniqStrGeneRepl,
 				'\t',
 				false,
 				includeGamma)
@@ -278,7 +282,7 @@ func main() {
 			// --------------------------------------------------------------------------------
 			// Train step
 			// --------------------------------------------------------------------------------
-			cpSignTrain := wf.NewProc("cpsign_train_"+uniqStrRepl,
+			cpSignTrain := wf.NewProc("cpsign_train_"+uniqStrGeneRepl,
 				`java -jar `+cpSignPath+` train \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
@@ -311,7 +315,7 @@ func main() {
 					t.Param("replicate"))
 			})
 			if *runSlurm {
-				cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + uniqStrRepl // SLURM string
+				cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + uniqStrGeneRepl // SLURM string
 			}
 
 			finalModelsSummary.InModel().Connect(cpSignTrain.Out("model"))
@@ -336,7 +340,7 @@ func main() {
 	procsToRun := []string{}
 	for _, gene := range geneSets[*geneSet] {
 		if strInSlice(gene, geneSets["bowes44min100percls_small"]) {
-			procsToRun = append(procsToRun, "fillup_"+str.ToLower(gene))
+			procsToRun = append(procsToRun, "fillup_"+str.ToLower(gene)+"_r1")
 		}
 	}
 	wf.RunToProcNames(procsToRun...)
