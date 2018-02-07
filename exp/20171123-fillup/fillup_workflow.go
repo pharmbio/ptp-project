@@ -199,7 +199,10 @@ func main() {
 				&& cat {i:rawdata} \
 				| awk -F"\t" '$1 != "{p:gene}" { print $2 "\tN" }' \
 				| shuf --random-source={i:randsrc} -n $fillup_lines_cnt >> {o:filledup}
-			`)
+			`) // FIXME: We must also make sure that the SMILES picked as
+			// assumed negative is not contained in the target data file already
+			// ... and that unique SMILES strings are picked.
+			// After this is done, this workflow needs to be re-run.
 			fillAssumedNonbinding.SetPathReplace("targetdata", "filledup", ".tsv", ".incl_assumed_neg.tsv")
 			fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
 			fillAssumedNonbinding.In("rawdata").Connect(removeConflicting.Out("gene_smiles_activity"))
