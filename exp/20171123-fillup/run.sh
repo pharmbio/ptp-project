@@ -4,7 +4,7 @@
 #SBATCH -C mem256GB
 #SBATCH -N 1
 #SBATCH -J ptp_fillup_wf
-#SBATCH -t 7-00:00:00
+#SBATCH -t 6:00:00
 #SBATCH --mail-user samuel.lampa@farmbio.uu.se
 #SBATCH --mail-type BEGIN,FAIL,END
 module load java/sun_jdk1.8.0_92
