@@ -358,7 +358,9 @@ func main() {
 
 	procsToRun := []string{}
 	for _, gene := range geneSets[*geneSet] {
-		procsToRun = append(procsToRun, "fillup_"+str.ToLower(gene))
+		if strInSlice(gene, geneSets["bowes44min100percls_small"]) {
+			procsToRun = append(procsToRun, "fillup_"+str.ToLower(gene))
+		}
 	}
 	wf.RunToProcNames(procsToRun...)
 }
