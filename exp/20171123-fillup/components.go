@@ -212,10 +212,10 @@ func (p *BestCostGamma) Run() {
 			}
 
 			obsFuzzActive, err := strconv.ParseFloat(rec[indexOfStr("ObsFuzzActive", header)], 64)
-			sp.CheckErr(err)
+			sp.Check(err)
 
 			obsFuzzNonactive, err := strconv.ParseFloat(rec[indexOfStr("ObsFuzzNonactive", header)], 64)
-			sp.CheckErr(err)
+			sp.Check(err)
 
 			classAvgObsFuzz := (obsFuzzActive + obsFuzzNonactive) / 2 // We take the average for the two classes, to get more equal influence of each class
 
@@ -225,30 +225,30 @@ func (p *BestCostGamma) Run() {
 				sp.Debug.Printf("Proc:%s Raw cost value: %s\n", p.Name(), rec[indexOfStr("Cost", header)])
 				bestCost, err = strconv.ParseInt(rec[indexOfStr("Cost", header)], 10, 0)
 				sp.Debug.Printf("Proc:%s Parsed cost value: %d\n", p.Name(), bestCost)
-				sp.CheckErr(err)
+				sp.Check(err)
 
 				if p.IncludeGamma {
 					bestGamma, err = strconv.ParseFloat(rec[indexOfStr("Gamma", header)], 64)
-					sp.CheckErr(err)
+					sp.Check(err)
 				}
 
 				bestValidity, err = strconv.ParseFloat(rec[indexOfStr("Validity", header)], 64)
-				sp.CheckErr(err)
+				sp.Check(err)
 
 				bestEfficiency, err = strconv.ParseFloat(rec[indexOfStr("Efficiency", header)], 64)
-				sp.CheckErr(err)
+				sp.Check(err)
 
 				bestObsFuzzOverall, err = strconv.ParseFloat(rec[indexOfStr("ObsFuzzOverall", header)], 64)
-				sp.CheckErr(err)
+				sp.Check(err)
 
 				bestObsFuzzActive = obsFuzzActive
 				bestObsFuzzNonactive = obsFuzzNonactive
 
 				bestClassConfidence, err = strconv.ParseFloat(rec[indexOfStr("ClassConfidence", header)], 64)
-				sp.CheckErr(err)
+				sp.Check(err)
 
 				bestClassCredibility, err = strconv.ParseFloat(rec[indexOfStr("ClassCredibility", header)], 64)
-				sp.CheckErr(err)
+				sp.Check(err)
 			}
 		}
 		sp.Debug.Printf("Final optimal (minimal) class-equalized observed fuzziness: %f (For: Cost:%03d)\n", bestClassAvgObsFuzz, bestCost)
@@ -376,7 +376,7 @@ func (p *FinalModelSummarizer) Run() {
 		activeCnt, err := strconv.ParseInt(activeStr, 10, 64)
 		nonActiveStr := str.TrimSuffix(strs[1], "\n")
 		nonActiveCnt, err := strconv.ParseInt(nonActiveStr, 10, 64)
-		sp.CheckErr(err)
+		sp.Check(err)
 		activeCounts[gene] = activeCnt
 		nonActiveCounts[gene] = nonActiveCnt
 		totalCompounds[gene] = activeCnt + nonActiveCnt
