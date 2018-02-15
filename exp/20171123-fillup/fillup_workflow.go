@@ -166,10 +166,9 @@ func main() {
 				genRandomProcs[genRandomID].SetPathStatic("rand", "dat/"+replicate+"_random_bytes.bin")
 
 				fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGeneRepl, `
-				cat {i:targetdata} > {o:filledup} && \
-				let "fillup_lines_cnt = "$(wc -l {i:targetdata} | awk '{ printf $1 }')" * 2" \
-				&& cat {i:rawdata} \
-				| awk -F"\t" '$1 != "{p:gene}" { print $2 "\tN" }' \
+				cat {i:targetdata} > {o:filledup} \
+				&& let "fillup_lines_cnt = "$(wc -l {i:targetdata} | awk '{ printf $1 }')" * 2" \
+				&& awk -F"\t" 'FNR==NR{target_smiles[$1]; next} ($1 != "{p:gene}") && ($2 not in target_smiles) { print $2 "\tN" }' {i:targetdata} {i:rawdata} \
 				| shuf --random-source={i:randsrc} -n $fillup_lines_cnt >> {o:filledup}`)
 				// FIXME: We must also make sure that the SMILES picked as
 				// assumed negative is not contained in the target data file already
