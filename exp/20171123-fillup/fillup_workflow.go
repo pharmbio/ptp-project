@@ -119,7 +119,7 @@ func main() {
 	extractGSA.In("excapedb").Connect(unPackDB.Out("unxzed"))
 
 	// removeConflicting removes (or, SHOULD remove) rows which have the same values on both row 1 and 2 (I think ...)
-	removeConflicting := wf.NewProc("remove_conflicting", `awk -F"\t" '(( $1 != p1 ) || ( $2 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print p1 "\t" p2 "\t" p3 }
+	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '(( $1 != p1 ) || ( $2 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print p1 "\t" p2 "\t" p3 }
 																	  { c[$1,$2]++; p1 = $1; p2 = $2; p3 = $3 }
 																	  END { print $1 "\t" $2 "\t" $3 }' \
 																	  {i:gene_smiles_activity} > {o:gene_smiles_activity}`)
@@ -168,7 +168,8 @@ func main() {
 				fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGeneRepl, `
 				cat {i:targetdata} > {o:filledup} \
 				&& let "fillup_lines_cnt = "$(wc -l {i:targetdata} | awk '{ printf $1 }')" * 2" \
-				&& awk -F"\t" 'FNR==NR{target_smiles[$1]; next} ($1 != "{p:gene}") && ($2 not in target_smiles) { print $2 "\tN" }' {i:targetdata} {i:rawdata} \
+				&& awk -F"\t" 'FNR==NR{target_smiles[$1]; next} ($1 != "{p:gene}") && !($2 in target_smiles) { print $2 "\tN" }' {i:targetdata} {i:rawdata} \
+				| sort -uV \
 				| shuf --random-source={i:randsrc} -n $fillup_lines_cnt >> {o:filledup}`)
 				// FIXME: We must also make sure that the SMILES picked as
 				// assumed negative is not contained in the target data file already
