@@ -329,7 +329,7 @@ func main() {
 	//	}
 	//}
 	//wf.RunTo(procsToRun...)
-	wf.RunTo(plotSummary)
+	wf.RunTo("plot_summary")
 }
 
 // --------------------------------------------------------------------------------
