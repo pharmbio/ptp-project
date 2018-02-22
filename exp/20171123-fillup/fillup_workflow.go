@@ -148,11 +148,7 @@ func main() {
 			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_extract_" + geneLowerCase // SLURM string
 		}
 
-		countTargetDataRows := wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, `awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' {i:targetdata} > {o:count} # {p:gene}`)
-		countTargetDataRows.SetPathExtend("targetdata", "count", ".count")
-		countTargetDataRows.In("targetdata").Connect(extractTargetData.Out("target_data"))
-		countTargetDataRows.ParamInPort("gene").ConnectStr(geneUppercase)
-
+		countProcs := map[string]*sp.Process{}
 		for _, replicate := range replicates {
 			uniqStrGeneRepl := uniqStrGene + "_" + replicate
 
@@ -179,6 +175,13 @@ func main() {
 				targetDataPort = fillAssumedNonbinding.Out("filledup")
 			} else {
 				targetDataPort = extractTargetData.Out("target_data")
+			}
+
+			if replicate == "r1" {
+				countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, `awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' {i:targetdata} > {o:count} # {p:gene}`)
+				countProcs[geneLowerCase].SetPathExtend("targetdata", "count", ".count")
+				countProcs[geneLowerCase].In("targetdata").Connect(targetDataPort)
+				countProcs[geneLowerCase].ParamInPort("gene").ConnectStr(geneUppercase)
 			}
 
 			// --------------------------------------------------------------------------------
@@ -307,7 +310,7 @@ func main() {
 
 			finalModelsSummary.InModel().Connect(cpSignTrain.Out("model"))
 		} // end: for replicate
-		finalModelsSummary.InTargetDataCount().Connect(countTargetDataRows.Out("count"))
+		finalModelsSummary.InTargetDataCount().Connect(countProcs[geneLowerCase].Out("count"))
 	} // end: for gene
 
 	sortSummaryOnDataSize := wf.NewProc("sort_summary", "head -n 1 {i:summary} > {o:sorted} && tail -n +2 {i:summary} | sort -nk 16 >> {o:sorted}")
