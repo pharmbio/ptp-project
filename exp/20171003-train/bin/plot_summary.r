@@ -21,7 +21,6 @@ if ( is.null(opt$format) || is.null(opt$infile) || is.null(opt$outfile) ) {
 # ------------------------------------------------------------------------
 # Create and plot the heatmap
 # ------------------------------------------------------------------------
-
 # Set output format
 if (opt$format == 'png') {
 	png(opt$outfile, width=1200, height=640, units="px")
@@ -79,50 +78,57 @@ legend("bottomright",
 # sorted alphabetically by gene name:
 sort_vector_totcounts <- aggregate(d$TotalCnt, by=list(Gene = d$Gene), FUN=median)
 
+# --------------------------------------------------------------------------------
 # Plot observed fuzziness
+# --------------------------------------------------------------------------------
 par(new=TRUE)
 plot(bplt, 1-drepl$r1$ObsFuzzClassAvg, type="p", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 par(new=TRUE);
 plot(bplt, 1-drepl$r2$ObsFuzzClassAvg, type="p", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 par(new=TRUE);
 plot(bplt, 1-drepl$r3$ObsFuzzClassAvg, type="p", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-
 ofca_median <- aggregate(d$ObsFuzzClassAvg, by=list(Gene = d$Gene), FUN=median)
 ofca_median <- ofca_median[order(sort_vector_totcounts$x),]
 par(new=TRUE);
 plot(bplt, 1-ofca_median$x, type="l", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-
 axis(4, las=2, col="blue", col.axis="blue", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
 mtext("Class-averaged Observed Fuzziness", side=4, line=4.8, col="blue")
+# --------------------------------------------------------------------------------
 
+
+# --------------------------------------------------------------------------------
 # Plot Efficiency
+# --------------------------------------------------------------------------------
 par(new=TRUE)
 plot(bplt, 1-drepl$r1$Efficiency, type="p", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 par(new=TRUE);
 plot(bplt, 1-drepl$r2$Efficiency, type="p", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 par(new=TRUE);
 plot(bplt, 1-drepl$r3$Efficiency, type="p", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-
 eff_median <- aggregate(d$Efficiency, by=list(Gene = d$Gene), FUN=median)
 eff_median <- eff_median[order(sort_vector_totcounts$x),]
 par(new=TRUE);
 plot(bplt, 1-eff_median$x, type="l", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-
 axis(4, las=2, col="#007700", col.axis="#007700", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
 mtext("Original CP Efficiency measure", side=4, line=6.0, col="#007700")
+# --------------------------------------------------------------------------------
 
+
+# --------------------------------------------------------------------------------
 # Plot training time (minutes)
+# --------------------------------------------------------------------------------
 par(new=TRUE);
 plot(bplt, drepl$r1$ExecTimeMS/(1000*60), type="p", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
 par(new=TRUE);
 plot(bplt, drepl$r2$ExecTimeMS/(1000*60), type="p", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
 par(new=TRUE);
 plot(bplt, drepl$r3$ExecTimeMS/(1000*60), type="p", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
-
 exectime_median <- aggregate(d$ExecTimeMS, by=list(Gene = d$Gene), FUN=median)
 exectime_median <- exectime_median[order(sort_vector_totcounts$x),]
 par(new=TRUE);
 plot(bplt, exectime_median$x/(1000*60), type="l", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
+# --------------------------------------------------------------------------------
+
 
 axis(4, las=2, col="white", col.axis="red", col.ticks="red", at=c(1,30,60), labels=c("1 min", "30 min", "1 h"));
 mtext("Training time (min)", side=4, line=3.6, col="red")
