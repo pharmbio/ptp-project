@@ -136,11 +136,15 @@ mtext("Training time (min)", side=4, line=3.6, col="red")
 # Plot validity
 # --------------------------------------------------------------------------------
 par(new=TRUE);
-plot(bplt, drepl$r1$Validity, type="p", col="purple3", axes=FALSE, ylab=NA, xlab=NA);
+plot(bplt, drepl$r1$Validity, type="p", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
 par(new=TRUE);
-plot(bplt, drepl$r2$Validity, type="p", col="purple3", axes=FALSE, ylab=NA, xlab=NA);
+plot(bplt, drepl$r2$Validity, type="p", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
 par(new=TRUE);
-plot(bplt, drepl$r3$Validity, type="p", col="purple3", axes=FALSE, ylab=NA, xlab=NA);
+plot(bplt, drepl$r3$Validity, type="p", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
+validity_median <- aggregate(d$Validity, by=list(Gene = d$Gene), FUN=median)
+validity_median <- validity_median[order(sort_vector_totcounts$x),]
+par(new=TRUE);
+plot(bplt, validity_median$x, type="l", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
 # --------------------------------------------------------------------------------
 
 
