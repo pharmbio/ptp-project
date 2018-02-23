@@ -54,7 +54,7 @@ func (p *SummarizeCostGammaPerf) OutStats() *sp.OutPort { return p.OutPort("out_
 func (p *SummarizeCostGammaPerf) Run() {
 	defer p.OutStats().Close()
 
-	outIp := sp.NewIP(p.FileName)
+	outIp := sp.NewFileIP(p.FileName)
 	if outIp.Exists() {
 		sp.Info.Printf("Process %s: Out-target %s already exists, so skipping\n", p.Name(), outIp.Path())
 	} else {
@@ -303,7 +303,7 @@ func (p *ParamPrinter) GetNewParamInPort(portName string) *sp.ParamInPort {
 func (p *ParamPrinter) Run() {
 	defer p.OutBestParamsFile().Close()
 
-	oip := sp.NewIP(p.BestParamsFileName)
+	oip := sp.NewFileIP(p.BestParamsFileName)
 	if !oip.Exists() && !oip.TempFileExists() {
 		rows := []map[string]string{}
 		for len(p.ParamInPorts()) > 0 {
@@ -326,7 +326,7 @@ func (p *ParamPrinter) Run() {
 				outContent += fmt.Sprintf("%s=%s\n", name, val)
 			}
 		}
-		oip.WriteTempFile([]byte(outContent))
+		oip.Write([]byte(outContent))
 		oip.Atomize()
 	} else {
 		sp.Info.Printf("Target file (or temp file) exists for: %s, so skipping\n", oip.Path())
@@ -370,6 +370,7 @@ func (p *FinalModelSummarizer) Run() {
 	nonActiveCounts := map[string]int64{}
 	totalCompounds := map[string]int64{}
 	for tdip := range p.InTargetDataCount().Chan {
+		fmt.Println(tdip.AuditInfo())
 		gene := tdip.Param("gene")
 		strs := str.Split(string(tdip.Read()), "\t")
 		activeStr := str.TrimSuffix(strs[0], "\n")
@@ -421,7 +422,7 @@ func (p *FinalModelSummarizer) Run() {
 		rows = append(rows, row)
 	}
 
-	oip := sp.NewIP(p.SummaryFileName)
+	oip := sp.NewFileIP(p.SummaryFileName)
 	fh := oip.OpenWriteTemp()
 	csvWriter := csv.NewWriter(fh)
 	csvWriter.Comma = p.Separator

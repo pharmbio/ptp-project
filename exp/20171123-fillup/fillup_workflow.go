@@ -241,7 +241,7 @@ func main() {
 					evalCost.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + uniqStrCost // SLURM string
 				}
 
-				extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniqStrCost, func(ip *sp.IP) map[string]string {
+				extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniqStrCost, func(ip *sp.FileIP) map[string]string {
 					crossValOut := &cpSignCrossValOutput{}
 					ip.UnMarshalJSON(crossValOut)
 					newKeys := map[string]string{}

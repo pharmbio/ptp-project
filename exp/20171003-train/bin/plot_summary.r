@@ -141,4 +141,4 @@ mtext("Training time (min)", side=4, line=3.6, col="red")
 
 dev.off()
 # Avoid sending non-zero exit values on exit
-quit(save = "no", status = 0, runLast = FALSE)
+#quit(save = "no", status = 0, runLast = FALSE)
