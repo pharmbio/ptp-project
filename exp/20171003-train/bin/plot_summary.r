@@ -127,11 +127,22 @@ exectime_median <- aggregate(d$ExecTimeMS, by=list(Gene = d$Gene), FUN=median)
 exectime_median <- exectime_median[order(sort_vector_totcounts$x),]
 par(new=TRUE);
 plot(bplt, exectime_median$x/(1000*60), type="l", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
+axis(4, las=2, col="white", col.axis="red", col.ticks="red", at=c(1,30,60), labels=c("1 min", "30 min", "1 h"));
+mtext("Training time (min)", side=4, line=3.6, col="red")
 # --------------------------------------------------------------------------------
 
 
-axis(4, las=2, col="white", col.axis="red", col.ticks="red", at=c(1,30,60), labels=c("1 min", "30 min", "1 h"));
-mtext("Training time (min)", side=4, line=3.6, col="red")
+# --------------------------------------------------------------------------------
+# Plot validity
+# --------------------------------------------------------------------------------
+par(new=TRUE);
+plot(bplt, drepl$r1$Validity, type="p", col="purple3", axes=FALSE, ylab=NA, xlab=NA);
+par(new=TRUE);
+plot(bplt, drepl$r2$Validity, type="p", col="purple3", axes=FALSE, ylab=NA, xlab=NA);
+par(new=TRUE);
+plot(bplt, drepl$r3$Validity, type="p", col="purple3", axes=FALSE, ylab=NA, xlab=NA);
+# --------------------------------------------------------------------------------
+
 
 # --------------------------------------------------------------------------------
 # Alternative legend, with the line plots included:
