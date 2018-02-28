@@ -102,7 +102,7 @@ probabilities are calculated using the Conformal Prediction methodology
 [REF2], with support vector machines for modeling and chemical structures
 described by the signature descriptor [REF3]. We study profiles for
 different sets of targets, including a subset of the minimal panel of 44
-targets for broad early hazard assessment suggested by Bowes et al.[REF1],
+targets for broad early hazard assessment suggested by \cite{Bowes2012},
 but also the applicability of larger as well as focused target sets. The
 resulting method is available as an online Web service via an API, and we
 also make the complete workflow for reproducing the study together with all
@@ -143,14 +143,14 @@ Also, from this extracted dataset, duplicate rows were removed. Also, all
 rows for which there were rows with a conflictnig value for the activity
 flag, were completely removed.
 
-As targets, a subset of the panel of 44 targets as suggested in Bowes et al.
-[REF] was used. Specifically, this list of 44 targets was filtered to remove
-any target for which the dataset contained less than 100 data points about
-either associated or non-associated ligands respectively. Thus, only targets
-with at least 100 associated, and at least 100 non-associated, compounds, where
-kept.
+As targets, a subset of the panel of 44 targets as suggested in
+\cite{Bowes2012} was used. Specifically, this list of 44 targets was filtered
+to remove any target for which the dataset contained less than 100 data
+points about either associated or non-associated ligands respectively. Thus,
+only targets with at least 100 associated, and at least 100 non-associated,
+compounds, where kept.
 
-Some of the gene ids used in Bowes et al. was not found in their exact form in
+Some of the gene ids used in \cite{Bowes2012} was not found in their exact form in
 the ExcapeDB dataset. To resolve this, we did PubMed entrez searches, to find
 synonymous gene IDs. The following replacements of gene ids were done:
 
