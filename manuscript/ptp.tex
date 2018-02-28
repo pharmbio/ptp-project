@@ -133,8 +133,15 @@ target sets.
 
 \section{Methods}
 
-The dataset used for information about binding association between ligands and
-targets, was ExcapeDB.
+The dataset used for information about binding association between ligands
+and targets, was ExcapeDB. An extraction of only the columns for Gene name,
+SMILES and Activity flag was performed in order to make subsequent data
+traformation steps easier to implement and faster to process, given the
+relative large size of the uncomplressed ExcapeDB data file (18 GB).
+
+Also, from this extracted dataset, duplicate rows were removed. Also, all
+rows for which there were rows with a conflictnig value for the activity
+flag, were completely removed.
 
 As targets, a subset of the panel of 44 targets as suggested in Bowes et al.
 [REF] was used. Specifically, this list of 44 targets was filtered to remove
@@ -162,6 +169,16 @@ SCN5A, CCKAR, ADRB1, PTGS1, CHRM3, CHRM2, EDNRA, MAOA, LCK,
 PTGS2, SLC6A2, ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR,
 SLC6A4, OPRM1, HTR1A, SLC6A3, OPRK1, AVPR1A, ADRB2, DRD2,
 KCNH2, DRD1, HTR2A, CHRM1.
+
+For 21 of these targets, the dataset contained less than 100 non-active
+compounds, leading to imbalanced datasets. These 21 target genes are: PDE3A,
+SCN5A, CCKAR, ADRB1, PTGS1, CHRM3, CHRM2, EDNRA, MAOA, LCK, PTGS2, SLC6A2,
+ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR, SLC6A4 and OPRM1. For these 21
+targets, we filled up their respective datasets with randomly selected
+examples from the raw dataset which were not reported to be active for this
+target, thus being ``assumed non-active''. The amount of such assumed
+non-active compounds were chosen to be twice the number of actives for each
+target in question.
 
 \subsection{Software for training and cross-validation}
 
