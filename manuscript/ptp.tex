@@ -180,11 +180,12 @@ target in question.
 
 \subsection{Software for training and cross-validation}
 
-The software for training and cross-validation was the cpsign software [REF]
-previously developed in the group. Certain modifications were done based on
-needs identified in the project, which have been merged into the latest
-release of the cpsign software. cpsign is a commercial software, available
-from genettasoft.com [LINK]. \todoil{Add something about academic licenses?}
+The software for training and cross-validation was the cpsign software
+\cite{CPSignDocs} previously developed in the group. Certain modifications
+were done based on needs identified in the project, which have been merged
+into the latest release of the cpsign software. cpsign is a commercial
+software, available from genettasoft.com [LINK].
+\todoil{Add something about academic licenses?}
 
 The computational workflows for orchestrating the extraction of data, running
 cpsign, and the collection of results for summarization and plotting, were
@@ -194,16 +195,16 @@ scipipe.org and github.com/scipipe/scipipe [LINK].
 
 \subsection{Choice of cost value for liblinear}
 
-For each of the 31 targets, we ran a parameter sweep to find the value of the
-cost parameter of liblinear that gave the best efficiency measure. The
-efficiency measure we used, was a slightly modified version of observed
-fuzziness scores as described in [REF]. Instead of using an overall observed
-fuzziness, which would have been been influenced more by values in the larger
-class in case of imbalanced datasets, we first calculated the observed
-fuzziness per class and divided it by the number of examples (compounds) in
-that class, and finally took the mean value of the resulting normalized
-observed fuzziness values for each class. In other words, we could thus call
-our measure a ``class-normalized observed fuzziness'' (CNOF).
+For each of the 31 targets, we ran a parameter sweep to find the value of the cost
+parameter of liblinear that gave the best efficiency measure. The efficiency
+measure we used, was a slightly modified version of observed fuzziness (OF)
+scores as described in \cite{Vovk2016}. Instead of using an overall OF, which
+would have been been influenced more by values in the larger class in case of
+imbalanced datasets, we first calculated the OF per class and divided it by
+the number of examples (compounds) in that class, and finally took the mean
+value of the resulting normalized OF values for each class. In other words,
+we could thus call our measure a ``class-normalized observed fuzziness''
+(CNOF).
 
 The parameter sweep evaluated three values for the cost parameter, for each
 target; 1, 10 and 100.
