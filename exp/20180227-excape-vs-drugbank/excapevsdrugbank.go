@@ -45,20 +45,13 @@ func main() {
 					for i, g := range drug.Groups {
 						fmt.Printf("... Group %d: %s\n", i, g)
 					}
+					for _, p := range drug.CalculatedProperties {
+						fmt.Printf("... %s: %s [%s]\n", p.Kind, p.Value, p.Source)
+					}
 				}
 			}
 		}
 	}
-
-	//apprZip := wf.NewProc("download_approved", "curl -Lf -o {o:zipfile} -u ... https://www.drugbank.ca/releases/5-0-11/downloads/approved-drug-sequences")
-	//apprZip.SetPathStatic("zipfile", "drug_sequences_approved.zip")
-
-	//withdrZip := wf.NewProc("download_withdrawn", "curl -Lf -o {o:zipfile} -u ... https://www.drugbank.ca/releases/5-0-11/downloads/withdrawn-drug-sequences")
-	//withdrZip.SetPathStatic("zipfile", "drug_sequences_withdrawn.zip")
-
-	//unpack := wf.NewProc("unzip", "unzip {i:zipfile}")
-	//unpack.In("zipfile").Connect(apprZip.Out("zipfile"))
-	//unpack.In("zipfile").Connect(withdrZip.Out("zipfile"))
 
 	wf.Run()
 }
@@ -69,15 +62,15 @@ type Drugbank struct {
 }
 
 type Drug struct {
-	XMLName xml.Name `xml:"drug"`
-	Name    string   `xml:"name"`
-	Groups  []string `xml:"groups>group"`
+	XMLName              xml.Name   `xml:"drug"`
+	Name                 string     `xml:"name"`
+	Groups               []string   `xml:"groups>group"`
+	CalculatedProperties []Property `xml:"calculated-properties>property"`
 }
 
 type Property struct {
 	XMLName xml.Name `xml:"property"`
-}
-
-type Group struct {
-	XMLName xml.Name `xml:"group"`
+	Kind    string   `xml:"kind"`
+	Value   string   `xml:"value"`
+	Source  string   `xml:"source"`
 }
