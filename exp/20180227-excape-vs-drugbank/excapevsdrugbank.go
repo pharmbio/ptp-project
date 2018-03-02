@@ -81,6 +81,10 @@ func main() {
 		}
 	}
 
+	sortTsv := wf.NewProc("sort_tsv", "head -n 1 {i:unsorted} > {o:sorted}; tail -n +2 {i:unsorted} | sort >> {o:sorted}")
+	sortTsv.SetPathReplace("unsorted", "sorted", ".tsv", ".sorted.tsv")
+	sortTsv.In("unsorted").Connect(xmlToTSV.Out("tsv"))
+
 	wf.Run()
 }
 
