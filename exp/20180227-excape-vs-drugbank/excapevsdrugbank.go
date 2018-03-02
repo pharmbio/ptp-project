@@ -42,6 +42,9 @@ func main() {
 						sp.Fail("Could not decode element", decErr)
 					}
 					fmt.Println("Drug:", drug.Name)
+					for i, g := range drug.Groups {
+						fmt.Printf("... Group %d: %s\n", i, g)
+					}
 				}
 			}
 		}
@@ -68,4 +71,13 @@ type Drugbank struct {
 type Drug struct {
 	XMLName xml.Name `xml:"drug"`
 	Name    string   `xml:"name"`
+	Groups  []string `xml:"groups>group"`
+}
+
+type Property struct {
+	XMLName xml.Name `xml:"property"`
+}
+
+type Group struct {
+	XMLName xml.Name `xml:"group"`
 }
