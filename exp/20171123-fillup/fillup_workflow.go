@@ -1,4 +1,5 @@
-// Workflow written in SciPipe.  // For more information about SciPipe, see: http://scipipe.org
+// Workflow written in SciPipe.
+// For more information about SciPipe, see: http://scipipe.org
 package main
 
 import (
