@@ -12,7 +12,12 @@ func main() {
 	wf := sp.NewWorkflow("exvsdb", 1)
 	//wf.NewProc("dl", "curl -Lfv -o filename.zip -u ... https://www.drugbank.ca/releases/5-0-11/downloads/all-full-database")
 
-	drugBank := sp.NewFileIPGenerator(wf, "drugbank_file", "dat/drugbank.xml")
+	excapeDB := sp.NewFileIPGenerator(wf, "excapedb", "../../raw/pubchem.chembl.dataset4publication_inchi_smiles.tsv")
+	drugBank := sp.NewFileIPGenerator(wf, "drugbank", "dat/drugbank.xml")
+
+	extractIA := wf.NewProc("extract_inchikey_activity", `awk -F"\t" '{ print $1 "\t" $4 }' {i:tsv} > {o:tsv}`)
+	extractIA.SetPathStatic("tsv", "dat/excapedb_inchikey_activity.tsv")
+	extractIA.In("tsv").Connect(excapeDB.Out())
 
 	xmlToTSV := wf.NewProc("xml_to_tsv", "# {i:xml} {o:tsv}")
 	xmlToTSV.SetPathExtend("xml", "tsv", ".tsv")
