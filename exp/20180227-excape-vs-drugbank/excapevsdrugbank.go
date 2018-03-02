@@ -31,7 +31,7 @@ func main() {
 
 		tsvWrt := csv.NewWriter(t.OutTargets["tsv"].OpenWriteTemp())
 		tsvWrt.Comma = '\t'
-		tsvHeader := []string{"status", "inchikey"}
+		tsvHeader := []string{"inchikey", "status"}
 		tsvWrt.Write(tsvHeader)
 
 		// Implement a streaming XML parser according to guide in
@@ -58,11 +58,11 @@ func main() {
 					}
 					for _, g := range drug.Groups {
 						if g == "approved" {
-							status = "approved"
+							status = "A"
 						}
 						// Withdrawn till "shadow" (what's the correct term?) approved status
 						if g == "withdrawn" {
-							status = "withdrawn"
+							status = "N"
 						}
 					}
 					for _, p := range drug.CalculatedProperties {
@@ -72,7 +72,7 @@ func main() {
 					}
 
 					if status != "" && inchikey != "" {
-						tsvWrt.Write([]string{status, inchikey})
+						tsvWrt.Write([]string{inchikey, status})
 					}
 				}
 			case xml.EndElement:
