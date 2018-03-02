@@ -31,7 +31,7 @@ func main() {
 
 		tsvWrt := csv.NewWriter(t.OutTargets["tsv"].OpenWriteTemp())
 		tsvWrt.Comma = '\t'
-		tsvHeader := []string{"status", "smiles"}
+		tsvHeader := []string{"status", "inchikey"}
 		tsvWrt.Write(tsvHeader)
 
 		// Implement a streaming XML parser according to guide in
@@ -49,7 +49,7 @@ func main() {
 			case xml.StartElement:
 				if startElem.Name.Local == "drug" {
 					var status string
-					var smiles string
+					var inchikey string
 
 					drug := &Drug{}
 					decErr := xmlDec.DecodeElement(drug, &startElem)
@@ -66,13 +66,13 @@ func main() {
 						}
 					}
 					for _, p := range drug.CalculatedProperties {
-						if p.Kind == "SMILES" {
-							smiles = p.Value
+						if p.Kind == "InChIKey" {
+							inchikey = p.Value
 						}
 					}
 
-					if status != "" && smiles != "" {
-						tsvWrt.Write([]string{status, smiles})
+					if status != "" && inchikey != "" {
+						tsvWrt.Write([]string{status, inchikey})
 					}
 				}
 			case xml.EndElement:
