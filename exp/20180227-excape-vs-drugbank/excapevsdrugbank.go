@@ -1,8 +1,8 @@
 package main
 
 import (
+	"encoding/csv"
 	"encoding/xml"
-	"fmt"
 	"os"
 
 	sp "github.com/scipipe/scipipe"
@@ -14,41 +14,64 @@ func main() {
 
 	drugBank := sp.NewFileIPGenerator(wf, "drugbank_file", "dat/drugbank.xml")
 
-	xmlParser := wf.NewProc("xmlparser", "# {i:xml}")
-	xmlParser.In("xml").Connect(drugBank.Out())
-	xmlParser.CustomExecute = func(t *sp.Task) {
+	xmlToTSV := wf.NewProc("xml_to_tsv", "# {i:xml} {o:tsv}")
+	xmlToTSV.SetPathExtend("xml", "tsv", ".tsv")
+	xmlToTSV.In("xml").Connect(drugBank.Out())
+	xmlToTSV.CustomExecute = func(t *sp.Task) {
 		fh, err := os.Open(t.InPath("xml"))
+		defer fh.Close()
 		if err != nil {
 			sp.Fail("Could not open file", t.InPath("xml"))
 		}
+
+		tsvWrt := csv.NewWriter(t.OutTargets["tsv"].OpenWriteTemp())
+		tsvWrt.Comma = '\t'
+		tsvHeader := []string{"status", "smiles"}
+		tsvWrt.Write(tsvHeader)
 
 		// Implement a streaming XML parser according to guide in
 		// http://blog.davidsingleton.org/parsing-huge-xml-files-with-go
 		xmlDec := xml.NewDecoder(fh)
 		for {
 			t, tokenErr := xmlDec.Token()
-			if tokenErr != nil {
-				sp.Fail("Failed to read token:", tokenErr)
-			}
 			if t == nil {
 				break
+			}
+			if tokenErr != nil {
+				sp.Fail("Failed to read token:", tokenErr)
 			}
 			switch startElem := t.(type) {
 			case xml.StartElement:
 				if startElem.Name.Local == "drug" {
+					var status string
+					var smiles string
+
 					drug := &Drug{}
 					decErr := xmlDec.DecodeElement(drug, &startElem)
 					if err != nil {
 						sp.Fail("Could not decode element", decErr)
 					}
-					fmt.Println("Drug:", drug.Name)
-					for i, g := range drug.Groups {
-						fmt.Printf("... Group %d: %s\n", i, g)
+					for _, g := range drug.Groups {
+						if g == "approved" {
+							status = "approved"
+						}
+						// Withdrawn till "shadow" (what's the correct term?) approved status
+						if g == "withdrawn" {
+							status = "withdrawn"
+						}
 					}
 					for _, p := range drug.CalculatedProperties {
-						fmt.Printf("... %s: %s [%s]\n", p.Kind, p.Value, p.Source)
+						if p.Kind == "SMILES" {
+							smiles = p.Value
+						}
+					}
+
+					if status != "" && smiles != "" {
+						tsvWrt.Write([]string{status, smiles})
 					}
 				}
+			case xml.EndElement:
+				break
 			}
 		}
 	}
