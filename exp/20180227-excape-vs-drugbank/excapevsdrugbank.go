@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	wf := sp.NewWorkflow("exvsdb", 1)
+	wf := sp.NewWorkflow("exvsdb", 2)
 	//wf.NewProc("dl", "curl -Lfv -o filename.zip -u ... https://www.drugbank.ca/releases/5-0-11/downloads/all-full-database")
 
 	excapeDB := sp.NewFileIPGenerator(wf, "excapedb", "../../raw/pubchem.chembl.dataset4publication_inchi_smiles.tsv")
