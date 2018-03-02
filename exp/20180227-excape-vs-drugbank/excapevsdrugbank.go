@@ -21,15 +21,29 @@ func main() {
 		if err != nil {
 			sp.Fail("Could not open file", t.InPath("xml"))
 		}
-		xmlDec := xml.NewDecoder(fh)
 
-		drugBank := &Drugbank{}
-		decErr := xmlDec.Decode(drugBank)
-		if decErr != nil {
-			sp.Fail("Could not decode XML!")
-		}
-		for _, drug := range drugBank.Drugs {
-			fmt.Println("Drug: ", drug.Name)
+		// Implement a streaming XML parser according to guide in
+		// http://blog.davidsingleton.org/parsing-huge-xml-files-with-go
+		xmlDec := xml.NewDecoder(fh)
+		for {
+			t, tokenErr := xmlDec.Token()
+			if tokenErr != nil {
+				sp.Fail("Failed to read token:", tokenErr)
+			}
+			if t == nil {
+				break
+			}
+			switch startElem := t.(type) {
+			case xml.StartElement:
+				if startElem.Name.Local == "drug" {
+					drug := &Drug{}
+					decErr := xmlDec.DecodeElement(drug, &startElem)
+					if err != nil {
+						sp.Fail("Could not decode element", decErr)
+					}
+					fmt.Println("Drug:", drug.Name)
+				}
+			}
 		}
 	}
 
