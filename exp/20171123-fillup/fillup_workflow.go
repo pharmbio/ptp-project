@@ -297,7 +297,8 @@ func main() {
 			cpSignTrain.ParamInPort("class_credibility").Connect(selectBest.OutBestClassCredibility())
 			cpSignTrain.ParamInPort("cost").Connect(selectBest.OutBestCost())
 			cpSignTrain.SetPathCustom("model", func(t *sp.Task) string {
-				return fmt.Sprintf("dat/final_models/%s/%s_c%s_nrmdl%s_%s.mdl",
+				return fmt.Sprintf("dat/final_models/%s/%s_%s_c%s_nrmdl%s_%s.mdl.jar",
+					str.ToLower(t.Param("gene")),
 					str.ToLower(t.Param("gene")),
 					"liblin",
 					t.Param("cost"),
