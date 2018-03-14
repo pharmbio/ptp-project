@@ -1,4 +1,8 @@
 #!/bin/bash
+# --------------------------------------------------------------------------------
+# DEPRECATED: This script is deprecated!!!
+#             (Using direct path to jars in workflows instead)
+# --------------------------------------------------------------------------------
 if [[ ! -z $(which module) ]]; then
     module load java/sun_jdk1.8.0_92
 fi;
