@@ -23,8 +23,8 @@ func main() {
 	extractIA.SetPathStatic("tsv", "dat/excapedb_inchikey_activity.tsv")
 	extractIA.In("tsv").Connect(excapeDB.Out())
 
-	xmlToTSV := wf.NewProc("xml_to_tsv", "# {i:xml} {o:tsv}")
-	xmlToTSV.SetPathExtend("xml", "tsv", ".tsv")
+	xmlToTSV := wf.NewProc("xml_to_tsv", "# Custom Go code with input: {i:xml} and output: {o:tsv}")
+	xmlToTSV.SetPathExtend("xml", "tsv", ".extr.tsv")
 	xmlToTSV.In("xml").Connect(unzipDrugBank.Out("drugbankxml"))
 	xmlToTSV.CustomExecute = func(t *sp.Task) {
 		fh, err := os.Open(t.InPath("xml"))
@@ -35,7 +35,7 @@ func main() {
 
 		tsvWrt := csv.NewWriter(t.OutTargets["tsv"].OpenWriteTemp())
 		tsvWrt.Comma = '\t'
-		tsvHeader := []string{"inchikey", "status"}
+		tsvHeader := []string{"inchikey", "status", "chembl_id", "pubchem_substance_id", "pubchem_compound_id"}
 		tsvWrt.Write(tsvHeader)
 
 		// Implement a streaming XML parser according to guide in
@@ -53,7 +53,10 @@ func main() {
 			case xml.StartElement:
 				if startElem.Name.Local == "drug" {
 					var status string
-					var inchikey string
+					var inchiKey string
+					var chemblID string
+					var pubChemSubstanceID string
+					var pubChemCompoundID string
 
 					drug := &Drug{}
 					decErr := xmlDec.DecodeElement(drug, &startElem)
@@ -71,12 +74,22 @@ func main() {
 					}
 					for _, p := range drug.CalculatedProperties {
 						if p.Kind == "InChIKey" {
-							inchikey = p.Value
+							inchiKey = p.Value
 						}
 					}
 
-					if status != "" && inchikey != "" {
-						tsvWrt.Write([]string{inchikey, status})
+					for _, eid := range drug.ExternalIdentifiers {
+						if eid.Resource == "ChEMBL" {
+							chemblID = eid.Identifier
+						} else if eid.Resource == "PubChem Substance" {
+							pubChemSubstanceID = eid.Identifier
+						} else if eid.Resource == "PubChem Compound" {
+							pubChemCompoundID = eid.Identifier
+						}
+					}
+
+					if status != "" && inchiKey != "" {
+						tsvWrt.Write([]string{inchiKey, status, chemblID, pubChemSubstanceID, pubChemCompoundID})
 					}
 				}
 			case xml.EndElement:
@@ -86,7 +99,7 @@ func main() {
 	}
 
 	sortTsv := wf.NewProc("sort_tsv", "head -n 1 {i:unsorted} > {o:sorted}; tail -n +2 {i:unsorted} | sort >> {o:sorted}")
-	sortTsv.SetPathReplace("unsorted", "sorted", ".tsv", ".sorted.tsv")
+	sortTsv.SetPathExtend("unsorted", "sorted", ".sorted.tsv")
 	sortTsv.In("unsorted").Connect(xmlToTSV.Out("tsv"))
 
 	wf.Run()
@@ -98,10 +111,11 @@ type Drugbank struct {
 }
 
 type Drug struct {
-	XMLName              xml.Name   `xml:"drug"`
-	Name                 string     `xml:"name"`
-	Groups               []string   `xml:"groups>group"`
-	CalculatedProperties []Property `xml:"calculated-properties>property"`
+	XMLName              xml.Name             `xml:"drug"`
+	Name                 string               `xml:"name"`
+	Groups               []string             `xml:"groups>group"`
+	CalculatedProperties []Property           `xml:"calculated-properties>property"`
+	ExternalIdentifiers  []ExternalIdentifier `xml:"external-identifiers>external-identifier"`
 }
 
 type Property struct {
@@ -109,4 +123,10 @@ type Property struct {
 	Kind    string   `xml:"kind"`
 	Value   string   `xml:"value"`
 	Source  string   `xml:"source"`
+}
+
+type ExternalIdentifier struct {
+	XMLName    xml.Name `xml:"external-identifier"`
+	Resource   string   `xml:"resource"`
+	Identifier string   `xml:"identifier"`
 }
