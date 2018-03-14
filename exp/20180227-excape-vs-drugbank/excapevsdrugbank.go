@@ -10,10 +10,14 @@ import (
 
 func main() {
 	wf := sp.NewWorkflow("exvsdb", 2)
-	//wf.NewProc("dl", "curl -Lfv -o filename.zip -u ... https://www.drugbank.ca/releases/5-0-11/downloads/all-full-database")
+	dlDrugBank := wf.NewProc("dl", "curl -Lfv -o {o:zipfile} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/all-full-database")
+	dlDrugBank.SetPathStatic("zipfile", "dat/drugbank.zip")
+
+	unzipDrugBank := wf.NewProc("unzip_drugbank", `unzip -d dat/ {i:zipfile}; mv "dat/full database.xml" {o:drugbankxml}`)
+	unzipDrugBank.SetPathStatic("drugbankxml", "dat/drugbank.xml")
+	unzipDrugBank.In("zipfile").Connect(dlDrugBank.Out("zipfile"))
 
 	excapeDB := sp.NewFileIPGenerator(wf, "excapedb", "../../raw/pubchem.chembl.dataset4publication_inchi_smiles.tsv")
-	drugBank := sp.NewFileIPGenerator(wf, "drugbank", "dat/drugbank.xml")
 
 	extractIA := wf.NewProc("extract_inchikey_activity", `awk -F"\t" '{ print $1 "\t" $4 }' {i:tsv} > {o:tsv}`)
 	extractIA.SetPathStatic("tsv", "dat/excapedb_inchikey_activity.tsv")
@@ -21,7 +25,7 @@ func main() {
 
 	xmlToTSV := wf.NewProc("xml_to_tsv", "# {i:xml} {o:tsv}")
 	xmlToTSV.SetPathExtend("xml", "tsv", ".tsv")
-	xmlToTSV.In("xml").Connect(drugBank.Out())
+	xmlToTSV.In("xml").Connect(unzipDrugBank.Out("drugbankxml"))
 	xmlToTSV.CustomExecute = func(t *sp.Task) {
 		fh, err := os.Open(t.InPath("xml"))
 		defer fh.Close()
