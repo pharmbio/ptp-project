@@ -54,7 +54,7 @@ func main() {
 	extractIA.SetPathStatic("tsv", "dat/excapedb_inchikey_activity.tsv")
 	extractIA.In("tsv").Connect(excapeDB.Out())
 
-	extractOrigEntryID := wf.NewProc("extract_origentryid", "tail -n +2 {i:excapedb} | awk -F'\t' '{ print $2 }' | uniq | sort -V > {o:entries}")
+	extractOrigEntryID := wf.NewProc("extract_origentryid", `tail -n +2 {i:excapedb} | awk -F'\t' '{ print $1 "\t" $2 }' | uniq -w 23 | awk -F'\t' '{ print $2 }' | sort -V > {o:entries}`)
 	extractOrigEntryID.SetPathExtend("excapedb", "entries", ".origids.tsv")
 	extractOrigEntryID.In("excapedb").Connect(excapeDB.Out())
 
