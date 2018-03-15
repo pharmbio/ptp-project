@@ -10,12 +10,26 @@ import (
 
 func main() {
 	wf := sp.NewWorkflow("exvsdb", 2)
-	dlDrugBank := wf.NewProc("dl", "curl -Lfv -o {o:zipfile} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/all-full-database")
-	dlDrugBank.SetPathStatic("zipfile", "dat/drugbank.zip")
+	dlDrugBank := wf.NewProc("dl", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/all-full-database")
+	dlDrugBank.SetPathStatic("zip", "dat/drugbank.zip")
 
-	unzipDrugBank := wf.NewProc("unzip_drugbank", `unzip -d dat/ {i:zipfile}; mv "dat/full database.xml" {o:drugbankxml}`)
-	unzipDrugBank.SetPathStatic("drugbankxml", "dat/drugbank.xml")
-	unzipDrugBank.In("zipfile").Connect(dlDrugBank.Out("zipfile"))
+	dlApproved := wf.NewProc("dl_approv", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/approved-structure-links")
+	dlApproved.SetPathStatic("zip", "dat/drugbank_approved_csv.zip")
+
+	unzipApproved := wf.NewProc("unzip_approved", `unzip -d dat/approved/ {i:zip}; mv "dat/approved/structure links.csv" {o:csv}`)
+	unzipApproved.SetPathStatic("csv", "dat/drugbank_approved.csv")
+	unzipApproved.In("zip").Connect(dlApproved.Out("zip"))
+
+	dlWithdrawn := wf.NewProc("dl_withdrawn", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/withdrawn-structure-links")
+	dlWithdrawn.SetPathStatic("zip", "dat/drugbank_withdrawn_csv.zip")
+
+	unzipWithdrawn := wf.NewProc("unzip_withdrawn", `unzip -d dat/withdrawn/ {i:zip}; mv "dat/withdrawn/structure links.csv" {o:csv}`)
+	unzipWithdrawn.SetPathStatic("csv", "dat/drugbank_withdrawn.csv")
+	unzipWithdrawn.In("zip").Connect(dlWithdrawn.Out("zip"))
+
+	unzipDrugBank := wf.NewProc("unzip_drugbank", `unzip -d dat/ {i:zip}; mv "dat/full database.xml" {o:xml}`)
+	unzipDrugBank.SetPathStatic("xml", "dat/drugbank.xml")
+	unzipDrugBank.In("zip").Connect(dlDrugBank.Out("zip"))
 
 	excapeDB := sp.NewFileIPGenerator(wf, "excapedb", "../../raw/pubchem.chembl.dataset4publication_inchi_smiles.tsv")
 
@@ -25,7 +39,7 @@ func main() {
 
 	xmlToTSV := wf.NewProc("xml_to_tsv", "# Custom Go code with input: {i:xml} and output: {o:tsv}")
 	xmlToTSV.SetPathExtend("xml", "tsv", ".extr.tsv")
-	xmlToTSV.In("xml").Connect(unzipDrugBank.Out("drugbankxml"))
+	xmlToTSV.In("xml").Connect(unzipDrugBank.Out("xml"))
 	xmlToTSV.CustomExecute = func(t *sp.Task) {
 		fh, err := os.Open(t.InPath("xml"))
 		if err != nil {
