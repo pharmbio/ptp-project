@@ -28,7 +28,6 @@ func main() {
 	xmlToTSV.In("xml").Connect(unzipDrugBank.Out("drugbankxml"))
 	xmlToTSV.CustomExecute = func(t *sp.Task) {
 		fh, err := os.Open(t.InPath("xml"))
-		defer fh.Close()
 		if err != nil {
 			sp.Fail("Could not open file", t.InPath("xml"))
 		}
@@ -43,11 +42,12 @@ func main() {
 		xmlDec := xml.NewDecoder(fh)
 		for {
 			t, tokenErr := xmlDec.Token()
-			if t == nil {
-				break
-			}
 			if tokenErr != nil {
-				sp.Fail("Failed to read token:", tokenErr)
+				if tokenErr.Error() == "EOF" {
+					break
+				} else {
+					sp.Fail("Failed to read token:", tokenErr)
+				}
 			}
 			switch startElem := t.(type) {
 			case xml.StartElement:
@@ -93,9 +93,11 @@ func main() {
 					}
 				}
 			case xml.EndElement:
-				break
+				continue
 			}
 		}
+		tsvWrt.Flush()
+		fh.Close()
 	}
 
 	sortTsv := wf.NewProc("sort_tsv", "head -n 1 {i:unsorted} > {o:sorted}; tail -n +2 {i:unsorted} | sort >> {o:sorted}")
