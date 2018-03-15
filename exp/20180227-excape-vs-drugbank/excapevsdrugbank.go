@@ -35,6 +35,12 @@ func main() {
 	unzipWithdrawn.SetPathStatic("csv", "dat/drugbank_withdrawn.csv")
 	unzipWithdrawn.In("zip").Connect(dlWithdrawn.Out("zip"))
 
+	// Compound IDs
+	drugBankCompIDs := wf.NewProc("drugbank_compids", "csvcut -K 1 -c 11,14 {i:drugbankcsv} | sed '/^,$/d' | sort -V > {o:compids}")
+	drugBankCompIDs.SetPathExtend("drugbankcsv", "compids", ".compids.csv")
+	drugBankCompIDs.In("drugbankcsv").Connect(unzipApproved.Out("csv"))
+	drugBankCompIDs.In("drugbankcsv").Connect(unzipWithdrawn.Out("csv"))
+
 	// CIDs
 	extractDrugBankCID := wf.NewProc("extract_cids", "csvcut -K 1 -c 11 -x {i:drugbank_csv} | sort -n > {o:cids}")
 	extractDrugBankCID.SetPathExtend("drugbank_csv", "cids", ".cids.csv")
