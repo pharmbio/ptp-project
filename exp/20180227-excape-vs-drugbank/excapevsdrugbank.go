@@ -10,9 +10,16 @@ import (
 
 func main() {
 	wf := sp.NewWorkflow("exvsdb", 2)
+
+	// DrugBank XML
 	dlDrugBank := wf.NewProc("dl", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/all-full-database")
 	dlDrugBank.SetPathStatic("zip", "dat/drugbank.zip")
 
+	unzipDrugBank := wf.NewProc("unzip_drugbank", `unzip -d dat/ {i:zip}; mv "dat/full database.xml" {o:xml}`)
+	unzipDrugBank.SetPathStatic("xml", "dat/drugbank.xml")
+	unzipDrugBank.In("zip").Connect(dlDrugBank.Out("zip"))
+
+	// Approved
 	dlApproved := wf.NewProc("dl_approv", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/approved-structure-links")
 	dlApproved.SetPathStatic("zip", "dat/drugbank_approved_csv.zip")
 
@@ -20,6 +27,7 @@ func main() {
 	unzipApproved.SetPathStatic("csv", "dat/drugbank_approved.csv")
 	unzipApproved.In("zip").Connect(dlApproved.Out("zip"))
 
+	// Withdrawn
 	dlWithdrawn := wf.NewProc("dl_withdrawn", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/withdrawn-structure-links")
 	dlWithdrawn.SetPathStatic("zip", "dat/drugbank_withdrawn_csv.zip")
 
@@ -27,10 +35,13 @@ func main() {
 	unzipWithdrawn.SetPathStatic("csv", "dat/drugbank_withdrawn.csv")
 	unzipWithdrawn.In("zip").Connect(dlWithdrawn.Out("zip"))
 
-	unzipDrugBank := wf.NewProc("unzip_drugbank", `unzip -d dat/ {i:zip}; mv "dat/full database.xml" {o:xml}`)
-	unzipDrugBank.SetPathStatic("xml", "dat/drugbank.xml")
-	unzipDrugBank.In("zip").Connect(dlDrugBank.Out("zip"))
+	// CIDs
+	extractDrugBankCID := wf.NewProc("extract_cids", "csvcut -K 1 -c 11 -x {i:drugbank_csv} | sort -n > {o:cids}")
+	extractDrugBankCID.SetPathExtend("drugbank_csv", "cids", ".cids.csv")
+	extractDrugBankCID.In("drugbank_csv").Connect(unzipApproved.Out("csv"))
+	extractDrugBankCID.In("drugbank_csv").Connect(unzipWithdrawn.Out("csv"))
 
+	// ExcapeDB
 	excapeDB := sp.NewFileIPGenerator(wf, "excapedb", "../../raw/pubchem.chembl.dataset4publication_inchi_smiles.tsv")
 
 	extractIA := wf.NewProc("extract_inchikey_activity", `awk -F"\t" '{ print $1 "\t" $4 }' {i:tsv} > {o:tsv}`)
@@ -40,7 +51,18 @@ func main() {
 	xmlToTSV := wf.NewProc("xml_to_tsv", "# Custom Go code with input: {i:xml} and output: {o:tsv}")
 	xmlToTSV.SetPathExtend("xml", "tsv", ".extr.tsv")
 	xmlToTSV.In("xml").Connect(unzipDrugBank.Out("xml"))
-	xmlToTSV.CustomExecute = func(t *sp.Task) {
+	xmlToTSV.CustomExecute = NewXMLToTSVFunc()
+	sortTsv := wf.NewProc("sort_tsv", "head -n 1 {i:unsorted} > {o:sorted}; tail -n +2 {i:unsorted} | sort >> {o:sorted}")
+	sortTsv.SetPathExtend("unsorted", "sorted", ".sorted.tsv")
+	sortTsv.In("unsorted").Connect(xmlToTSV.Out("tsv"))
+
+	wf.Run()
+}
+
+// NewXMLToTSVFunc returns a CustomExecute function to be used by the XML to TSV
+// component in the workflow above
+func NewXMLToTSVFunc() func(t *sp.Task) {
+	return func(t *sp.Task) {
 		fh, err := os.Open(t.InPath("xml"))
 		if err != nil {
 			sp.Fail("Could not open file", t.InPath("xml"))
@@ -111,12 +133,6 @@ func main() {
 		tsvWrt.Flush()
 		fh.Close()
 	}
-
-	sortTsv := wf.NewProc("sort_tsv", "head -n 1 {i:unsorted} > {o:sorted}; tail -n +2 {i:unsorted} | sort >> {o:sorted}")
-	sortTsv.SetPathExtend("unsorted", "sorted", ".sorted.tsv")
-	sortTsv.In("unsorted").Connect(xmlToTSV.Out("tsv"))
-
-	wf.Run()
 }
 
 type Drugbank struct {
