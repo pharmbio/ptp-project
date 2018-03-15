@@ -48,6 +48,10 @@ func main() {
 	extractIA.SetPathStatic("tsv", "dat/excapedb_inchikey_activity.tsv")
 	extractIA.In("tsv").Connect(excapeDB.Out())
 
+	extractOrigEntryID := wf.NewProc("extract_origentryid", "tail -n +2 {i:excapedb} | awk -F'\t' '{ print $2 }' | uniq | sort -V > {o:entries}")
+	extractOrigEntryID.SetPathExtend("excapedb", "entries", ".origids.tsv")
+	extractOrigEntryID.In("excapedb").Connect(excapeDB.Out())
+
 	xmlToTSV := wf.NewProc("xml_to_tsv", "# Custom Go code with input: {i:xml} and output: {o:tsv}")
 	xmlToTSV.SetPathExtend("xml", "tsv", ".extr.tsv")
 	xmlToTSV.In("xml").Connect(unzipDrugBank.Out("xml"))
