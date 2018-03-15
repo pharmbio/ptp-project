@@ -69,7 +69,7 @@ func main() {
 						}
 						// Withdrawn till "shadow" (what's the correct term?) approved status
 						if g == "withdrawn" {
-							status = "N"
+							status = "W"
 						}
 					}
 					for _, p := range drug.CalculatedProperties {
