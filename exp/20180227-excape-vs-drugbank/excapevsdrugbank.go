@@ -34,7 +34,7 @@ func main() {
 
 		tsvWrt := csv.NewWriter(t.OutTargets["tsv"].OpenWriteTemp())
 		tsvWrt.Comma = '\t'
-		tsvHeader := []string{"inchikey", "status", "chembl_id", "pubchem_substance_id", "pubchem_compound_id"}
+		tsvHeader := []string{"inchikey", "status", "chembl_id", "pubchem_sid", "pubchem_cid"}
 		tsvWrt.Write(tsvHeader)
 
 		// Implement a streaming XML parser according to guide in
@@ -55,8 +55,8 @@ func main() {
 					var status string
 					var inchiKey string
 					var chemblID string
-					var pubChemSubstanceID string
-					var pubChemCompoundID string
+					var pubchemSID string
+					var pubchemCID string
 
 					drug := &Drug{}
 					decErr := xmlDec.DecodeElement(drug, &startElem)
@@ -82,15 +82,13 @@ func main() {
 						if eid.Resource == "ChEMBL" {
 							chemblID = eid.Identifier
 						} else if eid.Resource == "PubChem Substance" {
-							pubChemSubstanceID = eid.Identifier
+							pubchemSID = eid.Identifier
 						} else if eid.Resource == "PubChem Compound" {
-							pubChemCompoundID = eid.Identifier
+							pubchemCID = eid.Identifier
 						}
 					}
 
-					if status != "" && inchiKey != "" {
-						tsvWrt.Write([]string{inchiKey, status, chemblID, pubChemSubstanceID, pubChemCompoundID})
-					}
+					tsvWrt.Write([]string{inchiKey, status, chemblID, pubchemSID, pubchemCID})
 				}
 			case xml.EndElement:
 				continue
