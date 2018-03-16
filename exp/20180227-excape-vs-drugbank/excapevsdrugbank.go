@@ -84,9 +84,6 @@ func main() {
 	excapeDBVsDrugBank.In("approv_ids").Connect(drugBankCompIDsApprov.Out("compids"))
 	excapeDBVsDrugBank.In("withdr_ids").Connect(drugBankCompIDsWithdr.Out("compids"))
 	excapeDBVsDrugBank.CustomExecute = func(t *sp.Task) {
-		approvCnt := 0
-		withdrCnt := 0
-
 		approvIds := map[string]bool{}
 		approvFile := t.InIP("approv_ids").Open()
 		approvCsvReader := csv.NewReader(approvFile)
@@ -120,6 +117,8 @@ func main() {
 		excIdsUniqFile := t.InIP("excapedb_ids_uniq").Open()
 		excIdsUniqCsvReader := csv.NewReader(excIdsUniqFile)
 		excIdsUniqCnt := 0
+		approvUniqCnt := 0
+		withdrUniqCnt := 0
 		for {
 			rec, err := excIdsUniqCsvReader.Read()
 			if err == io.EOF {
@@ -129,27 +128,27 @@ func main() {
 			}
 			excIdsUniqCnt++
 			if _, ok := approvIds[rec[0]]; ok {
-				approvCnt++
+				approvUniqCnt++
 			}
 			if _, ok := withdrIds[rec[0]]; ok {
-				withdrCnt++
+				withdrUniqCnt++
 			}
 		}
 		excIdsUniqFile.Close()
 
 		compoundsCnt := map[string]int{}
-		compoundsCnt["excapedb_compounds_in_drugbank_approved"] = approvCnt
-		compoundsCnt["excapedb_compounds_in_drugbank_withdrawn"] = withdrCnt
-		compoundsCnt["excapedb_compounds_in_drugbank_total"] = approvCnt + withdrCnt
+		compoundsCnt["excapedb_compounds_in_drugbank_approved"] = approvUniqCnt
+		compoundsCnt["excapedb_compounds_in_drugbank_withdrawn"] = withdrUniqCnt
+		compoundsCnt["excapedb_compounds_in_drugbank_total"] = approvUniqCnt + withdrUniqCnt
 		compCntJSON, cerr := json.Marshal(compoundsCnt)
 		if cerr != nil {
 			sp.Fail(cerr)
 		}
 
 		compoundsFrac := map[string]float64{}
-		compoundsFrac["excapedb_fraction_compounds_in_drugbank_approved"] = float64(approvCnt) / float64(excIdsUniqCnt)
-		compoundsFrac["excapedb_fraction_compounds_in_drugbank_withdrawn"] = float64(withdrCnt) / float64(excIdsUniqCnt)
-		compoundsFrac["excapedb_fraction_compounds_in_drugbank_total"] = float64(approvCnt+withdrCnt) / float64(excIdsUniqCnt)
+		compoundsFrac["excapedb_fraction_compounds_in_drugbank_approved"] = float64(approvUniqCnt) / float64(excIdsUniqCnt)
+		compoundsFrac["excapedb_fraction_compounds_in_drugbank_withdrawn"] = float64(withdrUniqCnt) / float64(excIdsUniqCnt)
+		compoundsFrac["excapedb_fraction_compounds_in_drugbank_total"] = float64(approvUniqCnt+withdrUniqCnt) / float64(excIdsUniqCnt)
 		compFracJSON, ferr := json.Marshal(compoundsFrac)
 		if ferr != nil {
 			sp.Fail(ferr)
@@ -158,6 +157,8 @@ func main() {
 		excIdsAllFile := t.InIP("excapedb_ids_all").Open()
 		excIdsAllCsvReader := csv.NewReader(excIdsAllFile)
 		excIdsAllCnt := 0
+		approvAllCnt := 0
+		withdrAllCnt := 0
 		for {
 			rec, err := excIdsAllCsvReader.Read()
 			if err == io.EOF {
@@ -167,27 +168,27 @@ func main() {
 			}
 			excIdsAllCnt++
 			if _, ok := approvIds[rec[0]]; ok {
-				approvCnt++
+				approvAllCnt++
 			}
 			if _, ok := withdrIds[rec[0]]; ok {
-				withdrCnt++
+				withdrAllCnt++
 			}
 		}
 		excIdsAllFile.Close()
 
 		entriesCnt := map[string]int{}
-		entriesCnt["excapedb_entries_in_drugbank_approved"] = approvCnt
-		entriesCnt["excapedb_entries_in_drugbank_withdrawn"] = withdrCnt
-		entriesCnt["excapedb_entries_in_drugbank_total"] = approvCnt + withdrCnt
+		entriesCnt["excapedb_entries_in_drugbank_approved"] = approvAllCnt
+		entriesCnt["excapedb_entries_in_drugbank_withdrawn"] = withdrAllCnt
+		entriesCnt["excapedb_entries_in_drugbank_total"] = approvAllCnt + withdrAllCnt
 		entrCntJSON, cerr := json.Marshal(entriesCnt)
 		if cerr != nil {
 			sp.Fail(cerr)
 		}
 
 		entriesFrac := map[string]float64{}
-		entriesFrac["excapedb_fraction_entries_in_drugbank_approved"] = float64(approvCnt) / float64(excIdsUniqCnt)
-		entriesFrac["excapedb_fraction_entries_in_drugbank_withdrawn"] = float64(withdrCnt) / float64(excIdsUniqCnt)
-		entriesFrac["excapedb_fraction_entries_in_drugbank_total"] = float64(approvCnt+withdrCnt) / float64(excIdsUniqCnt)
+		entriesFrac["excapedb_fraction_entries_in_drugbank_approved"] = float64(approvAllCnt) / float64(excIdsAllCnt)
+		entriesFrac["excapedb_fraction_entries_in_drugbank_withdrawn"] = float64(withdrAllCnt) / float64(excIdsAllCnt)
+		entriesFrac["excapedb_fraction_entries_in_drugbank_total"] = float64(approvAllCnt+withdrAllCnt) / float64(excIdsAllCnt)
 		entrFracJSON, ferr := json.Marshal(entriesFrac)
 		if ferr != nil {
 			sp.Fail(ferr)
