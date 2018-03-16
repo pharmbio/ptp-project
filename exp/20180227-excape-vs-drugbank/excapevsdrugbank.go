@@ -140,6 +140,7 @@ func main() {
 		compoundsCnt["excapedb_compounds_in_drugbank_approved"] = approvUniqCnt
 		compoundsCnt["excapedb_compounds_in_drugbank_withdrawn"] = withdrUniqCnt
 		compoundsCnt["excapedb_compounds_in_drugbank_total"] = approvUniqCnt + withdrUniqCnt
+		compoundsCnt["excapedb_compounds_total"] = excIdsUniqCnt
 		compCntJSON, cerr := json.Marshal(compoundsCnt)
 		if cerr != nil {
 			sp.Fail(cerr)
@@ -180,6 +181,7 @@ func main() {
 		entriesCnt["excapedb_entries_in_drugbank_approved"] = approvAllCnt
 		entriesCnt["excapedb_entries_in_drugbank_withdrawn"] = withdrAllCnt
 		entriesCnt["excapedb_entries_in_drugbank_total"] = approvAllCnt + withdrAllCnt
+		entriesCnt["excapedb_entries_total"] = excIdsAllCnt
 		entrCntJSON, cerr := json.Marshal(entriesCnt)
 		if cerr != nil {
 			sp.Fail(cerr)
