@@ -114,6 +114,7 @@ func main() {
 
 		excIdsFile := t.InIP("excapedb_ids").Open()
 		excIdsCsvReader := csv.NewReader(excIdsFile)
+		excIdsCnt := 0
 		for {
 			rec, err := excIdsCsvReader.Read()
 			if err == io.EOF {
@@ -121,6 +122,7 @@ func main() {
 			} else if err != nil {
 				sp.Fail(err)
 			}
+			excIdsCnt++
 			if _, ok := approvIds[rec[0]]; ok {
 				approvCnt++
 			}
@@ -129,15 +131,24 @@ func main() {
 			}
 		}
 		excIdsFile.Close()
-		totStats := map[string]int{}
-		totStats["excapedb_compounds_in_drugbank_approved"] = approvCnt
-		totStats["excapedb_compounds_in_drugbank_withdrawn"] = withdrCnt
-		totStats["excapedb_compounds_in_drugbank_total"] = approvCnt + withdrCnt
-		statsJSON, err := json.Marshal(totStats)
-		if err != nil {
-			sp.Fail(err)
+		counts := map[string]int{}
+		counts["excapedb_compounds_in_drugbank_approved"] = approvCnt
+		counts["excapedb_compounds_in_drugbank_withdrawn"] = withdrCnt
+		counts["excapedb_compounds_in_drugbank_total"] = approvCnt + withdrCnt
+		fracs := map[string]float64{}
+		fracs["excapedb_fraction_compounds_in_drugbank_approved"] = float64(approvCnt) / float64(excIdsCnt)
+		fracs["excapedb_fraction_compounds_in_drugbank_withdrawn"] = float64(withdrCnt) / float64(excIdsCnt)
+		fracs["excapedb_fraction_compounds_in_drugbank_total"] = float64(approvCnt+withdrCnt) / float64(excIdsCnt)
+
+		statsJSON, cerr := json.Marshal(counts)
+		if cerr != nil {
+			sp.Fail(cerr)
 		}
-		t.OutIP("stats").Write(statsJSON)
+		fracsJSON, ferr := json.Marshal(fracs)
+		if ferr != nil {
+			sp.Fail(ferr)
+		}
+		t.OutIP("stats").Write(append(statsJSON, fracsJSON...))
 	}
 
 	wf.Run()
