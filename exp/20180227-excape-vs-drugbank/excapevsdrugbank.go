@@ -36,16 +36,20 @@ func main() {
 	unzipWithdrawn.In("zip").Connect(dlWithdrawn.Out("zip"))
 
 	// Compound IDs
-	drugBankCompIDs := wf.NewProc("drugbank_compids", "csvcut -K 1 -c 11,14 {i:drugbankcsv} | sed '/^,$/d' | sort -V > {o:compids}")
-	drugBankCompIDs.SetPathExtend("drugbankcsv", "compids", ".compids.csv")
-	drugBankCompIDs.In("drugbankcsv").Connect(unzipApproved.Out("csv"))
-	drugBankCompIDs.In("drugbankcsv").Connect(unzipWithdrawn.Out("csv"))
+	drugBankCompIDCmd := "csvcut -K 1 -c 11,14 {i:drugbankcsv} | sed '/^,$/d' | sort -V > {o:compids}"
 
-	// CIDs
-	extractDrugBankCID := wf.NewProc("extract_cids", "csvcut -K 1 -c 11 -x {i:drugbank_csv} | sort -n > {o:cids}")
-	extractDrugBankCID.SetPathExtend("drugbank_csv", "cids", ".cids.csv")
-	extractDrugBankCID.In("drugbank_csv").Connect(unzipApproved.Out("csv"))
-	extractDrugBankCID.In("drugbank_csv").Connect(unzipWithdrawn.Out("csv"))
+	drugBankCompIDsAppr := wf.NewProc("drugbank_compids_appr", drugBankCompIDCmd)
+	drugBankCompIDsAppr.SetPathExtend("drugbankcsv", "compids", ".compids.csv")
+	drugBankCompIDsAppr.In("drugbankcsv").Connect(unzipApproved.Out("csv"))
+
+	drugBankCompIDsWithdr := wf.NewProc("drugbank_compids_withdr", drugBankCompIDCmd)
+	drugBankCompIDsWithdr.SetPathExtend("drugbankcsv", "compids", ".compids.csv")
+	drugBankCompIDsWithdr.In("drugbankcsv").Connect(unzipWithdrawn.Out("csv"))
+
+	mergeApprWithdr := wf.NewProc("merge_appr_withdr", "cat {i:in1} {i:in2} | sort -V | uniq > {o:out}")
+	mergeApprWithdr.SetPathStatic("out", "dat/drugbank_compids_all.csv")
+	mergeApprWithdr.In("in1").Connect(drugBankCompIDsAppr.Out("compids"))
+	mergeApprWithdr.In("in2").Connect(drugBankCompIDsWithdr.Out("compids"))
 
 	// ExcapeDB
 	excapeDB := sp.NewFileIPGenerator(wf, "excapedb", "../../raw/pubchem.chembl.dataset4publication_inchi_smiles.tsv")
@@ -62,6 +66,7 @@ func main() {
 	xmlToTSV.SetPathExtend("xml", "tsv", ".extr.tsv")
 	xmlToTSV.In("xml").Connect(unzipDrugBank.Out("xml"))
 	xmlToTSV.CustomExecute = NewXMLToTSVFunc()
+
 	sortTsv := wf.NewProc("sort_tsv", "head -n 1 {i:unsorted} > {o:sorted}; tail -n +2 {i:unsorted} | sort >> {o:sorted}")
 	sortTsv.SetPathExtend("unsorted", "sorted", ".sorted.tsv")
 	sortTsv.In("unsorted").Connect(xmlToTSV.Out("tsv"))
