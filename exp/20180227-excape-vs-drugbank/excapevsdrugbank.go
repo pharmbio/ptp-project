@@ -15,7 +15,7 @@ import (
 // --------------------------------------------------------------------------------
 
 func main() {
-	wf := sp.NewWorkflow("exvsdb", 4)
+	wf := sp.NewWorkflow("exvsdb", 2)
 
 	// DrugBank XML
 	dlDrugBank := wf.NewProc("dl", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/all-full-database")
