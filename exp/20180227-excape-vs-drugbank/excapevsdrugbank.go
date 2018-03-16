@@ -10,6 +10,10 @@ import (
 	sp "github.com/scipipe/scipipe"
 )
 
+// --------------------------------------------------------------------------------
+// Main Workflow
+// --------------------------------------------------------------------------------
+
 func main() {
 	wf := sp.NewWorkflow("exvsdb", 4)
 
@@ -83,7 +87,19 @@ func main() {
 	excapeDBVsDrugBank.In("excapedb_ids_all").Connect(excapeDBOrigIDsAll.Out("entries"))
 	excapeDBVsDrugBank.In("approv_ids").Connect(drugBankCompIDsApprov.Out("compids"))
 	excapeDBVsDrugBank.In("withdr_ids").Connect(drugBankCompIDsWithdr.Out("compids"))
-	excapeDBVsDrugBank.CustomExecute = func(t *sp.Task) {
+	excapeDBVsDrugBank.CustomExecute = NewExcapeDBVsDrugBankFunc()
+
+	wf.Run()
+}
+
+// --------------------------------------------------------------------------------
+// Components and stuff
+// --------------------------------------------------------------------------------
+
+// NewExcapeDBVsDrugBankFunc returns a func to be used in the excapeDBVsDrugBank
+// process in the workflow above
+func NewExcapeDBVsDrugBankFunc() func(t *sp.Task) {
+	return func(t *sp.Task) {
 		approvIds := map[string]bool{}
 		approvFile := t.InIP("approv_ids").Open()
 		approvCsvReader := csv.NewReader(approvFile)
@@ -198,8 +214,6 @@ func main() {
 
 		t.OutIP("stats").Write(append(append(append(compCntJSON, compFracJSON...), entrCntJSON...), entrFracJSON...))
 	}
-
-	wf.Run()
 }
 
 // NewXMLToTSVFunc returns a CustomExecute function to be used by the XML to TSV
