@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	wf := sp.NewWorkflow("exvsdb", 2)
+	wf := sp.NewWorkflow("exvsdb", 4)
 
 	// DrugBank XML
 	dlDrugBank := wf.NewProc("dl", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/all-full-database")
@@ -60,24 +60,29 @@ func main() {
 	extractIA.SetPathStatic("tsv", "dat/excapedb_inchikey_activity.tsv")
 	extractIA.In("tsv").Connect(excapeDB.Out())
 
-	extractOrigEntryID := wf.NewProc("extract_origentryid", `tail -n +2 {i:excapedb} | awk -F'\t' '{ print $1 "\t" $2 }' | uniq -w 23 | awk -F'\t' '{ print $2 }' | sort -V > {o:entries}`)
-	extractOrigEntryID.SetPathExtend("excapedb", "entries", ".origids.tsv")
-	extractOrigEntryID.In("excapedb").Connect(excapeDB.Out())
+	excapeDBOrigIDsAll := wf.NewProc("excapedb_origids_all", `tail -n +2 {i:excapedb} | awk -F'\t' '{ print $1 "\t" $2 }' | awk -F'\t' '{ print $2 }' | sort -V > {o:entries}`)
+	excapeDBOrigIDsAll.SetPathExtend("excapedb", "entries", ".origids.all.tsv")
+	excapeDBOrigIDsAll.In("excapedb").Connect(excapeDB.Out())
 
-	xmlToTSV := wf.NewProc("xml_to_tsv", "# Custom Go code with input: {i:xml} and output: {o:tsv}")
-	xmlToTSV.SetPathExtend("xml", "tsv", ".extr.tsv")
-	xmlToTSV.In("xml").Connect(unzipDrugBank.Out("xml"))
-	xmlToTSV.CustomExecute = NewXMLToTSVFunc()
+	excapeDBOrigIDsUnique := wf.NewProc("excapedb_origids_unique", `tail -n +2 {i:excapedb} | awk -F'\t' '{ print $1 "\t" $2 }' | uniq -w 23 | awk -F'\t' '{ print $2 }' | sort -V > {o:entries}`)
+	excapeDBOrigIDsUnique.SetPathExtend("excapedb", "entries", ".origids.uniq.tsv")
+	excapeDBOrigIDsUnique.In("excapedb").Connect(excapeDB.Out())
 
-	sortTsv := wf.NewProc("sort_tsv", "head -n 1 {i:unsorted} > {o:sorted}; tail -n +2 {i:unsorted} | sort >> {o:sorted}")
-	sortTsv.SetPathExtend("unsorted", "sorted", ".sorted.tsv")
-	sortTsv.In("unsorted").Connect(xmlToTSV.Out("tsv"))
+	//xmlToTSV := wf.NewProc("xml_to_tsv", "# Custom Go code with input: {i:xml} and output: {o:tsv}")
+	//xmlToTSV.SetPathExtend("xml", "tsv", ".extr.tsv")
+	//xmlToTSV.In("xml").Connect(unzipDrugBank.Out("xml"))
+	//xmlToTSV.CustomExecute = NewXMLToTSVFunc()
 
-	excapeDBVsDrugBank := wf.NewProc("exc_vs_drb", "# Custom Go function with inputs: {i:excapedb_ids}, {i:approv_ids}, {i:withdr_ids} and output: {o:stats}")
+	//sortTsv := wf.NewProc("sort_tsv", "head -n 1 {i:unsorted} > {o:sorted}; tail -n +2 {i:unsorted} | sort >> {o:sorted}")
+	//sortTsv.SetPathExtend("unsorted", "sorted", ".sorted.tsv")
+	//sortTsv.In("unsorted").Connect(xmlToTSV.Out("tsv"))
+
+	excapeDBVsDrugBank := wf.NewProc("exc_vs_drb", "# Custom Go function with inputs: {i:excapedb_ids_uniq}, {i:excapedb_ids_all} {i:approv_ids}, {i:withdr_ids} and output: {o:stats}")
 	excapeDBVsDrugBank.SetPathStatic("stats", "dat/excapedb_vs_drugbank_stats.json")
-	excapeDBVsDrugBank.In("excapedb_ids").Connect(extractOrigEntryID.Out(""))
-	excapeDBVsDrugBank.In("approv_ids").Connect(drugBankCompIDsApprov.Out(""))
-	excapeDBVsDrugBank.In("withdr_ids").Connect(drugBankCompIDsWithdr.Out(""))
+	excapeDBVsDrugBank.In("excapedb_ids_uniq").Connect(excapeDBOrigIDsUnique.Out("entries"))
+	excapeDBVsDrugBank.In("excapedb_ids_all").Connect(excapeDBOrigIDsAll.Out("entries"))
+	excapeDBVsDrugBank.In("approv_ids").Connect(drugBankCompIDsApprov.Out("compids"))
+	excapeDBVsDrugBank.In("withdr_ids").Connect(drugBankCompIDsWithdr.Out("compids"))
 	excapeDBVsDrugBank.CustomExecute = func(t *sp.Task) {
 		approvCnt := 0
 		withdrCnt := 0
@@ -112,17 +117,17 @@ func main() {
 		}
 		withdrFile.Close()
 
-		excIdsFile := t.InIP("excapedb_ids").Open()
-		excIdsCsvReader := csv.NewReader(excIdsFile)
-		excIdsCnt := 0
+		excIdsUniqFile := t.InIP("excapedb_ids_uniq").Open()
+		excIdsUniqCsvReader := csv.NewReader(excIdsUniqFile)
+		excIdsUniqCnt := 0
 		for {
-			rec, err := excIdsCsvReader.Read()
+			rec, err := excIdsUniqCsvReader.Read()
 			if err == io.EOF {
 				break
 			} else if err != nil {
 				sp.Fail(err)
 			}
-			excIdsCnt++
+			excIdsUniqCnt++
 			if _, ok := approvIds[rec[0]]; ok {
 				approvCnt++
 			}
@@ -130,25 +135,65 @@ func main() {
 				withdrCnt++
 			}
 		}
-		excIdsFile.Close()
-		counts := map[string]int{}
-		counts["excapedb_compounds_in_drugbank_approved"] = approvCnt
-		counts["excapedb_compounds_in_drugbank_withdrawn"] = withdrCnt
-		counts["excapedb_compounds_in_drugbank_total"] = approvCnt + withdrCnt
-		fracs := map[string]float64{}
-		fracs["excapedb_fraction_compounds_in_drugbank_approved"] = float64(approvCnt) / float64(excIdsCnt)
-		fracs["excapedb_fraction_compounds_in_drugbank_withdrawn"] = float64(withdrCnt) / float64(excIdsCnt)
-		fracs["excapedb_fraction_compounds_in_drugbank_total"] = float64(approvCnt+withdrCnt) / float64(excIdsCnt)
+		excIdsUniqFile.Close()
 
-		statsJSON, cerr := json.Marshal(counts)
+		compoundsCnt := map[string]int{}
+		compoundsCnt["excapedb_compounds_in_drugbank_approved"] = approvCnt
+		compoundsCnt["excapedb_compounds_in_drugbank_withdrawn"] = withdrCnt
+		compoundsCnt["excapedb_compounds_in_drugbank_total"] = approvCnt + withdrCnt
+		compCntJSON, cerr := json.Marshal(compoundsCnt)
 		if cerr != nil {
 			sp.Fail(cerr)
 		}
-		fracsJSON, ferr := json.Marshal(fracs)
+
+		compoundsFrac := map[string]float64{}
+		compoundsFrac["excapedb_fraction_compounds_in_drugbank_approved"] = float64(approvCnt) / float64(excIdsUniqCnt)
+		compoundsFrac["excapedb_fraction_compounds_in_drugbank_withdrawn"] = float64(withdrCnt) / float64(excIdsUniqCnt)
+		compoundsFrac["excapedb_fraction_compounds_in_drugbank_total"] = float64(approvCnt+withdrCnt) / float64(excIdsUniqCnt)
+		compFracJSON, ferr := json.Marshal(compoundsFrac)
 		if ferr != nil {
 			sp.Fail(ferr)
 		}
-		t.OutIP("stats").Write(append(statsJSON, fracsJSON...))
+
+		excIdsAllFile := t.InIP("excapedb_ids_all").Open()
+		excIdsAllCsvReader := csv.NewReader(excIdsAllFile)
+		excIdsAllCnt := 0
+		for {
+			rec, err := excIdsAllCsvReader.Read()
+			if err == io.EOF {
+				break
+			} else if err != nil {
+				sp.Fail(err)
+			}
+			excIdsAllCnt++
+			if _, ok := approvIds[rec[0]]; ok {
+				approvCnt++
+			}
+			if _, ok := withdrIds[rec[0]]; ok {
+				withdrCnt++
+			}
+		}
+		excIdsAllFile.Close()
+
+		entriesCnt := map[string]int{}
+		entriesCnt["excapedb_entries_in_drugbank_approved"] = approvCnt
+		entriesCnt["excapedb_entries_in_drugbank_withdrawn"] = withdrCnt
+		entriesCnt["excapedb_entries_in_drugbank_total"] = approvCnt + withdrCnt
+		entrCntJSON, cerr := json.Marshal(entriesCnt)
+		if cerr != nil {
+			sp.Fail(cerr)
+		}
+
+		entriesFrac := map[string]float64{}
+		entriesFrac["excapedb_fraction_entries_in_drugbank_approved"] = float64(approvCnt) / float64(excIdsUniqCnt)
+		entriesFrac["excapedb_fraction_entries_in_drugbank_withdrawn"] = float64(withdrCnt) / float64(excIdsUniqCnt)
+		entriesFrac["excapedb_fraction_entries_in_drugbank_total"] = float64(approvCnt+withdrCnt) / float64(excIdsUniqCnt)
+		entrFracJSON, ferr := json.Marshal(entriesFrac)
+		if ferr != nil {
+			sp.Fail(ferr)
+		}
+
+		t.OutIP("stats").Write(append(append(append(compCntJSON, compFracJSON...), entrCntJSON...), entrFracJSON...))
 	}
 
 	wf.Run()
