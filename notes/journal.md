@@ -447,6 +447,8 @@ So, we have basically two major things we will try to do:
 
 - [ ] Run both with and without fillup assumed negatives
   so that we can compare how the fillup affects performance.
+  - [ ] Make sure to not use assumed negatives in calibration and validation,
+  with the help of functionality in Staffan's latest version of CPSign
   - [ ] Fill up to double amount of non-actives compared to actives
 
 - [ ] Rebuild everything without drugbank, so that we can try to predict target
