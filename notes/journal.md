@@ -198,27 +198,24 @@ PTP 1 and a PTP 2 project, like follows:
   - Run libSVM instead of LIBLINEAR?
   - Run Venn-Abers to get ROC-curves?
 
-
 ## Other notes
 
 - The `--proper-train` flag is used for the dataset that should not be included
   in calibration nor testing.
 - The `--train` flags is for data that is used for both
   - Remaining question: So, it is used in neither calibration nor testing?
-PTP  Meeting 30 Oct 2017
-========================
+
+# Project meeting 2017-10-30
 
 Participants: Ola, Jonathan, Staffan, Arvid, Samuel
 
-Action points
--------------
+## Action points
 
 - [ ] Ola to send conformal prediction-reading list to Samuel (reminder)
 - [ ] Staffan to implement the new measure ("Observed Fuzziness". See [Eq 9](https://link.springer.com/chapter/10.1007/978-3-319-33395-3_2#Equ9)
   in [Vovk et al 2016](https://doi.org/10.1007/978-3-319-33395-3_2)).
 
-Questions and Answers
----------------------
+## Questions and Answers
 
 - Do stratified classification?
   - We delay this and see how good it gets with the other modifications first.
@@ -465,7 +462,7 @@ So, we have basically two major things we will try to do:
 ## Misc. notes
 
 - [ ] Samuel to try to put reproducibility info into model jar files
-- [ ] Ta bort 'target profile'
+- [ ] Samuel to remove 'target profile' from the names when training
 
 We also discussed the "Class-averaged Observed Fuzziness" measure that we have used. We concluded the following:
 
