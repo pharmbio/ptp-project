@@ -191,7 +191,7 @@ func main() {
 				`java -jar `+cpSignPath+` precompute \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
-									--proper-train {i:propertraindata} \
+									--proper-trainfile {i:propertraindata} \
 									--trainfile {i:traindata} \
 									--labels A, N \
 									--model-out {o:precomp} \
@@ -218,7 +218,7 @@ func main() {
 				evalCost := wf.NewProc("crossval_"+uniqStrCost, `java -jar `+cpSignPath+` crossvalidate \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
-									--proper-train {i:propertraindata} \
+									--proper-trainfile {i:propertraindata} \
 									--trainfile {i:traindata} \
 									--impl liblinear \
 									--labels A, N \
