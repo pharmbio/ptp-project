@@ -166,7 +166,7 @@ func main() {
 				&& let "fillup_lines_cnt = "$(awk -F"\t" '$2 == "A" { A += 1 } $2 == "N" { N += 1 } END { print A*3-N }' {i:targetdata}) \
 				&& awk -F"\t" 'FNR==NR{target_smiles[$1]; next} ($1 != "{p:gene}") && !($2 in target_smiles) { print $2 "\tN" }' {i:targetdata} {i:rawdata} \
 				| sort -uV \
-				| shuf --random-source={i:randsrc} -n $fillup_lines_cnt >> {o:filledup}`)
+				| shuf --random-source={i:randsrc} -n $fillup_lines_cnt >> {o:filledup} && sleep 60`)
 				fillAssumedNonbinding.SetPathReplace("targetdata", "filledup", ".tsv", ".incl_assumed_neg.tsv")
 				fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
 				fillAssumedNonbinding.In("rawdata").Connect(removeConflicting.Out("gene_smiles_activity"))
