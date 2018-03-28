@@ -226,7 +226,7 @@ func main() {
 									--cost {p:cost} \
 									--cv-folds {p:cvfolds} \
 									--output-format json \
-									--confidence {p:confidence} | grep -P "^{" > {o:stats} # {p:gene} {p:replicate}`)
+									--confidences {p:confidences} | grep -P "^{" > {o:stats} # {p:gene} {p:replicate}`)
 				evalCost.SetPathCustom("stats", func(t *sp.Task) string {
 					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 					sp.Check(err)
@@ -237,7 +237,7 @@ func main() {
 				evalCost.In("traindata").Connect(targetDataPort)
 				evalCost.ParamInPort("nrmdl").ConnectStr("10")
 				evalCost.ParamInPort("cvfolds").ConnectStr("10")
-				evalCost.ParamInPort("confidence").ConnectStr("0.9")
+				evalCost.ParamInPort("confidences").ConnectStr("[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]")
 				evalCost.ParamInPort("gene").ConnectStr(geneUppercase)
 				evalCost.ParamInPort("replicate").ConnectStr(replicate)
 				evalCost.ParamInPort("cost").ConnectStr(cost)
