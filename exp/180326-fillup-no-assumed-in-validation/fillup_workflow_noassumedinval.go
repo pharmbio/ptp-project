@@ -191,11 +191,13 @@ func main() {
 				`java -jar `+cpSignPath+` precompute \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
+									--proper-train {i:propertraindata} \
 									--trainfile {i:traindata} \
 									--labels A, N \
 									--model-out {o:precomp} \
 									--model-name "`+geneUppercase+` target profile"`)
 			cpSignPrecomp.In("traindata").Connect(targetDataPort)
+			cpSignPrecomp.In("propertraindata").Connect(extractTargetData.Out("target_data"))
 			cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
 			if *runSlurm {
 				cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLowerCase // SLURM string
@@ -216,6 +218,7 @@ func main() {
 				evalCost := wf.NewProc("crossval_"+uniqStrCost, `java -jar `+cpSignPath+` crossvalidate \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
+									--proper-train {i:propertraindata} \
 									--trainfile {i:traindata} \
 									--impl liblinear \
 									--labels A, N \
@@ -230,6 +233,7 @@ func main() {
 					trainDataBasePath := filepath.Base(t.InPath("traindata"))
 					return str.Replace(t.InPath("traindata"), trainDataBasePath, t.Param("replicate")+"/"+trainDataBasePath, 1) + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
 				})
+				evalCost.In("propertraindata").Connect(extractTargetData.Out("target_data"))
 				evalCost.In("traindata").Connect(targetDataPort)
 				evalCost.ParamInPort("nrmdl").ConnectStr("10")
 				evalCost.ParamInPort("cvfolds").ConnectStr("10")
