@@ -226,7 +226,7 @@ func main() {
 									--cost {p:cost} \
 									--cv-folds {p:cvfolds} \
 									--output-format json \
-									--confidences {p:confidences} | grep -P "^{" > {o:stats} # {p:gene} {p:replicate}`)
+									--confidences "{p:confidences}" | grep -P "^{" > {o:stats} # {p:gene} {p:replicate}`)
 				evalCost.SetPathCustom("stats", func(t *sp.Task) string {
 					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 					sp.Check(err)
