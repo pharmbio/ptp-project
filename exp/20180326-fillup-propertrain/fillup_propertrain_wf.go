@@ -237,7 +237,7 @@ func main() {
 				evalCost.In("traindata").Connect(targetDataPort)
 				evalCost.ParamInPort("nrmdl").ConnectStr("10")
 				evalCost.ParamInPort("cvfolds").ConnectStr("10")
-				evalCost.ParamInPort("confidences").ConnectStr("[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]")
+				evalCost.ParamInPort("confidences").ConnectStr("[0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]")
 				evalCost.ParamInPort("gene").ConnectStr(geneUppercase)
 				evalCost.ParamInPort("replicate").ConnectStr(replicate)
 				evalCost.ParamInPort("cost").ConnectStr(cost)
