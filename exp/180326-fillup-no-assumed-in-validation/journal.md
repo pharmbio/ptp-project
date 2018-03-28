@@ -1,1 +1,3 @@
-- [X] Copy the workflow from the previous fillup folder 
+- [X] Copy the workflow from the previous fillup folder
+- [ ] Use new flag(s) for proper training set in CPSign
+  - (`... crossvalidate --proper-trainfile`)
