@@ -370,7 +370,6 @@ func (p *FinalModelSummarizer) Run() {
 	nonActiveCounts := map[string]int64{}
 	totalCompounds := map[string]int64{}
 	for tdip := range p.InTargetDataCount().Chan {
-		fmt.Println(tdip.AuditInfo())
 		gene := tdip.Param("gene")
 		strs := str.Split(string(tdip.Read()), "\t")
 		activeStr := str.TrimSuffix(strs[0], "\n")
