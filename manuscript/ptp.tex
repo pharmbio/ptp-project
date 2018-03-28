@@ -89,6 +89,7 @@
 %    Table} for details according to article type.
 
 \todoil{Can you really have refs in abstract?}
+\todoil{--- No not really, the abstract should probably be completely rewritten. // jonalv}
 Off-target pharmacology and polypharmacology has big implications on drug
 efficacy and safety, and prediction of target binding profiles for ligands is
 an important task that can aid early drug discovery \cite{Bowes2012}.
@@ -132,13 +133,13 @@ also the applicability of larger as well as focused target sets.
 \section{Methods}
 
 The dataset used for information about binding association between ligands
-and targets, was ExcapeDB. An extraction of only the columns for Gene name,
+and targets, was ExcapeDB~\texttt{\color{magenta}ADD REF!}. An extraction of only the columns for Gene name,
 SMILES and Activity flag was performed in order to make subsequent data
 traformation steps easier to implement and faster to process, given the
 relative large size of the uncomplressed ExcapeDB data file (18 GB).
 
 Also, from this extracted dataset, duplicate rows were removed. Also, all
-rows for which there were rows with a conflictnig value for the activity
+rows for which there were rows with a conflicting value for the activity
 flag, were completely removed.
 
 As targets, a subset of the panel of 44 targets as suggested in
@@ -161,6 +162,8 @@ Both MINK1 and CHRNA4 were removed in the filtering step mentioned above, since
 the dataset did not contain more than 100 active and 100 non-active compounds
 for neither MINK1 nor CHRNA4.
 
+\todoil{Let's make a table out of this! including number of negatives and
+positives and stuff //jonalv}
 The resulting panel consists of 31 targets, represented by the following gene
 IDs in the ExcapeDB dataset, and througout this article: PDE3A,
 SCN5A, CCKAR, ADRB1, PTGS1, CHRM3, CHRM2, EDNRA, MAOA, LCK,
@@ -319,7 +322,7 @@ value -- Aggregated Conformal Prediction (ACP), with 10 aggregated models.
 %the academic community as representing a potential conflict of interest must
 %be disclosed. If no such relationship exists, authors will be asked to confirm
 %the following statement:
-
+\todoil{Declare working for, having worked for, and other relationships with Genetta Soft}
 The authors declare that the research was conducted in the absence of any
 commercial or financial relationships that could be construed as a potential
 conflict of interest.
