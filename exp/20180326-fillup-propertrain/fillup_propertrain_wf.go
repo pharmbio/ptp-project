@@ -1,5 +1,4 @@
-// Workflow written in SciPipe.
-// For more information about SciPipe, see: http://scipipe.org
+// Workflow written in SciPipe.  // For more information about SciPipe, see: http://scipipe.org
 package main
 
 import (
@@ -246,16 +245,20 @@ func main() {
 				}
 
 				extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniqStrCost, func(ip *sp.FileIP) map[string]string {
-					crossValOut := &cpSignCrossValOutput{}
-					ip.UnMarshalJSON(crossValOut)
 					newKeys := map[string]string{}
-					newKeys["validity"] = fmt.Sprintf("%.3f", crossValOut.Validity)
-					newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
-					newKeys["class_confidence"] = fmt.Sprintf("%.3f", crossValOut.ClassConfidence)
-					newKeys["class_credibility"] = fmt.Sprintf("%.3f", crossValOut.ClassCredibility)
-					newKeys["obsfuzz_active"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Active)
-					newKeys["obsfuzz_nonactive"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Nonactive)
-					newKeys["obsfuzz_overall"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Overall)
+					crossValOuts := &[]cpSignCrossValOutput{}
+					ip.UnMarshalJSON(crossValOuts)
+					for _, crossValOut := range *crossValOuts {
+						if (crossValOut.Confidence - 0.9) < 0.001 {
+							newKeys["validity"] = fmt.Sprintf("%.3f", crossValOut.Validity)
+							newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
+							newKeys["class_confidence"] = fmt.Sprintf("%.3f", crossValOut.ClassConfidence)
+							newKeys["class_credibility"] = fmt.Sprintf("%.3f", crossValOut.ClassCredibility)
+							newKeys["obsfuzz_active"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Active)
+							newKeys["obsfuzz_nonactive"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Nonactive)
+							newKeys["obsfuzz_overall"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Overall)
+						}
+					}
 					return newKeys
 				})
 				extractCostGammaStats.In().Connect(evalCost.Out("stats"))
@@ -358,11 +361,13 @@ func main() {
 // --------------------------------------------------------------------------------
 
 type cpSignCrossValOutput struct {
+	Efficiency        float64                 `json:"efficiency"`
+	Confidence        float64                 `json:"confidence"`
+	ClassCredibility  float64                 `json:"classCredibility"`
+	Accuracy          float64                 `json:"accuracy"`
 	ClassConfidence   float64                 `json:"classConfidence"`
 	ObservedFuzziness cpSignObservedFuzziness `json:"observedFuzziness"`
 	Validity          float64                 `json:"validity"`
-	Efficiency        float64                 `json:"efficiency"`
-	ClassCredibility  float64                 `json:"classCredibility"`
 }
 
 type cpSignObservedFuzziness struct {
