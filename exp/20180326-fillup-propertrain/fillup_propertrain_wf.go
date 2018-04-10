@@ -198,7 +198,7 @@ func main() {
 									--trainfile {i:traindata} \
 									--labels A, N \
 									--model-out {o:precomp} \
-									--model-name "`+geneUppercase)
+									--model-name "`+geneUppercase+`"`)
 			cpSignPrecomp.In("traindata").Connect(targetDataPort)
 			cpSignPrecomp.In("propertraindata").Connect(extractTargetData.Out("target_data"))
 			cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
