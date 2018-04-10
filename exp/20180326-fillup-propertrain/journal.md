@@ -2,4 +2,5 @@
 - [x] Use new flag(s) for proper training set in CPSign
   - (`... crossvalidate --proper-trainfile`)
 - [x] Fill up *to* 3x#actives, instead of *adding* 2x#actives new assumed negatives
+- [x] Remove "target info" from names when training
 - [ ] Test re-run locally with 3 smallest target
