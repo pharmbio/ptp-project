@@ -154,6 +154,7 @@ func main() {
 			var targetDataPort *sp.OutPort
 
 			if doFillUp {
+				sp.Audit.Printf("Filling up dataset with assumed negatives, for gene %s ...\n", geneUppercase)
 				genRandomID := "create_random_bytes_" + replicate
 				if _, ok := genRandomProcs[genRandomID]; !ok {
 					genRandomProcs[genRandomID] = wf.NewProc(genRandomID, "dd if=/dev/urandom of={o:rand} bs=1048576 count=1024")
