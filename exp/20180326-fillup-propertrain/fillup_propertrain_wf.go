@@ -165,20 +165,30 @@ func main() {
 				// to number of actives, by multiplying the number of actives
 				// times two, and subtracting the number of existing
 				// non-actices (See "A*2-N" in the AWK-script below).
-				fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGeneRepl, `
-				let "fillup_lines_cnt = "$(awk -F"\t" '$2 == "A" { A += 1 } $2 == "N" { N += 1 } END { print A*2-N }' {i:targetdata}) \
-				&& cat {i:targetdata} \
-				<(awk -F"\t" 'FNR==NR{target_smiles[$1]; next} ($1 != "{p:gene}") && !($2 in target_smiles) { print $2 "\tN" }' {i:targetdata} {i:rawdata} \
-				| sort -uV \
-				| shuf --random-source={i:randsrc} -n $fillup_lines_cnt) > {o:filledup} # replicate:{p:replicate}`)
+				extractAssumedNonBinding := wf.NewProc("extract_assumed_n_"+uniqStrGeneRepl, `
+					let "fillup_lines_cnt = "$(awk -F"\t" '$2 == "A" { A += 1 } $2 == "N" { N += 1 } END { print A*2-N }' {i:targetdata}) \
+					&& awk -F"\t" 'FNR==NR{target_smiles[$1]; next} ($1 != "{p:gene}") && !($2 in target_smiles) { print $2 "\tN" }' {i:targetdata} {i:rawdata} \
+					| sort -uV \
+					| shuf --random-source={i:randsrc} -n $fillup_lines_cnt > {o:assumed_n} # replicate:{p:replicate}`)
+				extractAssumedNonBinding.SetPathCustom("assumed_n", func(t *sp.Task) string {
+					geneLC := str.ToLower(t.Param("gene"))
+					return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + geneLC + "." + t.Param("replicate") + ".assumed_n.tsv"
+				})
+				extractAssumedNonBinding.In("rawdata").Connect(removeConflicting.Out("gene_smiles_activity"))
+				extractAssumedNonBinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
+				extractAssumedNonBinding.ParamInPort("gene").ConnectStr(geneUppercase)
+				extractAssumedNonBinding.ParamInPort("replicate").ConnectStr(replicate)
+				extractAssumedNonBinding.In("randsrc").Connect(genRandomProcs[genRandomID].Out("rand"))
+
+				// --------------------
+				fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGeneRepl, `cat {i:targetdata} {i:assumed_n} > {o:filledup} # gene:{p:gene} replicate:{p:replicate}`)
 				fillAssumedNonbinding.SetPathCustom("filledup", func(t *sp.Task) string {
-					return "dat/" + str.ToLower(t.Param("gene")) + "/" + t.Param("replicate") + "/" + filepath.Base(t.InIP("targetdata").Path()) + ".fill_assumed_n.tsv"
+					return "dat/" + str.ToLower(t.Param("gene")) + "/" + filepath.Base(t.InIP("targetdata").Path()) + ".fill_assumed_n.tsv"
 				})
 				fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
-				fillAssumedNonbinding.In("rawdata").Connect(removeConflicting.Out("gene_smiles_activity"))
+				fillAssumedNonbinding.In("assumed_n").Connect(extractAssumedNonBinding.Out("assumed_n"))
 				fillAssumedNonbinding.ParamInPort("gene").ConnectStr(geneUppercase)
 				fillAssumedNonbinding.ParamInPort("replicate").ConnectStr(replicate)
-				fillAssumedNonbinding.In("randsrc").Connect(genRandomProcs[genRandomID].Out("rand"))
 				targetDataPort = fillAssumedNonbinding.Out("filledup")
 			} else {
 				targetDataPort = extractTargetData.Out("target_data")

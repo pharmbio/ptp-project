@@ -5,4 +5,4 @@
 - [x] Remove "target info" from names when training
 - [x] Test re-run locally with 3 smallest target
 - [ ] Fix bug that makes the plot show the unfilled amount of non-actives in the plot
-  - [ ] Split up fill-up in two components: One that extracts the fill-up lines, and one that merges them with the existing data.
+  - [x] Split up fill-up in two components: One that extracts the fill-up lines, and one that merges them with the existing data.
