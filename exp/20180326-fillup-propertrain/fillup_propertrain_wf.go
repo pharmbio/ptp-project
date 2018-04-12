@@ -183,7 +183,8 @@ func main() {
 				// --------------------
 				fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGeneRepl, `cat {i:targetdata} {i:assumed_n} > {o:filledup} # gene:{p:gene} replicate:{p:replicate}`)
 				fillAssumedNonbinding.SetPathCustom("filledup", func(t *sp.Task) string {
-					return "dat/" + str.ToLower(t.Param("gene")) + "/" + filepath.Base(t.InIP("targetdata").Path()) + ".fill_assumed_n.tsv"
+					geneLC := str.ToLower(t.Param("gene"))
+					return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + filepath.Base(t.InIP("targetdata").Path()) + "." + t.Param("replicate") + ".fill_assumed_n." + ".tsv"
 				})
 				fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
 				fillAssumedNonbinding.In("assumed_n").Connect(extractAssumedNonBinding.Out("assumed_n"))
@@ -247,8 +248,9 @@ func main() {
 				evalCost.SetPathCustom("stats", func(t *sp.Task) string {
 					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 					sp.Check(err)
-					trainDataBasePath := filepath.Base(t.InPath("traindata"))
-					return str.Replace(t.InPath("traindata"), trainDataBasePath, t.Param("replicate")+"/"+trainDataBasePath, 1) + fmt.Sprintf(".liblin_c%03d", c) + "_crossval_stats.json"
+					gene := str.ToLower(t.Param("gene"))
+					repl := t.Param("replicate")
+					return filepath.Dir(t.InPath("traindata")) + "/" + fmt.Sprintf("%s.%s.liblin_c%03d", gene, repl, c) + "_crossval_stats.json"
 				})
 				evalCost.In("propertraindata").Connect(extractTargetData.Out("target_data"))
 				evalCost.In("traindata").Connect(targetDataPort)
