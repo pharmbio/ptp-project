@@ -351,14 +351,8 @@ func main() {
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
-	//procsToRun := []string{}
-	//for _, gene := range geneSets[*geneSet] {
-	//	if strInSlice(gene, geneSets["bowes44min100percls_small"]) {
-	//		procsToRun = append(procsToRun, "fillup_"+str.ToLower(gene)+"_r1")
-	//	}
-	//}
 	//wf.RunTo(procsToRun...)
-	//wf.RunToRegex("fillup_.*")
+	//wf.RunToRegex("extract_assumed_n_.*")
 	wf.RunTo("plot_summary")
 }
 
