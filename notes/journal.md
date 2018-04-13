@@ -168,7 +168,7 @@ in the chat, at 9:02, Sep 29 2017:
   - Vovk, V., Fedorova, V., Nouretdinov, I., Gammerman, A., 2016. Criteria of
     efficiency for conformal prediction. In: Symposium on Conformal and
     Probabilistic Prediction with Applications. Springer, pp. 23–39.
-- [ ] Samuel to start writing the methods section in manuscript.
+- [x] Samuel to start writing the methods section in manuscript.
 - [ ] Next meeting: Probably on Monday, Oct 30
 
 ## Main conclusions
@@ -212,7 +212,7 @@ Participants: Ola, Jonathan, Staffan, Arvid, Samuel
 ## Action points
 
 - [ ] Ola to send conformal prediction-reading list to Samuel (reminder)
-- [ ] Staffan to implement the new measure ("Observed Fuzziness". See [Eq 9](https://link.springer.com/chapter/10.1007/978-3-319-33395-3_2#Equ9)
+- [x] Staffan to implement the new measure ("Observed Fuzziness". See [Eq 9](https://link.springer.com/chapter/10.1007/978-3-319-33395-3_2#Equ9)
   in [Vovk et al 2016](https://doi.org/10.1007/978-3-319-33395-3_2)).
 
 ## Questions and Answers
@@ -236,13 +236,13 @@ We looked at this plot, based on the latest UPPMAX run:
 
 ## Action points
 
-- [ ] Ola ask the Frontiers journal for a 2 month deadline extension
+- [x] Ola ask the Frontiers journal for a 2 month deadline extension
 - [x] Ola to ask for more CPU hours
 - Samuel to:
-  - [ ] Start writing
-  - [ ] Rerun the current run with 2 more replicates, to get some
+  - [x] Start writing
+  - [x] Rerun the current run with 2 more replicates, to get some
     variance of the efficiency measures
-  - [ ] Implement drawing random "assumed negative" examples, up to
+  - [x] Implement drawing random "assumed negative" examples, up to
     double the size of the number of active compounds for each model.
     (Only for the non-huge datasets).
   - [ ] Fix plot:
@@ -290,7 +290,8 @@ assumed negatives" for datasets with smaller than 100 actives.
 - [ ] Samuel to compare approved / withdrawn drugs with actives / nonactives in
   ExcapeDB, to get an overview of how they relate.
 - [ ] From the last meeting we had the idea to also compare with
-  actives/nonactives in DrugBank. (Ola says this is the same)
+  actives/nonactives (edit: approved/withdrawn) in DrugBank. (Ola says this is
+  the same)
 - [ ] Samuel will then look at predicting / generating binding profiles on
   UPPMAX, by running cpSign in commandline mode.
   - Staffan noted that cpSign has some upstart time to take into account, but
@@ -298,7 +299,7 @@ assumed negatives" for datasets with smaller than 100 actives.
     SMILES) in the same input file and sent to cpSign. Then it is only for each
     target that this has to be run separately, which is not too much of a
     problem.
-- [ ] In parallel, Jonathan will look at enabling to upload jar-models from
+- [x] In parallel, Jonathan will look at enabling to upload jar-models from
   cpSign in ModellingWeb (how to spell that?), so that we can eventually
   predict / generate target binding profiles via the API.
 
@@ -352,20 +353,20 @@ Attending: Ola, Jonathan, Samuel, Ernst
 
 ## Action points:
 
-- [X] Check with Nina how to resolve Inchi/InchiKeys
+- [x] Check with Nina how to resolve Inchi/InchiKeys
   - Confirmed by Nina that Inchis might differ due to standardization.
   - We will try with ChEMBL/PubChem IDs instead.
   - Backup would be to generate new InChi/InChiKeys with the exact same method
     for DrugBank as done in ExcapeDB.
   - So, what we want to do, is to remove from the ExcapeDB, all the compounds available in DrugBank.
   - Possibly the other way around too?
-- [X] Get overlap info about ExcapeDB vs DrugBank (Samuel)
+- [x] Get overlap info about ExcapeDB vs DrugBank (Samuel)
   1. How many in ExcapeDB AND DrugBank
   2. How many in ExcapeDB AND NOT DrugBank
   3. How many in DrugBank AND NOT ExcapeDB
   4. How many in ExcapeDB AND DrugBank AND NOT IN (ExcapeDB AND DrugBank) (Complement to 1.)
-- [ ] Check with with Staffan about calibration plots from cross validation
-- [ ] Check with Staffan about not including presumed negatives in the neither
+- [x] Check with with Staffan about calibration plots from cross validation
+- [x] Check with Staffan about not including presumed negatives in the neither
       test (and probably not in calibration either)
 - [ ] ...
 
@@ -447,9 +448,9 @@ So, we have basically two major things we will try to do:
 
 - [ ] Run both with and without fillup assumed negatives
   so that we can compare how the fillup affects performance.
-  - [ ] Make sure to not use assumed negatives in calibration and validation,
+  - [x] Make sure to not use assumed negatives in calibration and validation,
   with the help of functionality in Staffan's latest version of CPSign
-  - [ ] Fill up to double amount of non-actives compared to actives
+  - [x] Fill up to double amount of non-actives compared to actives
 
 - [ ] Rebuild everything without drugbank, so that we can try to predict target
   binding, and later also approved/withdrawn status for drugbank molecules
@@ -464,7 +465,7 @@ So, we have basically two major things we will try to do:
 ## Misc. notes
 
 - [ ] Samuel to try to put reproducibility info into model jar files
-- [ ] Samuel to remove 'target profile' from the names when training
+- [x] Samuel to remove 'target profile' from the names when training
 
 We also discussed the "Class-averaged Observed Fuzziness" measure that we have used. We concluded the following:
 
