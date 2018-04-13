@@ -1,3 +1,6 @@
+Experiment Journal
+==================
+
 - [x] Copy the workflow from the previous fillup folder
 - [x] Use new flag(s) for proper training set in CPSign
   - (`... crossvalidate --proper-trainfile`)
@@ -18,6 +21,6 @@
   > måste ju vara något som inte stämmer. hur kan efficiency och fuzz vara
   > så bra?
 - [ ] Implement date/time field in audit log.
-- [ ] Check up what is that PROV standard for provenance reporting.
 - [ ] Run full workflow *with* fillup (of assumed non-actives)
+- [ ] Check up more about PROV and if we should adapt to it
 - [ ] Run full workflow *without* fillup (of assumed non-actives)
