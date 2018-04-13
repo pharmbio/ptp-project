@@ -11,3 +11,13 @@
     workflow runs going on at the same time. At least it worked better this
     time when running the small targets on cihost. 21 targets x 3 replicates,
     and no empty fillup files this time.
+- [ ] Fix minor thing making some file names contain two consecutive dots (`..`).
+- [ ] Figure out why validity is `0.000` in the latest run, and effiency and
+  validity a bit too good.
+  staffan said:
+  > måste ju vara något som inte stämmer. hur kan efficiency och fuzz vara
+  > så bra?
+- [ ] Implement date/time field in audit log.
+- [ ] Check up what is that PROV standard for provenance reporting.
+- [ ] Run full workflow *with* fillup (of assumed non-actives)
+- [ ] Run full workflow *without* fillup (of assumed non-actives)
