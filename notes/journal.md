@@ -437,6 +437,7 @@ We concluded:
     might be a problem sometimes.
   - We leave it up to staffan to implement the output in a format that seems
     reasonable.
+
 # Project meeting 2018-03-23
 
 - Time: ca 15:28
@@ -480,3 +481,47 @@ We also discussed the "Class-averaged Observed Fuzziness" measure that we have u
   models with the different values, and compare their performance.
   - [ ] Run two sets of final models: With class-averaged, and without
     class-averaged observed fuzziness as efficiency score
+
+# Project meeting 2018-04-13
+
+Time: 10:05 ca
+Attending: Jonathan, Staffan, Samuel
+
+We discussed the current status of the project.
+
+Samuel mentioned that he has:
+
+- Made use of the new --proper-train flag in cpsign 1.6.11.
+- Has changed the fillup-of-assumed-negatives component so that it fills up
+  *to* 2 times the number of actives, with non-actives, instead of *adding* 2
+  times the number of actives.
+- Has re-run the workflow with the new fillup-workflow, for the 21 "small"
+  targets (those under 10k rows) on cihost (the virtual machine set up by
+  Anders L on messi)
+
+We concluded that the next steps are:
+
+- [ ] Samuel to continue running all targets, with and without fillup.
+  - Since UPPMAX has service stop until at least next week, he'll try to run on
+    cihost as much as possible, at least when developing workflows.
+  - Samuel proposed (after the meeting) that we could book a g3.8xlarge
+    instance on AWS EC2 for around 1k SEK for two days, if badly needed.
+- [ ] Samuel tries as soon as possible to get to predicting with the built
+  models, so we can get data for the second type of models (based on target
+  binding profiles.
+- [ ] Samuel tries as soon as possible to get to predicting
+  with the built models, so we can get data for the second type of models
+  (based on target binding profiles).
+- [ ] Staffan to develop component which takes data in the form of target panel
+  binding profiles on the form below, ad builds a conformal prediction model
+  from it.
+- [ ] Staffan also develops a small REST service which can run this model file,
+  on modelling-web.
+
+Some further notes:
+
+Jonathan noted that it is good if Samuel makes a note about when new models are
+deployed to the web service, so we know which version is there. Samuel also
+reminded that he will try to put the audit log files into the model files.
+Samuel also realized that he needs to make sure that the audit files contain
+the date and time of when commands were executed.
