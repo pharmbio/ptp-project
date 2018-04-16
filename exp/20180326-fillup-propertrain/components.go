@@ -24,11 +24,11 @@ func indexOfStr(s string, strs []string) int {
 	return -1
 }
 
-// gene, efficiency, validity, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, cost)
+// gene, efficiency, accuracy, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, cost)
 
 // SummarizeCostGammaPerf is specialized a SciPipe Process that reads output
 // from cpSign status output to extract information about the efficiency and
-// validity of generated models for given cost and gamma values
+// accuracy of generated models for given cost and gamma values
 type SummarizeCostGammaPerf struct {
 	sp.BaseProcess
 	procName     string
@@ -58,7 +58,7 @@ func (p *SummarizeCostGammaPerf) Run() {
 	if outIp.Exists() {
 		sp.Info.Printf("Process %s: Out-target %s already exists, so skipping\n", p.Name(), outIp.Path())
 	} else {
-		header := []string{"Gene", "Efficiency", "Validity", "ObsFuzzActive", "ObsFuzzNonactive", "ObsFuzzOverall", "ClassConfidence", "ClassCredibility", "Cost"}
+		header := []string{"Gene", "Efficiency", "Accuracy", "ObsFuzzActive", "ObsFuzzNonactive", "ObsFuzzOverall", "ClassConfidence", "ClassCredibility", "Cost"}
 		if p.IncludeGamma {
 			header = append(header, "Gamma")
 		}
@@ -66,7 +66,7 @@ func (p *SummarizeCostGammaPerf) Run() {
 		for iip := range p.In().Chan {
 			gene := iip.Param("gene")
 			efficiency := iip.Key("efficiency")
-			validity := iip.Key("validity")
+			accuracy := iip.Key("accuracy")
 			cost := iip.Param("cost")
 
 			obsFuzzActive := iip.Key("obsfuzz_active")
@@ -75,7 +75,7 @@ func (p *SummarizeCostGammaPerf) Run() {
 			classConfidence := iip.Key("class_confidence")
 			classCredibility := iip.Key("class_credibility")
 
-			row := []string{gene, efficiency, validity, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, classConfidence, classCredibility, cost}
+			row := []string{gene, efficiency, accuracy, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, classConfidence, classCredibility, cost}
 			if p.IncludeGamma {
 				row = append(row, iip.Param("gamma"))
 			}
@@ -102,7 +102,7 @@ type BestCostGamma struct {
 	Separator           rune
 	Header              bool
 	EfficiencyValColIdx int // Which column to check for the efficiency value
-	ValidityValColIdx   int // Which column to check for the validity value
+	AccuracyValColIdx   int // Which column to check for the accuracy value
 	IncludeGamma        bool
 }
 
@@ -114,7 +114,7 @@ func NewBestCostGamma(wf *sp.Workflow, procName string, separator rune, header b
 		IncludeGamma: includeGamma,
 	}
 	sbcr.InitInPort(sbcr, "csv_file")
-	sbcr.InitParamOutPort(sbcr, "best_validity")
+	sbcr.InitParamOutPort(sbcr, "best_accuracy")
 	sbcr.InitParamOutPort(sbcr, "best_eff")
 	sbcr.InitParamOutPort(sbcr, "best_obsfuzz_classavg")
 	sbcr.InitParamOutPort(sbcr, "best_obsfuzz_overall")
@@ -131,8 +131,8 @@ func NewBestCostGamma(wf *sp.Workflow, procName string, separator rune, header b
 func (p BestCostGamma) InCSVFile() *sp.InPort {
 	return p.InPort("csv_file")
 }
-func (p *BestCostGamma) OutBestValidity() *sp.ParamOutPort {
-	return p.ParamOutPort("best_validity")
+func (p *BestCostGamma) OutBestAccuracy() *sp.ParamOutPort {
+	return p.ParamOutPort("best_accuracy")
 }
 func (p *BestCostGamma) OutBestEfficiency() *sp.ParamOutPort {
 	return p.ParamOutPort("best_eff")
@@ -167,7 +167,7 @@ func (p *BestCostGamma) Run() {
 	if p.IncludeGamma {
 		defer p.OutBestGamma().Close()
 	}
-	defer p.OutBestValidity().Close()
+	defer p.OutBestAccuracy().Close()
 	defer p.OutBestEfficiency().Close()
 	defer p.OutBestObsFuzzClassAvg().Close()
 	defer p.OutBestObsFuzzOverall().Close()
@@ -189,7 +189,7 @@ func (p *BestCostGamma) Run() {
 
 		var bestCost int64 = -1
 		var bestGamma float64 = -1.0
-		var bestValidity float64 = -1.0
+		var bestAccuracy float64 = -1.0
 		var bestEfficiency float64 = -1.0
 		var bestObsFuzzOverall float64 = -1.0
 		var bestObsFuzzActive float64 = -1.0
@@ -232,7 +232,7 @@ func (p *BestCostGamma) Run() {
 					sp.Check(err)
 				}
 
-				bestValidity, err = strconv.ParseFloat(rec[indexOfStr("Validity", header)], 64)
+				bestAccuracy, err = strconv.ParseFloat(rec[indexOfStr("Accuracy", header)], 64)
 				sp.Check(err)
 
 				bestEfficiency, err = strconv.ParseFloat(rec[indexOfStr("Efficiency", header)], 64)
@@ -259,7 +259,7 @@ func (p *BestCostGamma) Run() {
 		if p.IncludeGamma {
 			p.OutBestGamma().Send(fmt.Sprintf("%.3f", bestGamma))
 		}
-		p.OutBestValidity().Send(fmt.Sprintf("%.3f", bestValidity))
+		p.OutBestAccuracy().Send(fmt.Sprintf("%.3f", bestAccuracy))
 		p.OutBestEfficiency().Send(fmt.Sprintf("%.3f", bestEfficiency))
 		p.OutBestObsFuzzClassAvg().Send(fmt.Sprintf("%.3f", bestClassAvgObsFuzz))
 		p.OutBestObsFuzzOverall().Send(fmt.Sprintf("%.3f", bestObsFuzzOverall))
@@ -385,7 +385,7 @@ func (p *FinalModelSummarizer) Run() {
 	rows := [][]string{[]string{
 		"Gene",
 		"Replicate",
-		"Validity",
+		"Accuracy",
 		"Efficiency",
 		"ObsFuzzClassAvg",
 		"ObsFuzzOverall",
@@ -403,7 +403,7 @@ func (p *FinalModelSummarizer) Run() {
 		row := []string{
 			iip.Param("gene"),
 			iip.Param("replicate"),
-			iip.Param("validity"),
+			iip.Param("accuracy"),
 			iip.Param("efficiency"),
 			iip.Param("obsfuzz_classavg"),
 			iip.Param("obsfuzz_overall"),

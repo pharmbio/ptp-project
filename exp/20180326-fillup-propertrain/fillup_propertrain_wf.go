@@ -1,4 +1,5 @@
-// Workflow written in SciPipe.  // For more information about SciPipe, see: http://scipipe.org
+// Workflow written in SciPipe.
+// For more information about SciPipe, see: http://scipipe.org
 package main
 
 import (
@@ -270,7 +271,7 @@ func main() {
 					ip.UnMarshalJSON(crossValOuts)
 					for _, crossValOut := range *crossValOuts {
 						if (crossValOut.Confidence - 0.9) < 0.001 {
-							newKeys["validity"] = fmt.Sprintf("%.3f", crossValOut.Validity)
+							newKeys["accuracy"] = fmt.Sprintf("%.3f", crossValOut.Accuracy)
 							newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
 							newKeys["class_confidence"] = fmt.Sprintf("%.3f", crossValOut.ClassConfidence)
 							newKeys["class_credibility"] = fmt.Sprintf("%.3f", crossValOut.ClassCredibility)
@@ -309,12 +310,12 @@ func main() {
 									--nr-models {p:nrmdl} \
 									--cost {p:cost} \
 									--model-out {o:model} \
-									--model-name "{p:gene} target profile" # {p:replicate} Validity: {p:validity} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
+									--model-name "{p:gene} target profile" # {p:replicate} Accuracy: {p:accuracy} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
 			cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
 			cpSignTrain.ParamInPort("nrmdl").ConnectStr("10")
 			cpSignTrain.ParamInPort("gene").ConnectStr(geneUppercase)
 			cpSignTrain.ParamInPort("replicate").ConnectStr(replicate)
-			cpSignTrain.ParamInPort("validity").Connect(selectBest.OutBestValidity())
+			cpSignTrain.ParamInPort("accuracy").Connect(selectBest.OutBestAccuracy())
 			cpSignTrain.ParamInPort("efficiency").Connect(selectBest.OutBestEfficiency())
 			cpSignTrain.ParamInPort("obsfuzz_classavg").Connect(selectBest.OutBestObsFuzzClassAvg())
 			cpSignTrain.ParamInPort("obsfuzz_overall").Connect(selectBest.OutBestObsFuzzOverall())
@@ -369,7 +370,7 @@ func main() {
 //         "N": 0.207,
 //         "overall": 0.231
 //     },
-//     "validity": 0.917,
+//     "accuracy": 0.917,
 //     "efficiency": 0.333,
 //     "classCredibility": 0.631
 // }
@@ -382,7 +383,6 @@ type cpSignCrossValOutput struct {
 	Accuracy          float64                 `json:"accuracy"`
 	ClassConfidence   float64                 `json:"classConfidence"`
 	ObservedFuzziness cpSignObservedFuzziness `json:"observedFuzziness"`
-	Validity          float64                 `json:"validity"`
 }
 
 type cpSignObservedFuzziness struct {

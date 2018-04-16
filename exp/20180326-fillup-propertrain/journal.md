@@ -22,6 +22,7 @@ Experiment Journal
   > så bra?
   - Found it now: Had forgot to rename from "Validity" to "Accuracy" after
     name change in CPSign.
+- [x] Fix Validity->Accuracy name change
 - [ ] Re-run everything after "extract_assumed_n_*" component
 - [ ] Implement date/time field in audit log.
 - [ ] Run full workflow *with* fillup (of assumed non-actives)
