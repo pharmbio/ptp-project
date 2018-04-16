@@ -24,7 +24,8 @@ Experiment Journal
     name change in CPSign.
 - [x] Implement date/time field in audit log.
 - [x] Fix Validity->Accuracy name change
-- [>] Re-run everything after "extract_assumed_n_*" component
+- [x] Re-run small datasets downstream of "extract_assumed_n_*" component,
+      after fixing validity->accuracy name change
 - [ ] Run full workflow *with* fillup (of assumed non-actives)
 - [ ] Check up more about PROV and if we should adapt to it
 - [ ] Run full workflow *without* fillup (of assumed non-actives)
