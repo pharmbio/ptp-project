@@ -20,6 +20,9 @@ Experiment Journal
   staffan said:
   > måste ju vara något som inte stämmer. hur kan efficiency och fuzz vara
   > så bra?
+  - Found it now: Had forgot to rename from "Validity" to "Accuracy" after
+    name change in CPSign.
+- [ ] Re-run everything after "extract_assumed_n_*" component
 - [ ] Implement date/time field in audit log.
 - [ ] Run full workflow *with* fillup (of assumed non-actives)
 - [ ] Check up more about PROV and if we should adapt to it
