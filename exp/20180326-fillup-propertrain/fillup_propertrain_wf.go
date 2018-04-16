@@ -184,7 +184,7 @@ func main() {
 				fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGeneRepl, `cat {i:targetdata} {i:assumed_n} > {o:filledup} # gene:{p:gene} replicate:{p:replicate}`)
 				fillAssumedNonbinding.SetPathCustom("filledup", func(t *sp.Task) string {
 					geneLC := str.ToLower(t.Param("gene"))
-					return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + filepath.Base(t.InIP("targetdata").Path()) + "." + t.Param("replicate") + ".fill_assumed_n." + ".tsv"
+					return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + filepath.Base(t.InIP("targetdata").Path()) + "." + t.Param("replicate") + ".fill_assumed_n" + ".tsv"
 				})
 				fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
 				fillAssumedNonbinding.In("assumed_n").Connect(extractAssumedNonBinding.Out("assumed_n"))

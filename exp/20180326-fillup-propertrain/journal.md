@@ -14,7 +14,7 @@ Experiment Journal
     workflow runs going on at the same time. At least it worked better this
     time when running the small targets on cihost. 21 targets x 3 replicates,
     and no empty fillup files this time.
-- [ ] Fix minor thing making some file names contain two consecutive dots (`..`).
+- [x] Fix minor thing making some file names contain two consecutive dots (`..`).
 - [ ] Figure out why validity is `0.000` in the latest run, and effiency and
   validity a bit too good.
   staffan said:
