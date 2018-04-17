@@ -197,9 +197,10 @@ func main() {
 			}
 
 			if replicate == "r1" {
-				countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, `awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' {i:targetdata} > {o:count} # {p:gene}`)
+				countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, `cat {i:targetdata} {i:assumed_n} | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:gene}`)
 				countProcs[geneLowerCase].SetPathExtend("targetdata", "count", ".count")
-				countProcs[geneLowerCase].In("targetdata").Connect(assumedN)
+				countProcs[geneLowerCase].In("targetdata").Connect(extractTargetData.Out("target_data"))
+				countProcs[geneLowerCase].In("assumed_n").Connect(assumedN)
 				countProcs[geneLowerCase].ParamInPort("gene").ConnectStr(geneUppercase)
 			}
 
