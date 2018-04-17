@@ -214,10 +214,12 @@ func main() {
 									--trainfile {i:traindata} \
 									--labels A, N \
 									--model-out {o:precomp} \
-									--model-name "`+geneUppercase+`"`)
+									--model-name "`+geneUppercase+`" \
+									--logfile {o:logfile}`)
 			cpSignPrecomp.In("traindata").Connect(targetDataPort)
 			cpSignPrecomp.In("propertraindata").Connect(extractTargetData.Out("target_data"))
 			cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
+			cpSignPrecomp.SetPathExtend("traindata", "logfile", ".precomp.cpsign.precompute.log")
 			if *runSlurm {
 				cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLowerCase // SLURM string
 			}
@@ -245,13 +247,18 @@ func main() {
 									--cost {p:cost} \
 									--cv-folds {p:cvfolds} \
 									--output-format json \
+									--logfile {o:logfile} \
 									--confidences "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:replicate}`)
-				evalCost.SetPathCustom("stats", func(t *sp.Task) string {
+				evalCostStatsPathFunc := func(t *sp.Task) string {
 					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 					sp.Check(err)
 					gene := str.ToLower(t.Param("gene"))
 					repl := t.Param("replicate")
 					return filepath.Dir(t.InPath("traindata")) + "/" + fmt.Sprintf("%s.%s.liblin_c%03d", gene, repl, c) + "_crossval_stats.json"
+				}
+				evalCost.SetPathCustom("stats", evalCostStatsPathFunc)
+				evalCost.SetPathCustom("logfile", func(t *sp.Task) string {
+					return evalCostStatsPathFunc(t) + ".cpsign.crossval.log"
 				})
 				evalCost.In("propertraindata").Connect(extractTargetData.Out("target_data"))
 				evalCost.In("traindata").Connect(targetDataPort)
@@ -310,6 +317,7 @@ func main() {
 									--nr-models {p:nrmdl} \
 									--cost {p:cost} \
 									--model-out {o:model} \
+									--logfile {o:logfile} \
 									--model-name "{p:gene} target profile" # {p:replicate} Accuracy: {p:accuracy} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
 			cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
 			cpSignTrain.ParamInPort("nrmdl").ConnectStr("10")
@@ -324,7 +332,7 @@ func main() {
 			cpSignTrain.ParamInPort("class_confidence").Connect(selectBest.OutBestClassConfidence())
 			cpSignTrain.ParamInPort("class_credibility").Connect(selectBest.OutBestClassCredibility())
 			cpSignTrain.ParamInPort("cost").Connect(selectBest.OutBestCost())
-			cpSignTrain.SetPathCustom("model", func(t *sp.Task) string {
+			cpSignTrainModelPathFunc := func(t *sp.Task) string {
 				return fmt.Sprintf("dat/final_models/%s/%s_%s_c%s_nrmdl%s_%s.mdl.jar",
 					str.ToLower(t.Param("gene")),
 					str.ToLower(t.Param("gene")),
@@ -332,6 +340,10 @@ func main() {
 					t.Param("cost"),
 					t.Param("nrmdl"),
 					t.Param("replicate"))
+			}
+			cpSignTrain.SetPathCustom("model", cpSignTrainModelPathFunc)
+			cpSignTrain.SetPathCustom("logfile", func(t *sp.Task) string {
+				return cpSignTrainModelPathFunc(t) + ".cpsign.train.log"
 			})
 			if *runSlurm {
 				cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + uniqStrGeneRepl // SLURM string
