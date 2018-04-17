@@ -28,6 +28,10 @@ Experiment Journal
       after fixing validity->accuracy name change
 - [x] Add `--logfile` lines for each cpsign call
 - [x] Fix bug: Filled-up dataset should go to proper-train, not the other way around
+- [x] Fix further bug: *only* the assumed negatives should go to
+      proper-train, not together with the original data
+      - Including upgrade to CPSign 1.6.12, where Staffan fixed so that proper-train
+        can actually take only non-actives ("N") without complaining.
 - [ ] Add calibration plot
 - [>] Run full workflow *with* fillup (of assumed non-actives)
 - [ ] Figure out if there is something weird with the green line (orig efficiency)

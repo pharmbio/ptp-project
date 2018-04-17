@@ -22,7 +22,7 @@ var (
 	runSlurm = flag.Bool("slurm", false, "Start computationally heavy jobs via SLURM")
 	debug    = flag.Bool("debug", false, "Increase logging level to include DEBUG messages")
 
-	cpSignPath = "../../bin/cpsign-0.6.11.jar"
+	cpSignPath = "../../bin/cpsign-0.6.12.jar"
 	geneSets   = map[string][]string{
 		"bowes44": []string{
 			// Not available in dataset: "CHRNA1".
@@ -153,7 +153,7 @@ func main() {
 		for _, replicate := range replicates {
 			uniqStrGeneRepl := uniqStrGene + "_" + replicate
 
-			var filledUp *sp.OutPort
+			var assumedN *sp.OutPort
 
 			if doFillUp {
 				sp.Audit.Printf("Filling up dataset with assumed negatives, for gene %s ...\n", geneUppercase)
@@ -181,24 +181,25 @@ func main() {
 				extractAssumedNonBinding.ParamInPort("gene").ConnectStr(geneUppercase)
 				extractAssumedNonBinding.ParamInPort("replicate").ConnectStr(replicate)
 				extractAssumedNonBinding.In("randsrc").Connect(genRandomProcs[genRandomID].Out("rand"))
+				assumedN = extractAssumedNonBinding.Out("assumed_n")
 
 				// --------------------
-				fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGeneRepl, `cat {i:targetdata} {i:assumed_n} > {o:filledup} # gene:{p:gene} replicate:{p:replicate}`)
-				fillAssumedNonbinding.SetPathCustom("filledup", func(t *sp.Task) string {
-					geneLC := str.ToLower(t.Param("gene"))
-					return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + filepath.Base(t.InIP("targetdata").Path()) + "." + t.Param("replicate") + ".fill_assumed_n" + ".tsv"
-				})
-				fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
-				fillAssumedNonbinding.In("assumed_n").Connect(extractAssumedNonBinding.Out("assumed_n"))
-				fillAssumedNonbinding.ParamInPort("gene").ConnectStr(geneUppercase)
-				fillAssumedNonbinding.ParamInPort("replicate").ConnectStr(replicate)
-				filledUp = fillAssumedNonbinding.Out("filledup")
+				//fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGeneRepl, `cat {i:targetdata} {i:assumed_n} > {o:filledup} # gene:{p:gene} replicate:{p:replicate}`)
+				//fillAssumedNonbinding.SetPathCustom("filledup", func(t *sp.Task) string {
+				//	geneLC := str.ToLower(t.Param("gene"))
+				//	return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + filepath.Base(t.InIP("targetdata").Path()) + "." + t.Param("replicate") + ".fill_assumed_n" + ".tsv"
+				//})
+				//fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
+				//fillAssumedNonbinding.In("assumed_n").Connect(extractAssumedNonBinding.Out("assumed_n"))
+				//fillAssumedNonbinding.ParamInPort("gene").ConnectStr(geneUppercase)
+				//fillAssumedNonbinding.ParamInPort("replicate").ConnectStr(replicate)
+				//filledUp = fillAssumedNonbinding.Out("filledup")
 			}
 
 			if replicate == "r1" {
 				countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, `awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' {i:targetdata} > {o:count} # {p:gene}`)
 				countProcs[geneLowerCase].SetPathExtend("targetdata", "count", ".count")
-				countProcs[geneLowerCase].In("targetdata").Connect(filledUp)
+				countProcs[geneLowerCase].In("targetdata").Connect(assumedN)
 				countProcs[geneLowerCase].ParamInPort("gene").ConnectStr(geneUppercase)
 			}
 
@@ -220,7 +221,7 @@ func main() {
 			cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrGeneRepl, cpSignPrecompCmd)
 			cpSignPrecomp.In("traindata").Connect(extractTargetData.Out("target_data"))
 			if doFillUp {
-				cpSignPrecomp.In("propertraindata").Connect(filledUp)
+				cpSignPrecomp.In("propertraindata").Connect(assumedN)
 			}
 			cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
 			cpSignPrecomp.SetPathExtend("traindata", "logfile", ".precomp.cpsign.precompute.log")
@@ -270,7 +271,7 @@ func main() {
 					return evalCostStatsPathFunc(t) + ".cpsign.crossval.log"
 				})
 				if doFillUp {
-					evalCost.In("propertraindata").Connect(filledUp)
+					evalCost.In("propertraindata").Connect(assumedN)
 				}
 				evalCost.In("traindata").Connect(extractTargetData.Out("target_data"))
 				evalCost.ParamInPort("nrmdl").ConnectStr("10")
