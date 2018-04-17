@@ -1,0 +1,61 @@
+{
+    "ID": "p6uehoayqfwjb3iyn92q",
+    "Command": "Rscript bin/plot_summary.r -i res/final_models_summary.sorted.tsv -o res/final_models_summary.sorted.tsv.plot.png.tmp -f png # ../../raw/pubchem.chembl.dataset4publication_inchi_smiles.ext_gene_smiles_activity.dedup.tsv",
+    "Params": {},
+    "Keys": {},
+    "ExecTimeMS": 315,
+    "Upstream": {
+        "../../raw/pubchem.chembl.dataset4publication_inchi_smiles.ext_gene_smiles_activity.dedup.tsv": {
+            "ID": "eddr33dgymhp8h3oue23",
+            "Command": "awk -F \"\\t\" '(( $1 != p1 ) || ( $2 != p2)) \u0026\u0026 ( c[p1,p2] \u003c= 1 ) \u0026\u0026 ( p1 != \"\" ) \u0026\u0026 ( p2 != \"\" ) { print p1 \"\\t\" p2 \"\\t\" p3 }\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  { c[$1,$2]++; p1 = $1; p2 = $2; p3 = $3 }\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  END { print $1 \"\\t\" $2 \"\\t\" $3 }' \\\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t  ../../raw/pubchem.chembl.dataset4publication_inchi_smiles.ext_gene_smiles_activity.tsv.fifo \u003e ../../raw/pubchem.chembl.dataset4publication_inchi_smiles.ext_gene_smiles_activity.dedup.tsv.tmp",
+            "Params": {},
+            "Keys": {},
+            "ExecTimeMS": 3738354,
+            "Upstream": {
+                "../../raw/pubchem.chembl.dataset4publication_inchi_smiles.ext_gene_smiles_activity.tsv": {
+                    "ID": "9yhsoqf5vevcu5rs8p3m",
+                    "Command": "awk -F \"\\t\" '{ print $9 \"\\t\" $12 \"\\t\" $4 }' ../../raw/pubchem.chembl.dataset4publication_inchi_smiles.tsv | sort -uV \u003e ../../raw/pubchem.chembl.dataset4publication_inchi_smiles.ext_gene_smiles_activity.tsv.fifo",
+                    "Params": {},
+                    "Keys": {},
+                    "ExecTimeMS": 3737114,
+                    "Upstream": {
+                        "../../raw/pubchem.chembl.dataset4publication_inchi_smiles.tsv": {
+                            "ID": "iu52knau1dw81s7oycfn",
+                            "Command": "xzcat ../../raw/pubchem.chembl.dataset4publication_inchi_smiles.tsv.xz \u003e ../../raw/pubchem.chembl.dataset4publication_inchi_smiles.tsv.tmp",
+                            "Params": {},
+                            "Keys": {},
+                            "ExecTimeMS": 93003,
+                            "Upstream": {
+                                "../../raw/pubchem.chembl.dataset4publication_inchi_smiles.tsv.xz": {
+                                    "ID": "",
+                                    "Command": "wget https://zenodo.org/record/173258/files/pubchem.chembl.dataset4publication_inchi_smiles.tsv.xz -O ../../raw/pubchem.chembl.dataset4publication_inchi_smiles.tsv.xz.tmp",
+                                    "Params": {},
+                                    "Keys": {},
+                                    "ExecTimeMS": 25213,
+                                    "Upstream": {}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "res/final_models_summary.sorted.tsv": {
+            "ID": "d330hxoxmpql6u1ffrl8",
+            "Command": "head -n 1 res/final_models_summary.tsv \u003e res/final_models_summary.sorted.tsv.tmp \u0026\u0026 tail -n +2 res/final_models_summary.tsv | sort -nk 16 \u003e\u003e res/final_models_summary.sorted.tsv.tmp",
+            "Params": {},
+            "Keys": {},
+            "ExecTimeMS": 14,
+            "Upstream": {
+                "res/final_models_summary.tsv": {
+                    "ID": "7wq54f3hr8bqvcqhj8zm",
+                    "Command": "",
+                    "Params": {},
+                    "Keys": {},
+                    "ExecTimeMS": -1,
+                    "Upstream": {}
+                }
+            }
+        }
+    }
+}
