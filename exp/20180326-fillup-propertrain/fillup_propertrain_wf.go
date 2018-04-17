@@ -5,6 +5,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -277,7 +278,8 @@ func main() {
 					crossValOuts := &[]cpSignCrossValOutput{}
 					ip.UnMarshalJSON(crossValOuts)
 					for _, crossValOut := range *crossValOuts {
-						if (crossValOut.Confidence - 0.9) < 0.001 {
+						if diff := math.Abs(crossValOut.Confidence - 0.9); diff < 0.001 {
+							newKeys["confidence"] = fmt.Sprintf("%.3f", crossValOut.Confidence)
 							newKeys["accuracy"] = fmt.Sprintf("%.3f", crossValOut.Accuracy)
 							newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
 							newKeys["class_confidence"] = fmt.Sprintf("%.3f", crossValOut.ClassConfidence)
