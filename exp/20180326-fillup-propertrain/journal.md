@@ -27,6 +27,7 @@ Experiment Journal
 - [x] Re-run small datasets downstream of "extract_assumed_n_*" component,
       after fixing validity->accuracy name change
 - [x] Add `--logfile` lines for each cpsign call
+- [x] Fix bug: Filled-up dataset should go to proper-train, not the other way around
 - [ ] Add calibration plot
 - [>] Run full workflow *with* fillup (of assumed non-actives)
 - [ ] Figure out if there is something weird with the green line (orig efficiency)

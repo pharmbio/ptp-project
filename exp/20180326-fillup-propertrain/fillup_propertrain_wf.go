@@ -153,7 +153,7 @@ func main() {
 		for _, replicate := range replicates {
 			uniqStrGeneRepl := uniqStrGene + "_" + replicate
 
-			var targetDataPort *sp.OutPort
+			var filledUp *sp.OutPort
 
 			if doFillUp {
 				sp.Audit.Printf("Filling up dataset with assumed negatives, for gene %s ...\n", geneUppercase)
@@ -192,33 +192,36 @@ func main() {
 				fillAssumedNonbinding.In("assumed_n").Connect(extractAssumedNonBinding.Out("assumed_n"))
 				fillAssumedNonbinding.ParamInPort("gene").ConnectStr(geneUppercase)
 				fillAssumedNonbinding.ParamInPort("replicate").ConnectStr(replicate)
-				targetDataPort = fillAssumedNonbinding.Out("filledup")
-			} else {
-				targetDataPort = extractTargetData.Out("target_data")
+				filledUp = fillAssumedNonbinding.Out("filledup")
 			}
 
 			if replicate == "r1" {
 				countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, `awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' {i:targetdata} > {o:count} # {p:gene}`)
 				countProcs[geneLowerCase].SetPathExtend("targetdata", "count", ".count")
-				countProcs[geneLowerCase].In("targetdata").Connect(targetDataPort)
+				countProcs[geneLowerCase].In("targetdata").Connect(filledUp)
 				countProcs[geneLowerCase].ParamInPort("gene").ConnectStr(geneUppercase)
 			}
 
 			// --------------------------------------------------------------------------------
 			// Pre-compute step
 			// --------------------------------------------------------------------------------
-			cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrGeneRepl,
-				`java -jar `+cpSignPath+` precompute \
+			cpSignPrecompCmd := `java -jar ` + cpSignPath + ` precompute \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
-									--proper-trainfile {i:propertraindata} \
 									--trainfile {i:traindata} \
 									--labels A, N \
 									--model-out {o:precomp} \
-									--model-name "`+geneUppercase+`" \
-									--logfile {o:logfile}`)
-			cpSignPrecomp.In("traindata").Connect(targetDataPort)
-			cpSignPrecomp.In("propertraindata").Connect(extractTargetData.Out("target_data"))
+									--model-name "` + geneUppercase + `" \
+									--logfile {o:logfile}`
+			if doFillUp {
+				cpSignPrecompCmd += ` \
+									--proper-trainfile {i:propertraindata}`
+			}
+			cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrGeneRepl, cpSignPrecompCmd)
+			cpSignPrecomp.In("traindata").Connect(extractTargetData.Out("target_data"))
+			if doFillUp {
+				cpSignPrecomp.In("propertraindata").Connect(filledUp)
+			}
 			cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
 			cpSignPrecomp.SetPathExtend("traindata", "logfile", ".precomp.cpsign.precompute.log")
 			if *runSlurm {
@@ -237,10 +240,9 @@ func main() {
 			for _, cost := range costVals {
 				uniqStrCost := uniqStrGeneRepl + "_" + cost
 				// If Liblinear
-				evalCost := wf.NewProc("crossval_"+uniqStrCost, `java -jar `+cpSignPath+` crossvalidate \
+				evalCostCmd := `java -jar ` + cpSignPath + ` crossvalidate \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
-									--proper-trainfile {i:propertraindata} \
 									--trainfile {i:traindata} \
 									--impl liblinear \
 									--labels A, N \
@@ -248,8 +250,14 @@ func main() {
 									--cost {p:cost} \
 									--cv-folds {p:cvfolds} \
 									--output-format json \
-									--logfile {o:logfile} \
-									--confidences "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:replicate}`)
+									--logfile {o:logfile}`
+				if doFillUp {
+					evalCostCmd += ` \
+									--proper-trainfile {i:propertraindata}`
+				}
+				evalCostCmd += ` \
+									--confidences "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:replicate}`
+				evalCost := wf.NewProc("crossval_"+uniqStrCost, evalCostCmd)
 				evalCostStatsPathFunc := func(t *sp.Task) string {
 					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 					sp.Check(err)
@@ -261,8 +269,10 @@ func main() {
 				evalCost.SetPathCustom("logfile", func(t *sp.Task) string {
 					return evalCostStatsPathFunc(t) + ".cpsign.crossval.log"
 				})
-				evalCost.In("propertraindata").Connect(extractTargetData.Out("target_data"))
-				evalCost.In("traindata").Connect(targetDataPort)
+				if doFillUp {
+					evalCost.In("propertraindata").Connect(filledUp)
+				}
+				evalCost.In("traindata").Connect(extractTargetData.Out("target_data"))
 				evalCost.ParamInPort("nrmdl").ConnectStr("10")
 				evalCost.ParamInPort("cvfolds").ConnectStr("10")
 				evalCost.ParamInPort("confidences").ConnectStr("0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95")
