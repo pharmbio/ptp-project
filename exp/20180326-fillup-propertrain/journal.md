@@ -33,8 +33,9 @@ Experiment Journal
       - Including upgrade to CPSign 1.6.12, where Staffan fixed so that proper-train
         can actually take only non-actives ("N") without complaining.
 - [x] Fix bug: Should count (orig) targetdata + assumed_n
-- [ ] Add calibration plot
+- [x] Re-run on small datasets, after bugfixes
 - [>] Run full workflow *with* fillup (of assumed non-actives)
+- [ ] Add calibration plot
 - [ ] Figure out if there is something weird with the green line (orig efficiency)
 - [ ] Check up more about PROV and if we should adapt to it
 - [ ] Run full workflow *without* fillup (of assumed non-actives)
