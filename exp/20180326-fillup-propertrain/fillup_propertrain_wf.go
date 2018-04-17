@@ -263,7 +263,7 @@ func main() {
 					sp.Check(err)
 					gene := str.ToLower(t.Param("gene"))
 					repl := t.Param("replicate")
-					return filepath.Dir(t.InPath("traindata")) + "/" + fmt.Sprintf("%s.%s.liblin_c%03d", gene, repl, c) + "_crossval_stats.json"
+					return filepath.Dir(t.InPath("traindata")) + "/" + repl + "/" + fmt.Sprintf("%s.%s.liblin_c%03d", gene, repl, c) + "_crossval_stats.json"
 				}
 				evalCost.SetPathCustom("stats", evalCostStatsPathFunc)
 				evalCost.SetPathCustom("logfile", func(t *sp.Task) string {
