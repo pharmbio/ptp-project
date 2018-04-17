@@ -27,6 +27,7 @@ Experiment Journal
 - [x] Re-run small datasets downstream of "extract_assumed_n_*" component,
       after fixing validity->accuracy name change
 - [x] Add `--logfile` lines for each cpsign call
+- [ ] Add calibration plot
 - [>] Run full workflow *with* fillup (of assumed non-actives)
 - [ ] Figure out if there is something weird with the green line (orig efficiency)
 - [ ] Check up more about PROV and if we should adapt to it
