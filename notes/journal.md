@@ -256,7 +256,7 @@ We looked at this plot, based on the latest UPPMAX run:
 Participating: Ola, Jonathan, Staffan, Samuel
 
 - Samuel: Tried running with replicates now, and with the new efficiency measure.
-  - [ ] Ola: Let's plot the new observed fuzziness score both with and without
+  - [x] Ola: Let's plot the new observed fuzziness score both with and without
     the class-averaging (Samuel).
 - Samuel: We found some inconsistencies in the data.
   - [ ] Needs more investigation as to whether it is like this in the original

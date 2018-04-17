@@ -79,7 +79,7 @@ legend("bottomright",
 sort_vector_totcounts <- aggregate(d$TotalCnt, by=list(Gene = d$Gene), FUN=median)
 
 # --------------------------------------------------------------------------------
-# Plot observed fuzziness
+# Plot observed fuzziness (Class-Averaged)
 # --------------------------------------------------------------------------------
 par(new=TRUE)
 plot(bplt, 1-drepl$r1$ObsFuzzClassAvg, type="p", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
@@ -93,6 +93,23 @@ par(new=TRUE);
 plot(bplt, 1-ofca_median$x, type="l", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 axis(4, las=2, col="blue", col.axis="blue", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
 mtext("Class-averaged Observed Fuzziness", side=4, line=4.8, col="blue")
+# --------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------
+# Plot observed fuzziness (Overall)
+# --------------------------------------------------------------------------------
+par(new=TRUE)
+plot(bplt, 1-drepl$r1$ObsFuzzOverall, type="p", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+par(new=TRUE);
+plot(bplt, 1-drepl$r2$ObsFuzzOverall, type="p", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+par(new=TRUE);
+plot(bplt, 1-drepl$r3$ObsFuzzOverall, type="p", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+ofca_median <- aggregate(d$ObsFuzzOverall, by=list(Gene = d$Gene), FUN=median)
+ofca_median <- ofca_median[order(sort_vector_totcounts$x),]
+par(new=TRUE);
+plot(bplt, 1-ofca_median$x, type="l", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+axis(4, las=2, col="#0099FF", col.axis="#0099FF", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
+mtext("Observed Fuzziness (Overall)", side=4, line=3.6, col="#0099FF")
 # --------------------------------------------------------------------------------
 
 
@@ -128,7 +145,7 @@ exectime_median <- exectime_median[order(sort_vector_totcounts$x),]
 par(new=TRUE);
 plot(bplt, exectime_median$x/(1000*60), type="l", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
 axis(4, las=2, col="white", col.axis="red", col.ticks="red", at=c(1,30,60), labels=c("1 min", "30 min", "1 h"));
-mtext("Training time (min)", side=4, line=3.6, col="red")
+mtext("Training time (min)", side=4, line=2.4, col="red")
 # --------------------------------------------------------------------------------
 
 
