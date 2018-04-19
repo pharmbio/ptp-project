@@ -131,83 +131,99 @@ func main() {
 
 	genRandomProcs := map[string]*sp.Process{}
 
-	// --------------------------------
-	// Set up gene-specific workflow branches
-	// --------------------------------
-	for _, geneUppercase := range geneSets[*geneSet] {
-		doFillUp := strInSlice(geneUppercase, geneSets["bowes44min100percls_small"])
+	runSets := []string{"orig", "fill"}
+	for _, runSet := range runSets {
 
-		geneLowerCase := str.ToLower(geneUppercase)
-		uniqStrGene := geneLowerCase
+		// --------------------------------
+		// Set up gene-specific workflow branches
+		// --------------------------------
+		for _, geneUppercase := range geneSets[*geneSet] {
+			doFillUp := false
+			if runSet == "fill" {
+				doFillUp = true
+			}
 
-		// extractTargetData extract all data for the specific target, into a separate file
-		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk -F"\t" '$1 == "{p:gene}" { print $2"\t"$3 }' {i:raw_data} > {o:target_data}`)
-		extractTargetData.ParamInPort("gene").ConnectStr(geneUppercase)
-		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLowerCase, geneLowerCase))
-		extractTargetData.In("raw_data").Connect(removeConflicting.Out("gene_smiles_activity"))
-		if *runSlurm {
-			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_extract_" + geneLowerCase // SLURM string
-		}
+			geneLowerCase := str.ToLower(geneUppercase)
+			uniqStrGene := runSet + "_" + geneLowerCase
 
-		countProcs := map[string]*sp.Process{}
-		for _, replicate := range replicates {
-			uniqStrGeneRepl := uniqStrGene + "_" + replicate
+			// extractTargetData extract all data for the specific target, into a separate file
+			extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk -F"\t" '$1 == "{p:gene}" { print $2"\t"$3 }' {i:raw_data} > {o:target_data}`)
+			extractTargetData.ParamInPort("gene").ConnectStr(geneUppercase)
+			extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLowerCase, geneLowerCase))
+			extractTargetData.In("raw_data").Connect(removeConflicting.Out("gene_smiles_activity"))
+			if *runSlurm {
+				extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_extract_" + geneLowerCase // SLURM string
+			}
 
-			var assumedNonActive *sp.OutPort
+			countProcs := map[string]*sp.Process{}
+			for _, replicate := range replicates {
+				uniqStrRepl := uniqStrGene + "_" + replicate
 
-			if doFillUp {
-				sp.Audit.Printf("Filling up dataset with assumed negatives, for gene %s ...\n", geneUppercase)
-				genRandomID := "create_random_bytes_" + replicate
-				if _, ok := genRandomProcs[genRandomID]; !ok {
-					genRandomProcs[genRandomID] = wf.NewProc(genRandomID, "dd if=/dev/urandom of={o:rand} bs=1048576 count=1024")
-				}
-				genRandomProcs[genRandomID].SetPathStatic("rand", "dat/"+replicate+"_random_bytes.bin")
+				var assumedNonActive *sp.OutPort
 
-				// Here we fill up TO the double amount of non-actives compared
-				// to number of actives, by multiplying the number of actives
-				// times two, and subtracting the number of existing
-				// non-actices (See "A*2-N" in the AWK-script below).
-				extractAssumedNonBinding := wf.NewProc("extract_assumed_n_"+uniqStrGeneRepl, `
+				if doFillUp {
+					sp.Audit.Printf("Filling up dataset with assumed negatives, for gene %s ...\n", geneUppercase)
+					genRandomID := "create_random_bytes_" + replicate
+					if _, ok := genRandomProcs[genRandomID]; !ok {
+						genRandomProcs[genRandomID] = wf.NewProc(genRandomID, "dd if=/dev/urandom of={o:rand} bs=1048576 count=1024")
+					}
+					genRandomProcs[genRandomID].SetPathStatic("rand", "dat/"+replicate+"_random_bytes.bin")
+
+					// Here we fill up TO the double amount of non-actives compared
+					// to number of actives, by multiplying the number of actives
+					// times two, and subtracting the number of existing
+					// non-actices (See "A*2-N" in the AWK-script below).
+					extractAssumedNonBinding := wf.NewProc("extract_assumed_n_"+uniqStrRepl, `
 					let "fillup_lines_cnt = "$(awk -F"\t" '$2 == "A" { A += 1 } $2 == "N" { N += 1 } END { print A*2-N }' {i:targetdata}) \
 					&& awk -F"\t" 'FNR==NR{target_smiles[$1]; next} ($1 != "{p:gene}") && !($2 in target_smiles) { print $2 "\tN" }' {i:targetdata} {i:rawdata} \
 					| sort -uV \
 					| shuf --random-source={i:randsrc} -n $fillup_lines_cnt > {o:assumed_n} # replicate:{p:replicate}`)
-				extractAssumedNonBinding.SetPathCustom("assumed_n", func(t *sp.Task) string {
-					geneLC := str.ToLower(t.Param("gene"))
-					return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + geneLC + "." + t.Param("replicate") + ".assumed_n.tsv"
-				})
-				extractAssumedNonBinding.In("rawdata").Connect(removeConflicting.Out("gene_smiles_activity"))
-				extractAssumedNonBinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
-				extractAssumedNonBinding.ParamInPort("gene").ConnectStr(geneUppercase)
-				extractAssumedNonBinding.ParamInPort("replicate").ConnectStr(replicate)
-				extractAssumedNonBinding.In("randsrc").Connect(genRandomProcs[genRandomID].Out("rand"))
-				assumedNonActive = extractAssumedNonBinding.Out("assumed_n")
+					extractAssumedNonBinding.SetPathCustom("assumed_n", func(t *sp.Task) string {
+						geneLC := str.ToLower(t.Param("gene"))
+						return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + geneLC + "." + t.Param("replicate") + ".assumed_n.tsv"
+					})
+					extractAssumedNonBinding.In("rawdata").Connect(removeConflicting.Out("gene_smiles_activity"))
+					extractAssumedNonBinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
+					extractAssumedNonBinding.ParamInPort("gene").ConnectStr(geneUppercase)
+					extractAssumedNonBinding.ParamInPort("replicate").ConnectStr(replicate)
+					extractAssumedNonBinding.In("randsrc").Connect(genRandomProcs[genRandomID].Out("rand"))
+					assumedNonActive = extractAssumedNonBinding.Out("assumed_n")
 
-				// --------------------
-				//fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGeneRepl, `cat {i:targetdata} {i:assumed_n} > {o:filledup} # gene:{p:gene} replicate:{p:replicate}`)
-				//fillAssumedNonbinding.SetPathCustom("filledup", func(t *sp.Task) string {
-				//	geneLC := str.ToLower(t.Param("gene"))
-				//	return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + filepath.Base(t.InIP("targetdata").Path()) + "." + t.Param("replicate") + ".fill_assumed_n" + ".tsv"
-				//})
-				//fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
-				//fillAssumedNonbinding.In("assumed_n").Connect(extractAssumedNonBinding.Out("assumed_n"))
-				//fillAssumedNonbinding.ParamInPort("gene").ConnectStr(geneUppercase)
-				//fillAssumedNonbinding.ParamInPort("replicate").ConnectStr(replicate)
-				//filledUp = fillAssumedNonbinding.Out("filledup")
-			}
+					// --------------------
+					//fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrRepl , `cat {i:targetdata} {i:assumed_n} > {o:filledup} # gene:{p:gene} replicate:{p:replicate}`)
+					//fillAssumedNonbinding.SetPathCustom("filledup", func(t *sp.Task) string {
+					//	geneLC := str.ToLower(t.Param("gene"))
+					//	return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + filepath.Base(t.InIP("targetdata").Path()) + "." + t.Param("replicate") + ".fill_assumed_n" + ".tsv"
+					//})
+					//fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
+					//fillAssumedNonbinding.In("assumed_n").Connect(extractAssumedNonBinding.Out("assumed_n"))
+					//fillAssumedNonbinding.ParamInPort("gene").ConnectStr(geneUppercase)
+					//fillAssumedNonbinding.ParamInPort("replicate").ConnectStr(replicate)
+					//filledUp = fillAssumedNonbinding.Out("filledup")
+				}
 
-			if replicate == "r1" {
-				countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, `cat {i:targetdata} {i:assumed_n} | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:gene}`)
-				countProcs[geneLowerCase].SetPathExtend("targetdata", "count", ".count")
-				countProcs[geneLowerCase].In("targetdata").Connect(extractTargetData.Out("target_data"))
-				countProcs[geneLowerCase].In("assumed_n").Connect(assumedNonActive)
-				countProcs[geneLowerCase].ParamInPort("gene").ConnectStr(geneUppercase)
-			}
+				if replicate == "r1" {
+					catPart := `cat {i:targetdata}`
+					if doFillUp {
+						catPart = `cat {i:targetdata} {i:assumed_n}`
+					}
+					countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, catPart+` | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:runset} {p:gene}`)
+					//countProcs[geneLowerCase].SetPathExtend("targetdata", "count", ".count")
+					countProcs[geneLowerCase].SetPathCustom("count", func(t *sp.Task) string {
+						return "dat/" + t.Param("runset") + "/" + str.ToLower(t.Param("gene")) + "." + t.Param("replicate") + ".cnt"
+					})
+					countProcs[geneLowerCase].In("targetdata").Connect(extractTargetData.Out("target_data"))
+					if doFillUp {
+						countProcs[geneLowerCase].In("assumed_n").Connect(assumedNonActive)
+					}
+					countProcs[geneLowerCase].ParamInPort("runset").ConnectStr(runSet)
+					countProcs[geneLowerCase].ParamInPort("gene").ConnectStr(geneUppercase)
+				}
 
-			// --------------------------------------------------------------------------------
-			// Pre-compute step
-			// --------------------------------------------------------------------------------
-			cpSignPrecompCmd := `java -jar ` + cpSignPath + ` precompute \
+				// --------------------------------------------------------------------------------
+				// Pre-compute step
+				// --------------------------------------------------------------------------------
+				cpSignPrecompCmd := `java -jar ` + cpSignPath + ` precompute \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
 									--trainfile {i:traindata} \
@@ -215,34 +231,34 @@ func main() {
 									--model-out {o:precomp} \
 									--model-name "` + geneUppercase + `" \
 									--logfile {o:logfile}`
-			if doFillUp {
-				cpSignPrecompCmd += ` \
+				if doFillUp {
+					cpSignPrecompCmd += ` \
 									--proper-trainfile {i:propertraindata}`
-			}
-			cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrGeneRepl, cpSignPrecompCmd)
-			cpSignPrecomp.In("traindata").Connect(extractTargetData.Out("target_data"))
-			if doFillUp {
-				cpSignPrecomp.In("propertraindata").Connect(assumedNonActive)
-			}
-			cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
-			cpSignPrecomp.SetPathExtend("traindata", "logfile", ".precomp.cpsign.precompute.log")
-			if *runSlurm {
-				cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLowerCase // SLURM string
-			}
+				}
+				cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrRepl, cpSignPrecompCmd)
+				cpSignPrecomp.In("traindata").Connect(extractTargetData.Out("target_data"))
+				if doFillUp {
+					cpSignPrecomp.In("propertraindata").Connect(assumedNonActive)
+				}
+				cpSignPrecomp.SetPathExtend("traindata", "precomp", "."+runSet+".precomp")
+				cpSignPrecomp.SetPathExtend("traindata", "logfile", ".precomp.cpsign.precompute.log")
+				if *runSlurm {
+					cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLowerCase // SLURM string
+				}
 
-			// --------------------------------------------------------------------------------
-			// Optimize cost/gamma-step
-			// --------------------------------------------------------------------------------
-			includeGamma := false // For liblinear
-			summarize := NewSummarizeCostGammaPerf(wf,
-				"summarize_cost_gamma_perf_"+uniqStrGeneRepl,
-				"dat/"+geneLowerCase+"/"+replicate+"/"+geneLowerCase+"_cost_gamma_perf_stats.tsv",
-				includeGamma)
+				// --------------------------------------------------------------------------------
+				// Optimize cost/gamma-step
+				// --------------------------------------------------------------------------------
+				includeGamma := false // For liblinear
+				summarize := NewSummarizeCostGammaPerf(wf,
+					"summarize_cost_gamma_perf_"+uniqStrRepl,
+					"dat/"+runSet+"/"+geneLowerCase+"/"+replicate+"/"+geneLowerCase+"_cost_gamma_perf_stats.tsv",
+					includeGamma)
 
-			for _, cost := range costVals {
-				uniqStrCost := uniqStrGeneRepl + "_" + cost
-				// If Liblinear
-				evalCostCmd := `java -jar ` + cpSignPath + ` crossvalidate \
+				for _, cost := range costVals {
+					uniqStrCost := uniqStrRepl + "_" + cost
+					// If Liblinear
+					evalCostCmd := `java -jar ` + cpSignPath + ` crossvalidate \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
 									--trainfile {i:traindata} \
@@ -253,76 +269,75 @@ func main() {
 									--cv-folds {p:cvfolds} \
 									--output-format json \
 									--logfile {o:logfile}`
-				if doFillUp {
-					evalCostCmd += ` \
+					if doFillUp {
+						evalCostCmd += ` \
 									--proper-trainfile {i:propertraindata}`
-				}
-				evalCostCmd += ` \
-									--confidences "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:replicate}`
-				evalCost := wf.NewProc("crossval_"+uniqStrCost, evalCostCmd)
-				evalCostStatsPathFunc := func(t *sp.Task) string {
-					c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
-					sp.Check(err)
-					gene := str.ToLower(t.Param("gene"))
-					repl := t.Param("replicate")
-					return filepath.Dir(t.InPath("traindata")) + "/" + repl + "/" + fmt.Sprintf("%s.%s.liblin_c%03d", gene, repl, c) + "_crossval_stats.json"
-				}
-				evalCost.SetPathCustom("stats", evalCostStatsPathFunc)
-				evalCost.SetPathCustom("logfile", func(t *sp.Task) string {
-					return evalCostStatsPathFunc(t) + ".cpsign.crossval.log"
-				})
-				if doFillUp {
-					evalCost.In("propertraindata").Connect(assumedNonActive)
-				}
-				evalCost.In("traindata").Connect(extractTargetData.Out("target_data"))
-				evalCost.ParamInPort("nrmdl").ConnectStr("10")
-				evalCost.ParamInPort("cvfolds").ConnectStr("10")
-				evalCost.ParamInPort("confidences").ConnectStr("0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95")
-				evalCost.ParamInPort("gene").ConnectStr(geneUppercase)
-				evalCost.ParamInPort("replicate").ConnectStr(replicate)
-				evalCost.ParamInPort("cost").ConnectStr(cost)
-				if *runSlurm {
-					evalCost.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + uniqStrCost // SLURM string
-				}
-
-				extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniqStrCost, func(ip *sp.FileIP) map[string]string {
-					newKeys := map[string]string{}
-					crossValOuts := &[]cpSignCrossValOutput{}
-					ip.UnMarshalJSON(crossValOuts)
-					for _, crossValOut := range *crossValOuts {
-						if diff := math.Abs(crossValOut.Confidence - 0.9); diff < 0.001 {
-							newKeys["confidence"] = fmt.Sprintf("%.3f", crossValOut.Confidence)
-							newKeys["accuracy"] = fmt.Sprintf("%.3f", crossValOut.Accuracy)
-							newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
-							newKeys["class_confidence"] = fmt.Sprintf("%.3f", crossValOut.ClassConfidence)
-							newKeys["class_credibility"] = fmt.Sprintf("%.3f", crossValOut.ClassCredibility)
-							newKeys["obsfuzz_active"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Active)
-							newKeys["obsfuzz_nonactive"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Nonactive)
-							newKeys["obsfuzz_overall"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Overall)
-						}
 					}
-					return newKeys
-				})
-				extractCostGammaStats.In().Connect(evalCost.Out("stats"))
+					evalCostCmd += ` \
+									--confidences "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:replicate}`
+					evalCost := wf.NewProc("crossval_"+uniqStrCost, evalCostCmd)
+					evalCostStatsPathFunc := func(t *sp.Task) string {
+						c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
+						sp.Check(err)
+						gene := str.ToLower(t.Param("gene"))
+						repl := t.Param("replicate")
+						return filepath.Dir(t.InPath("traindata")) + "/" + runSet + "/" + repl + "/" + fmt.Sprintf("%s.%s.liblin_c%03d", gene, repl, c) + "_crossval_stats.json"
+					}
+					evalCost.SetPathCustom("stats", evalCostStatsPathFunc)
+					evalCost.SetPathCustom("logfile", func(t *sp.Task) string {
+						return evalCostStatsPathFunc(t) + ".cpsign.crossval.log"
+					})
+					if doFillUp {
+						evalCost.In("propertraindata").Connect(assumedNonActive)
+					}
+					evalCost.In("traindata").Connect(extractTargetData.Out("target_data"))
+					evalCost.ParamInPort("nrmdl").ConnectStr("10")
+					evalCost.ParamInPort("cvfolds").ConnectStr("10")
+					evalCost.ParamInPort("confidences").ConnectStr("0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95")
+					evalCost.ParamInPort("gene").ConnectStr(geneUppercase)
+					evalCost.ParamInPort("replicate").ConnectStr(replicate)
+					evalCost.ParamInPort("cost").ConnectStr(cost)
+					if *runSlurm {
+						evalCost.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + uniqStrCost // SLURM string
+					}
 
-				summarize.In().Connect(extractCostGammaStats.Out())
-			} // end for cost
+					extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniqStrCost, func(ip *sp.FileIP) map[string]string {
+						newKeys := map[string]string{}
+						crossValOuts := &[]cpSignCrossValOutput{}
+						ip.UnMarshalJSON(crossValOuts)
+						for _, crossValOut := range *crossValOuts {
+							if diff := math.Abs(crossValOut.Confidence - 0.9); diff < 0.001 {
+								newKeys["confidence"] = fmt.Sprintf("%.3f", crossValOut.Confidence)
+								newKeys["accuracy"] = fmt.Sprintf("%.3f", crossValOut.Accuracy)
+								newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
+								newKeys["class_confidence"] = fmt.Sprintf("%.3f", crossValOut.ClassConfidence)
+								newKeys["class_credibility"] = fmt.Sprintf("%.3f", crossValOut.ClassCredibility)
+								newKeys["obsfuzz_active"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Active)
+								newKeys["obsfuzz_nonactive"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Nonactive)
+								newKeys["obsfuzz_overall"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Overall)
+							}
+						}
+						return newKeys
+					})
+					extractCostGammaStats.In().Connect(evalCost.Out("stats"))
 
-			// TODO: Let select best operate directly on the stream of IPs, not
-			// via the summarize component, so that we can retain the keys in
-			// the IP!
-			selectBest := NewBestCostGamma(wf,
-				"select_best_cost_gamma_"+uniqStrGeneRepl,
-				'\t',
-				false,
-				includeGamma)
-			selectBest.InCSVFile().Connect(summarize.OutStats())
+					summarize.In().Connect(extractCostGammaStats.Out())
+				} // end for cost
 
-			// --------------------------------------------------------------------------------
-			// Train step
-			// --------------------------------------------------------------------------------
-			cpSignTrain := wf.NewProc("cpsign_train_"+uniqStrGeneRepl,
-				`java -jar `+cpSignPath+` train \
+				// TODO: Let select best operate directly on the stream of IPs, not
+				// via the summarize component, so that we can retain the keys in
+				// the IP!
+				selectBest := NewBestCostGamma(wf,
+					"select_best_cost_gamma_"+uniqStrRepl,
+					'\t',
+					false, includeGamma)
+				selectBest.InCSVFile().Connect(summarize.OutStats())
+
+				// --------------------------------------------------------------------------------
+				// Train step
+				// --------------------------------------------------------------------------------
+				cpSignTrain := wf.NewProc("cpsign_train_"+uniqStrRepl,
+					`java -jar `+cpSignPath+` train \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
 									--modelfile {i:model} \
@@ -333,40 +348,42 @@ func main() {
 									--model-out {o:model} \
 									--logfile {o:logfile} \
 									--model-name "{p:gene} target profile" # {p:replicate} Accuracy: {p:accuracy} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
-			cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
-			cpSignTrain.ParamInPort("nrmdl").ConnectStr("10")
-			cpSignTrain.ParamInPort("gene").ConnectStr(geneUppercase)
-			cpSignTrain.ParamInPort("replicate").ConnectStr(replicate)
-			cpSignTrain.ParamInPort("accuracy").Connect(selectBest.OutBestAccuracy())
-			cpSignTrain.ParamInPort("efficiency").Connect(selectBest.OutBestEfficiency())
-			cpSignTrain.ParamInPort("obsfuzz_classavg").Connect(selectBest.OutBestObsFuzzClassAvg())
-			cpSignTrain.ParamInPort("obsfuzz_overall").Connect(selectBest.OutBestObsFuzzOverall())
-			cpSignTrain.ParamInPort("obsfuzz_active").Connect(selectBest.OutBestObsFuzzActive())
-			cpSignTrain.ParamInPort("obsfuzz_nonactive").Connect(selectBest.OutBestObsFuzzNonactive())
-			cpSignTrain.ParamInPort("class_confidence").Connect(selectBest.OutBestClassConfidence())
-			cpSignTrain.ParamInPort("class_credibility").Connect(selectBest.OutBestClassCredibility())
-			cpSignTrain.ParamInPort("cost").Connect(selectBest.OutBestCost())
-			cpSignTrainModelPathFunc := func(t *sp.Task) string {
-				return fmt.Sprintf("dat/final_models/%s/%s_%s_c%s_nrmdl%s_%s.mdl.jar",
-					str.ToLower(t.Param("gene")),
-					str.ToLower(t.Param("gene")),
-					"liblin",
-					t.Param("cost"),
-					t.Param("nrmdl"),
-					t.Param("replicate"))
-			}
-			cpSignTrain.SetPathCustom("model", cpSignTrainModelPathFunc)
-			cpSignTrain.SetPathCustom("logfile", func(t *sp.Task) string {
-				return cpSignTrainModelPathFunc(t) + ".cpsign.train.log"
-			})
-			if *runSlurm {
-				cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + uniqStrGeneRepl // SLURM string
-			}
+				cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
+				cpSignTrain.ParamInPort("nrmdl").ConnectStr("10")
+				cpSignTrain.ParamInPort("gene").ConnectStr(geneUppercase)
+				cpSignTrain.ParamInPort("replicate").ConnectStr(replicate)
+				cpSignTrain.ParamInPort("accuracy").Connect(selectBest.OutBestAccuracy())
+				cpSignTrain.ParamInPort("efficiency").Connect(selectBest.OutBestEfficiency())
+				cpSignTrain.ParamInPort("obsfuzz_classavg").Connect(selectBest.OutBestObsFuzzClassAvg())
+				cpSignTrain.ParamInPort("obsfuzz_overall").Connect(selectBest.OutBestObsFuzzOverall())
+				cpSignTrain.ParamInPort("obsfuzz_active").Connect(selectBest.OutBestObsFuzzActive())
+				cpSignTrain.ParamInPort("obsfuzz_nonactive").Connect(selectBest.OutBestObsFuzzNonactive())
+				cpSignTrain.ParamInPort("class_confidence").Connect(selectBest.OutBestClassConfidence())
+				cpSignTrain.ParamInPort("class_credibility").Connect(selectBest.OutBestClassCredibility())
+				cpSignTrain.ParamInPort("cost").Connect(selectBest.OutBestCost())
+				cpSignTrainModelPathFunc := func(t *sp.Task) string {
+					return fmt.Sprintf("dat/final_models/%s/%s/%s_%s_c%s_nrmdl%s_%s.mdl.jar",
+						runSet,
+						str.ToLower(t.Param("gene")),
+						str.ToLower(t.Param("gene")),
+						"liblin",
+						t.Param("cost"),
+						t.Param("nrmdl"),
+						t.Param("replicate"))
+				}
+				cpSignTrain.SetPathCustom("model", cpSignTrainModelPathFunc)
+				cpSignTrain.SetPathCustom("logfile", func(t *sp.Task) string {
+					return cpSignTrainModelPathFunc(t) + ".cpsign.train.log"
+				})
+				if *runSlurm {
+					cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + uniqStrRepl // SLURM string
+				}
 
-			finalModelsSummary.InModel().Connect(cpSignTrain.Out("model"))
-		} // end: for replicate
-		finalModelsSummary.InTargetDataCount().Connect(countProcs[geneLowerCase].Out("count"))
-	} // end: for gene
+				finalModelsSummary.InModel().Connect(cpSignTrain.Out("model"))
+			} // end: for replicate
+			finalModelsSummary.InTargetDataCount().Connect(countProcs[geneLowerCase].Out("count"))
+		} // end: for gene
+	}
 
 	sortSummaryOnDataSize := wf.NewProc("sort_summary", "head -n 1 {i:summary} > {o:sorted} && tail -n +2 {i:summary} | sort -nk 16 >> {o:sorted}")
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
