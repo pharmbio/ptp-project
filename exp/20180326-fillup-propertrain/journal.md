@@ -15,7 +15,7 @@ Experiment Journal
     time when running the small targets on cihost. 21 targets x 3 replicates,
     and no empty fillup files this time.
 - [x] Fix minor thing making some file names contain two consecutive dots (`..`).
-- [ ] Figure out why validity is `0.000` in the latest run, and effiency and
+- [x] Figure out why validity is `0.000` in the latest run, and effiency and
   validity a bit too good.
   staffan said:
   > måste ju vara något som inte stämmer. hur kan efficiency och fuzz vara
@@ -34,8 +34,3 @@ Experiment Journal
         can actually take only non-actives ("N") without complaining.
 - [x] Fix bug: Should count (orig) targetdata + assumed_n
 - [x] Re-run on small datasets, after bugfixes
-- [>] Run full workflow *with* fillup (of assumed non-actives)
-- [ ] Add calibration plot
-- [ ] Figure out if there is something weird with the green line (orig efficiency)
-- [ ] Check up more about PROV and if we should adapt to it
-- [ ] Run full workflow *without* fillup (of assumed non-actives)
