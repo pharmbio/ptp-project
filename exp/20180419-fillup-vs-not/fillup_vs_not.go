@@ -153,7 +153,7 @@ func main() {
 		for _, replicate := range replicates {
 			uniqStrGeneRepl := uniqStrGene + "_" + replicate
 
-			var assumedN *sp.OutPort
+			var assumedNonActive *sp.OutPort
 
 			if doFillUp {
 				sp.Audit.Printf("Filling up dataset with assumed negatives, for gene %s ...\n", geneUppercase)
@@ -181,7 +181,7 @@ func main() {
 				extractAssumedNonBinding.ParamInPort("gene").ConnectStr(geneUppercase)
 				extractAssumedNonBinding.ParamInPort("replicate").ConnectStr(replicate)
 				extractAssumedNonBinding.In("randsrc").Connect(genRandomProcs[genRandomID].Out("rand"))
-				assumedN = extractAssumedNonBinding.Out("assumed_n")
+				assumedNonActive = extractAssumedNonBinding.Out("assumed_n")
 
 				// --------------------
 				//fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrGeneRepl, `cat {i:targetdata} {i:assumed_n} > {o:filledup} # gene:{p:gene} replicate:{p:replicate}`)
@@ -200,7 +200,7 @@ func main() {
 				countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, `cat {i:targetdata} {i:assumed_n} | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:gene}`)
 				countProcs[geneLowerCase].SetPathExtend("targetdata", "count", ".count")
 				countProcs[geneLowerCase].In("targetdata").Connect(extractTargetData.Out("target_data"))
-				countProcs[geneLowerCase].In("assumed_n").Connect(assumedN)
+				countProcs[geneLowerCase].In("assumed_n").Connect(assumedNonActive)
 				countProcs[geneLowerCase].ParamInPort("gene").ConnectStr(geneUppercase)
 			}
 
@@ -222,7 +222,7 @@ func main() {
 			cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrGeneRepl, cpSignPrecompCmd)
 			cpSignPrecomp.In("traindata").Connect(extractTargetData.Out("target_data"))
 			if doFillUp {
-				cpSignPrecomp.In("propertraindata").Connect(assumedN)
+				cpSignPrecomp.In("propertraindata").Connect(assumedNonActive)
 			}
 			cpSignPrecomp.SetPathExtend("traindata", "precomp", ".precomp")
 			cpSignPrecomp.SetPathExtend("traindata", "logfile", ".precomp.cpsign.precompute.log")
@@ -272,7 +272,7 @@ func main() {
 					return evalCostStatsPathFunc(t) + ".cpsign.crossval.log"
 				})
 				if doFillUp {
-					evalCost.In("propertraindata").Connect(assumedN)
+					evalCost.In("propertraindata").Connect(assumedNonActive)
 				}
 				evalCost.In("traindata").Connect(extractTargetData.Out("target_data"))
 				evalCost.ParamInPort("nrmdl").ConnectStr("10")
