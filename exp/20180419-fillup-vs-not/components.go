@@ -225,7 +225,7 @@ func (p *BestCostGamma) Run() {
 				sp.Debug.Printf("Proc:%s Raw cost value: %s\n", p.Name(), rec[indexOfStr("Cost", header)])
 				bestCost, err = strconv.ParseInt(rec[indexOfStr("Cost", header)], 10, 0)
 				sp.Debug.Printf("Proc:%s Parsed cost value: %d\n", p.Name(), bestCost)
-				sp.Check(err)
+				sp.CheckWithMsg(err, "Could not parse best cost value")
 
 				if p.IncludeGamma {
 					bestGamma, err = strconv.ParseFloat(rec[indexOfStr("Gamma", header)], 64)
@@ -374,9 +374,10 @@ func (p *FinalModelSummarizer) Run() {
 		strs := str.Split(string(tdip.Read()), "\t")
 		activeStr := str.TrimSuffix(strs[0], "\n")
 		activeCnt, err := strconv.ParseInt(activeStr, 10, 64)
+		sp.CheckWithMsg(err, "Could not parse active count value")
 		nonActiveStr := str.TrimSuffix(strs[1], "\n")
 		nonActiveCnt, err := strconv.ParseInt(nonActiveStr, 10, 64)
-		sp.Check(err)
+		sp.CheckWithMsg(err, "Could not parse non-active count value")
 		activeCounts[gene] = activeCnt
 		nonActiveCounts[gene] = nonActiveCnt
 		totalCompounds[gene] = activeCnt + nonActiveCnt
