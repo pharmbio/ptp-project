@@ -131,33 +131,32 @@ func main() {
 
 	genRandomProcs := map[string]*sp.Process{}
 
-	runSets := []string{"orig", "fill"}
-	for _, runSet := range runSets {
+	// --------------------------------
+	// Set up gene-specific workflow branches
+	// --------------------------------
+	for _, geneUppercase := range geneSets[*geneSet] {
+		geneLowerCase := str.ToLower(geneUppercase)
+		uniqStrGene := geneLowerCase
 
-		// --------------------------------
-		// Set up gene-specific workflow branches
-		// --------------------------------
-		for _, geneUppercase := range geneSets[*geneSet] {
+		// extractTargetData extract all data for the specific target, into a separate file
+		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk -F"\t" '$1 == "{p:gene}" { print $2"\t"$3 }' {i:raw_data} > {o:target_data}`)
+		extractTargetData.ParamInPort("gene").ConnectStr(geneUppercase)
+		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLowerCase, geneLowerCase))
+		extractTargetData.In("raw_data").Connect(removeConflicting.Out("gene_smiles_activity"))
+		if *runSlurm {
+			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_extract_" + geneLowerCase // SLURM string
+		}
+
+		runSets := []string{"orig", "fill"}
+		for _, runSet := range runSets {
 			doFillUp := false
 			if runSet == "fill" {
 				doFillUp = true
 			}
 
-			geneLowerCase := str.ToLower(geneUppercase)
-			uniqStrGene := runSet + "_" + geneLowerCase
-
-			// extractTargetData extract all data for the specific target, into a separate file
-			extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk -F"\t" '$1 == "{p:gene}" { print $2"\t"$3 }' {i:raw_data} > {o:target_data}`)
-			extractTargetData.ParamInPort("gene").ConnectStr(geneUppercase)
-			extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLowerCase, geneLowerCase))
-			extractTargetData.In("raw_data").Connect(removeConflicting.Out("gene_smiles_activity"))
-			if *runSlurm {
-				extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_extract_" + geneLowerCase // SLURM string
-			}
-
 			countProcs := map[string]*sp.Process{}
 			for _, replicate := range replicates {
-				uniqStrRepl := uniqStrGene + "_" + replicate
+				uniqStrRepl := uniqStrGene + "_" + runSet + "_" + replicate
 
 				var assumedNonActive *sp.OutPort
 
@@ -207,7 +206,7 @@ func main() {
 					if doFillUp {
 						catPart = `cat {i:targetdata} {i:assumed_n}`
 					}
-					countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, catPart+` | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:runset} {p:gene} {p:replicate}`)
+					countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrRepl, catPart+` | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:runset} {p:gene} {p:replicate}`)
 					//countProcs[geneLowerCase].SetPathExtend("targetdata", "count", ".count")
 					countProcs[geneLowerCase].SetPathCustom("count", func(t *sp.Task) string {
 						return "dat/" + t.Param("runset") + "/" + str.ToLower(t.Param("gene")) + "." + t.Param("replicate") + ".cnt"
@@ -383,8 +382,8 @@ func main() {
 				finalModelsSummary.InModel().Connect(cpSignTrain.Out("model"))
 			} // end: for replicate
 			finalModelsSummary.InTargetDataCount().Connect(countProcs[geneLowerCase].Out("count"))
-		} // end: for gene
-	}
+		} // end: runset
+	} // end: for gene
 
 	sortSummaryOnDataSize := wf.NewProc("sort_summary", "head -n 1 {i:summary} > {o:sorted} && tail -n +2 {i:summary} | sort -nk 16 >> {o:sorted}")
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
