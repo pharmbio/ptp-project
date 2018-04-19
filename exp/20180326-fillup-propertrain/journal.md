@@ -34,3 +34,5 @@ Experiment Journal
         can actually take only non-actives ("N") without complaining.
 - [x] Fix bug: Should count (orig) targetdata + assumed_n
 - [x] Re-run on small datasets, after bugfixes
+- [x] Figure out if there is something weird with the green line
+  - Seems to be OK now
