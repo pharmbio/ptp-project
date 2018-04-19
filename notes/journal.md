@@ -525,3 +525,37 @@ deployed to the web service, so we know which version is there. Samuel also
 reminded that he will try to put the audit log files into the model files.
 Samuel also realized that he needs to make sure that the audit files contain
 the date and time of when commands were executed.
+
+# Project meeting 2018-04-19
+
+Time: 13:10
+Attending: Ola, Jonathan, Staffan, Samuel (via Hangout)
+
+## Reports
+
+- Staffan reported on the new cli-tool for training and predicting based on
+  target profiles.
+- Samuel reported on work and debugging to make the workflow work with
+  staffan's new `--proper-train` flag, so that filled-up datasets are evaluated
+  properly.
+- UPPMAX / Rackham has been down for one week and a day, up again today. Samuel
+  has been developing, and running on the small datasets, on messi ("cihost")
+  meanwhile.
+
+## Decided action steps:
+
+- [ ] @olas to mail frontiers about extension to May 31.
+  - (If doesn't work, try to submit to other non-jcheminf journal)
+- [ ] We go with using the Observed Fuzziness (Overall) score *only*, for the cost-estimation.
+  - We can still report the class-avergaed Observed Fuzziness, but will not use
+    it for deciding on cost value.
+- [ ] First re-run all datasets with and without fill-up of assumed non-actives 
+  - Do some proper statistics to say with confideince which one is (significantly) better.
+- [ ] Based on the result of non-fillup vs fillup above, choose the best for the following runs:
+- [ ] Remove molecules included in DrugBank, and train models.
+- [ ] Use these trained models to train target profile models
+- [ ] Use these target profile-based models to predict Active/Withdrawn in drugbank.
+
+## Next meeting:
+
+- On Monday, April 23, after morning meeting, but before 10 
