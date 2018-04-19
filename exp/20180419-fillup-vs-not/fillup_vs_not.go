@@ -207,7 +207,7 @@ func main() {
 					if doFillUp {
 						catPart = `cat {i:targetdata} {i:assumed_n}`
 					}
-					countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, catPart+` | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:runset} {p:gene}`)
+					countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrGene, catPart+` | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:runset} {p:gene} {p:replicate}`)
 					//countProcs[geneLowerCase].SetPathExtend("targetdata", "count", ".count")
 					countProcs[geneLowerCase].SetPathCustom("count", func(t *sp.Task) string {
 						return "dat/" + t.Param("runset") + "/" + str.ToLower(t.Param("gene")) + "." + t.Param("replicate") + ".cnt"
@@ -218,6 +218,7 @@ func main() {
 					}
 					countProcs[geneLowerCase].ParamInPort("runset").ConnectStr(runSet)
 					countProcs[geneLowerCase].ParamInPort("gene").ConnectStr(geneUppercase)
+					countProcs[geneLowerCase].ParamInPort("replicate").ConnectStr(replicate)
 				}
 
 				// --------------------------------------------------------------------------------
