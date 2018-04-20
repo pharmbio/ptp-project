@@ -261,7 +261,7 @@ func main() {
 					// If Liblinear
 					evalCostCmd := `java -jar ` + cpSignPath + ` crossvalidate \
 									--license ../../bin/cpsign.lic \
-									--seed {i:seed} \
+									--seed {p:seed} \
 									--cptype 1 \
 									--trainfile {i:traindata} \
 									--impl liblinear \
@@ -343,7 +343,7 @@ func main() {
 				cpSignTrain := wf.NewProc("cpsign_train_"+uniqStrRepl,
 					`java -jar `+cpSignPath+` train \
 									--license ../../bin/cpsign.lic \
-									--seed {i:seed} \
+									--seed {p:seed} \
 									--cptype 1 \
 									--modelfile {i:model} \
 									--labels A, N \
