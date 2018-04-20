@@ -241,7 +241,7 @@ func main() {
 					cpSignPrecomp.In("propertraindata").Connect(assumedNonActive)
 				}
 				cpSignPrecomp.SetPathExtend("traindata", "precomp", "."+runSet+".precomp")
-				cpSignPrecomp.SetPathExtend("traindata", "logfile", ".precomp.cpsign.precompute.log")
+				cpSignPrecomp.SetPathExtend("traindata", "logfile", "."+runSet+".precomp.cpsign.log")
 				if *runSlurm {
 					cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLowerCase // SLURM string
 				}
@@ -375,7 +375,7 @@ func main() {
 				}
 				cpSignTrain.SetPathCustom("model", cpSignTrainModelPathFunc)
 				cpSignTrain.SetPathCustom("logfile", func(t *sp.Task) string {
-					return cpSignTrainModelPathFunc(t) + ".cpsign.train.log"
+					return cpSignTrainModelPathFunc(t) + ".cpsign.log"
 				})
 				if *runSlurm {
 					cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + uniqStrRepl // SLURM string
