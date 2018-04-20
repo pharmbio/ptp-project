@@ -183,7 +183,7 @@ func (p *BestCostGamma) Run() {
 		csvReader := csv.NewReader(bytesReader)
 		csvReader.Comma = p.Separator
 
-		bestClassAvgObsFuzz := 1000000.000 // N.B: The best efficiency in Conformal Prediction is the *minimal* one. Initializing here with an unreasonably large number in order to spot when something is wrong.
+		bestObsFuzzOverall := 1000000.000 // N.B: The best efficiency in Conformal Prediction is the *minimal* one. Initializing here with an unreasonably large number in order to spot when something is wrong.
 
 		var header []string
 
@@ -191,11 +191,11 @@ func (p *BestCostGamma) Run() {
 		var bestGamma float64 = -1.0
 		var bestAccuracy float64 = -1.0
 		var bestEfficiency float64 = -1.0
-		var bestObsFuzzOverall float64 = -1.0
 		var bestObsFuzzActive float64 = -1.0
 		var bestObsFuzzNonactive float64 = -1.0
 		var bestClassConfidence float64 = -1.0
 		var bestClassCredibility float64 = -1.0
+		var bestClassAvgObsFuzz float64 = -1.0
 
 		i := 0
 		for {
@@ -211,16 +211,11 @@ func (p *BestCostGamma) Run() {
 				}
 			}
 
-			obsFuzzActive, err := strconv.ParseFloat(rec[indexOfStr("ObsFuzzActive", header)], 64)
+			obsFuzzOverall, err := strconv.ParseFloat(rec[indexOfStr("ObsFuzzOverall", header)], 64)
 			sp.Check(err)
 
-			obsFuzzNonactive, err := strconv.ParseFloat(rec[indexOfStr("ObsFuzzNonactive", header)], 64)
-			sp.Check(err)
-
-			classAvgObsFuzz := (obsFuzzActive + obsFuzzNonactive) / 2 // We take the average for the two classes, to get more equal influence of each class
-
-			if classAvgObsFuzz < bestClassAvgObsFuzz { // Smaller is better
-				bestClassAvgObsFuzz = classAvgObsFuzz
+			if obsFuzzOverall < bestObsFuzzOverall { // Smaller is better
+				bestObsFuzzOverall = obsFuzzOverall
 
 				sp.Debug.Printf("Proc:%s Raw cost value: %s\n", p.Name(), rec[indexOfStr("Cost", header)])
 				bestCost, err = strconv.ParseInt(rec[indexOfStr("Cost", header)], 10, 0)
@@ -238,11 +233,13 @@ func (p *BestCostGamma) Run() {
 				bestEfficiency, err = strconv.ParseFloat(rec[indexOfStr("Efficiency", header)], 64)
 				sp.Check(err)
 
-				bestObsFuzzOverall, err = strconv.ParseFloat(rec[indexOfStr("ObsFuzzOverall", header)], 64)
+				bestObsFuzzActive, err := strconv.ParseFloat(rec[indexOfStr("ObsFuzzActive", header)], 64)
 				sp.Check(err)
 
-				bestObsFuzzActive = obsFuzzActive
-				bestObsFuzzNonactive = obsFuzzNonactive
+				bestObsFuzzNonactive, err := strconv.ParseFloat(rec[indexOfStr("ObsFuzzNonactive", header)], 64)
+				sp.Check(err)
+
+				bestClassAvgObsFuzz = (bestObsFuzzActive + bestObsFuzzNonactive) / 2 // We take the average for the two classes, to get more equal influence of each class
 
 				bestClassConfidence, err = strconv.ParseFloat(rec[indexOfStr("ClassConfidence", header)], 64)
 				sp.Check(err)
@@ -251,9 +248,9 @@ func (p *BestCostGamma) Run() {
 				sp.Check(err)
 			}
 		}
-		sp.Debug.Printf("Final optimal (minimal) class-equalized observed fuzziness: %f (For: Cost:%03d)\n", bestClassAvgObsFuzz, bestCost)
+		sp.Debug.Printf("Final optimal (minimal) observed fuzziness (overall): %f (For: Cost:%03d)\n", bestObsFuzzOverall, bestCost)
 		if p.IncludeGamma {
-			sp.Debug.Printf("Final optimal (minimal) class-equalized observed fuzziness: %f (For: Cost:%03d, Gamma:%.3f)\n", bestClassAvgObsFuzz, bestCost, bestGamma)
+			sp.Debug.Printf("Final optimal (minimal) observed fuzziness (overall): %f (For: Cost:%03d, Gamma:%.3f)\n", bestObsFuzzOverall, bestCost, bestGamma)
 		}
 		p.OutBestCost().Send(fmt.Sprintf("%d", bestCost))
 		if p.IncludeGamma {
