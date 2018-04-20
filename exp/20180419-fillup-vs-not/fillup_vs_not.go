@@ -274,14 +274,14 @@ func main() {
 									--proper-trainfile {i:propertraindata}`
 					}
 					evalCostCmd += ` \
-									--confidences "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:replicate}`
+									--confidences "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:runset} {p:replicate}`
 					evalCost := wf.NewProc("crossval_"+uniqStrCost, evalCostCmd)
 					evalCostStatsPathFunc := func(t *sp.Task) string {
 						c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 						sp.Check(err)
 						gene := str.ToLower(t.Param("gene"))
 						repl := t.Param("replicate")
-						return filepath.Dir(t.InPath("traindata")) + "/" + runSet + "/" + repl + "/" + fmt.Sprintf("%s.%s.liblin_c%03d", gene, repl, c) + "_crossval_stats.json"
+						return filepath.Dir(t.InPath("traindata")) + "/" + t.Param("runset") + "/" + repl + "/" + fmt.Sprintf("%s.%s.liblin_c%03d", gene, repl, c) + "_crossval_stats.json"
 					}
 					evalCost.SetPathCustom("stats", evalCostStatsPathFunc)
 					evalCost.SetPathCustom("logfile", func(t *sp.Task) string {
@@ -295,6 +295,7 @@ func main() {
 					evalCost.ParamInPort("cvfolds").ConnectStr("10")
 					evalCost.ParamInPort("confidences").ConnectStr("0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95")
 					evalCost.ParamInPort("gene").ConnectStr(geneUppercase)
+					evalCost.ParamInPort("runset").ConnectStr(runSet)
 					evalCost.ParamInPort("replicate").ConnectStr(replicate)
 					evalCost.ParamInPort("cost").ConnectStr(cost)
 					if *runSlurm {
@@ -347,11 +348,12 @@ func main() {
 									--cost {p:cost} \
 									--model-out {o:model} \
 									--logfile {o:logfile} \
-									--model-name "{p:gene} target profile" # {p:replicate} Accuracy: {p:accuracy} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
+									--model-name "{p:gene} target profile" # {p:runset} {p:replicate} Accuracy: {p:accuracy} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
 				cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
 				cpSignTrain.ParamInPort("nrmdl").ConnectStr("10")
 				cpSignTrain.ParamInPort("gene").ConnectStr(geneUppercase)
 				cpSignTrain.ParamInPort("replicate").ConnectStr(replicate)
+				cpSignTrain.ParamInPort("runset").ConnectStr(runSet)
 				cpSignTrain.ParamInPort("accuracy").Connect(selectBest.OutBestAccuracy())
 				cpSignTrain.ParamInPort("efficiency").Connect(selectBest.OutBestEfficiency())
 				cpSignTrain.ParamInPort("obsfuzz_classavg").Connect(selectBest.OutBestObsFuzzClassAvg())
@@ -363,7 +365,7 @@ func main() {
 				cpSignTrain.ParamInPort("cost").Connect(selectBest.OutBestCost())
 				cpSignTrainModelPathFunc := func(t *sp.Task) string {
 					return fmt.Sprintf("dat/final_models/%s/%s/%s_%s_c%s_nrmdl%s_%s.mdl.jar",
-						runSet,
+						t.Param("runset"),
 						str.ToLower(t.Param("gene")),
 						str.ToLower(t.Param("gene")),
 						"liblin",
