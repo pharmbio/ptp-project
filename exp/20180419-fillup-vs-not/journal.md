@@ -4,6 +4,7 @@ Main points:
 
 - [x] Re-work select cost component to work on Overall Observed Fuzziness, not
   Class-averaged OF
+- [x] Add seed (same seed within one replicate) to CPSign crossvalidate and train commands
 - [>] Run full workflow *with* fillup (of assumed non-actives)
 - [>] Run full workflow *without* fillup (of assumed non-actives)
 - Had started this workflow overnight on messi/cihost

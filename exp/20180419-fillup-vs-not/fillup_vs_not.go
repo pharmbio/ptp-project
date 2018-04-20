@@ -155,7 +155,8 @@ func main() {
 			}
 
 			countProcs := map[string]*sp.Process{}
-			for _, replicate := range replicates {
+			for i, replicate := range replicates {
+				seed := i + 1 // Not sure if safe to use 0 as seed in CPSign, so ...(?)
 				uniqStrRepl := uniqStrGene + "_" + runSet + "_" + replicate
 
 				var assumedNonActive *sp.OutPort
@@ -260,6 +261,7 @@ func main() {
 					// If Liblinear
 					evalCostCmd := `java -jar ` + cpSignPath + ` crossvalidate \
 									--license ../../bin/cpsign.lic \
+									--seed {i:seed} \
 									--cptype 1 \
 									--trainfile {i:traindata} \
 									--impl liblinear \
@@ -291,6 +293,7 @@ func main() {
 						evalCost.In("propertraindata").Connect(assumedNonActive)
 					}
 					evalCost.In("traindata").Connect(extractTargetData.Out("target_data"))
+					evalCost.ParamInPort("seed").ConnectStr(fmt.Sprintf("%d", seed))
 					evalCost.ParamInPort("nrmdl").ConnectStr("10")
 					evalCost.ParamInPort("cvfolds").ConnectStr("10")
 					evalCost.ParamInPort("confidences").ConnectStr("0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95")
@@ -340,6 +343,7 @@ func main() {
 				cpSignTrain := wf.NewProc("cpsign_train_"+uniqStrRepl,
 					`java -jar `+cpSignPath+` train \
 									--license ../../bin/cpsign.lic \
+									--seed {i:seed} \
 									--cptype 1 \
 									--modelfile {i:model} \
 									--labels A, N \
@@ -350,6 +354,7 @@ func main() {
 									--logfile {o:logfile} \
 									--model-name "{p:gene} target profile" # {p:runset} {p:replicate} Accuracy: {p:accuracy} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
 				cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
+				cpSignTrain.ParamInPort("seed").ConnectStr(fmt.Sprintf("%d", seed))
 				cpSignTrain.ParamInPort("nrmdl").ConnectStr("10")
 				cpSignTrain.ParamInPort("gene").ConnectStr(geneUppercase)
 				cpSignTrain.ParamInPort("replicate").ConnectStr(replicate)
