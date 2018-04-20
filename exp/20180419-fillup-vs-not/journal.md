@@ -8,6 +8,8 @@ Main points:
 - In the morning (today, April 20) it had stopped upon a non-existent directory
   causing a problem for a pure Go component. [Fixed it in scipipe now](https://github.com/scipipe/scipipe/commit/05b6a8).
 - [ ] Do some proper statistics to say with confideince which one is (significantly) better.
+  - Paired t-tests, (between fillup/non-fillups, within each replicate?)
+  - ANOVA?
 
 Some more remaining points:
 
