@@ -210,7 +210,7 @@ func main() {
 					countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrRepl, catPart+` | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:runset} {p:gene} {p:replicate}`)
 					//countProcs[geneLowerCase].SetPathExtend("targetdata", "count", ".count")
 					countProcs[geneLowerCase].SetPathCustom("count", func(t *sp.Task) string {
-						return "dat/" + t.Param("runset") + "/" + str.ToLower(t.Param("gene")) + "." + t.Param("replicate") + ".cnt"
+						return "dat/" + t.Param("replicate") + "/" + t.Param("runset") + "/" + str.ToLower(t.Param("gene")) + ".cnt"
 					})
 					countProcs[geneLowerCase].In("targetdata").Connect(extractTargetData.Out("target_data"))
 					if doFillUp {
@@ -283,7 +283,7 @@ func main() {
 						sp.Check(err)
 						gene := str.ToLower(t.Param("gene"))
 						repl := t.Param("replicate")
-						return filepath.Dir(t.InPath("traindata")) + "/" + t.Param("runset") + "/" + repl + "/" + fmt.Sprintf("%s.%s.liblin_c%03d", gene, repl, c) + "_crossval_stats.json"
+						return filepath.Dir(t.InPath("traindata")) + "/" + repl + "/" + t.Param("runset") + "/" + fmt.Sprintf("%s.%s.liblin_c%03d", gene, repl, c) + "_crossval_stats.json"
 					}
 					evalCost.SetPathCustom("stats", evalCostStatsPathFunc)
 					evalCost.SetPathCustom("logfile", func(t *sp.Task) string {
@@ -370,13 +370,13 @@ func main() {
 				cpSignTrain.ParamInPort("cost").Connect(selectBest.OutBestCost())
 				cpSignTrainModelPathFunc := func(t *sp.Task) string {
 					return fmt.Sprintf("dat/final_models/%s/%s/%s_%s_c%s_nrmdl%s_%s.mdl.jar",
-						t.Param("runset"),
+						t.Param("replicate"),
 						str.ToLower(t.Param("gene")),
 						str.ToLower(t.Param("gene")),
 						"liblin",
 						t.Param("cost"),
 						t.Param("nrmdl"),
-						t.Param("replicate"))
+						t.Param("runset"))
 				}
 				cpSignTrain.SetPathCustom("model", cpSignTrainModelPathFunc)
 				cpSignTrain.SetPathCustom("logfile", func(t *sp.Task) string {
