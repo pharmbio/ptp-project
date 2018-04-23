@@ -131,6 +131,7 @@ func main() {
 
 	genRandomProcs := map[string]*sp.Process{}
 
+	runSets := []string{"orig", "fill"}
 	// --------------------------------
 	// Set up gene-specific workflow branches
 	// --------------------------------
@@ -147,7 +148,6 @@ func main() {
 			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_extract_" + geneLowerCase // SLURM string
 		}
 
-		runSets := []string{"orig", "fill"}
 		for _, runSet := range runSets {
 			uniqStrRunSet := uniqStrGene + "_" + runSet
 
@@ -394,21 +394,24 @@ func main() {
 		} // end: runset
 	} // end: for gene
 
-	sortSummaryOnDataSize := wf.NewProc("sort_summary", "head -n 1 {i:summary} > {o:sorted} && tail -n +2 {i:summary} | sort -V >> {o:sorted}")
+	sortSummaryOnDataSize := wf.NewProc("sort_summary", "head -n 1 {i:summary} > {o:sorted} && tail -n +2 {i:summary} | sort -k 15n,15 -k 2,2 -k 3r,3 >> {o:sorted}")
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
 	sortSummaryOnDataSize.In("summary").Connect(finalModelsSummary.OutSummary())
 
-	plotSummary := wf.NewProc("plot_summary", "Rscript bin/plot_summary.r -i {i:summary} -o {o:plot} -f png # {i:gene_smiles_activity}")
-	plotSummary.SetPathExtend("summary", "plot", ".plot.png")
-	plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
-	plotSummary.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_smiles_activity"))
+	for _, runSet := range runSets {
+		plotSummary := wf.NewProc("plot_summary_"+runSet, "Rscript bin/plot_summary.r -r {p:runset} -i {i:summary} -o {o:plot} -f png # {i:gene_smiles_activity}")
+		plotSummary.SetPathExtend("summary", "plot", "."+runSet+".png")
+		plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
+		plotSummary.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_smiles_activity"))
+		plotSummary.ParamInPort("runset").ConnectStr(runSet)
+	}
 
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
 	//wf.RunTo(procsToRun...)
 	//wf.RunToRegex("extract_assumed_n_.*")
-	wf.RunTo("plot_summary")
+	wf.RunToRegex("plot_summary_.*")
 }
 
 // --------------------------------------------------------------------------------

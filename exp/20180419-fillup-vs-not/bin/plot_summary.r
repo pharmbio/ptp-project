@@ -5,6 +5,7 @@
 # ------------------------------------------------------------------------
 library(getopt)
 optspec = matrix(c(
+  'runset', 'r', 1, 'character',
   'infile', 'i', 1, 'character',
   'outfile', 'o', 1, 'character',
   'format', 'f', 1, 'character'
@@ -14,7 +15,7 @@ opt = getopt(optspec);
 # if help was asked for print a friendly message
 # and exit with a non-zero error code
 if ( is.null(opt$format) || is.null(opt$infile) || is.null(opt$outfile) ) {
-  cat('Usage: Rscript plot_heatmap.r -i infile -o outfile -f (png|pdf)\n');
+  cat('Usage: Rscript plot_heatmap.r -r (orig|fill) -i infile -o outfile -f (png|pdf)\n');
   q(status=1);
 }
 
@@ -37,7 +38,8 @@ d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 # d <- read.csv("res/final_models_summary.sorted.tsv", sep = '\t', dec=".", header = TRUE, quote="")
 # --------------------------------------------------------------------------------
 
-drepl <- split(d, d$Replicate)
+drunset <- d[ which( d$Runset==opt$runset ), ]
+drepl <- split(drunset, drunset$Replicate)
 
 invert <- function(x) (
   return(1-x)
@@ -76,7 +78,7 @@ legend("bottomright",
 # by alphabetic sort of gene names. This will work well to get sorting by total
 # counts, on another vector (ofca_median for example, in this case) that is
 # sorted alphabetically by gene name:
-sort_vector_totcounts <- aggregate(d$TotalCnt, by=list(Gene = d$Gene), FUN=median)
+sort_vector <- aggregate(drunset$ActiveCnt, by=list(Gene = drunset$Gene), FUN=sum)
 
 # --------------------------------------------------------------------------------
 # Plot observed fuzziness (Class-Averaged)
@@ -87,8 +89,8 @@ par(new=TRUE);
 plot(bplt, 1-drepl$r2$ObsFuzzClassAvg, type="p", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 par(new=TRUE);
 plot(bplt, 1-drepl$r3$ObsFuzzClassAvg, type="p", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-ofca_median <- aggregate(d$ObsFuzzClassAvg, by=list(Gene = d$Gene), FUN=median)
-ofca_median <- ofca_median[order(sort_vector_totcounts$x),]
+ofca_median <- aggregate(drunset$ObsFuzzClassAvg, by=list(Gene = drunset$Gene), FUN=median)
+ofca_median <- ofca_median[order(sort_vector$x),]
 par(new=TRUE);
 plot(bplt, 1-ofca_median$x, type="l", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 axis(4, las=2, col="blue", col.axis="blue", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
@@ -104,8 +106,8 @@ par(new=TRUE);
 plot(bplt, 1-drepl$r2$ObsFuzzOverall, type="p", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 par(new=TRUE);
 plot(bplt, 1-drepl$r3$ObsFuzzOverall, type="p", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-ofca_median <- aggregate(d$ObsFuzzOverall, by=list(Gene = d$Gene), FUN=median)
-ofca_median <- ofca_median[order(sort_vector_totcounts$x),]
+ofca_median <- aggregate(drunset$ObsFuzzOverall, by=list(Gene = drunset$Gene), FUN=median)
+ofca_median <- ofca_median[order(sort_vector$x),]
 par(new=TRUE);
 plot(bplt, 1-ofca_median$x, type="l", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 axis(4, las=2, col="#0099FF", col.axis="#0099FF", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
@@ -122,8 +124,8 @@ par(new=TRUE);
 plot(bplt, 1-drepl$r2$Efficiency, type="p", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 par(new=TRUE);
 plot(bplt, 1-drepl$r3$Efficiency, type="p", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-eff_median <- aggregate(d$Efficiency, by=list(Gene = d$Gene), FUN=median)
-eff_median <- eff_median[order(sort_vector_totcounts$x),]
+eff_median <- aggregate(drunset$Efficiency, by=list(Gene = drunset$Gene), FUN=median)
+eff_median <- eff_median[order(sort_vector$x),]
 par(new=TRUE);
 plot(bplt, 1-eff_median$x, type="l", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 axis(4, las=2, col="#007700", col.axis="#007700", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
@@ -140,8 +142,8 @@ par(new=TRUE);
 plot(bplt, drepl$r2$ExecTimeMS/(1000*60), type="p", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
 par(new=TRUE);
 plot(bplt, drepl$r3$ExecTimeMS/(1000*60), type="p", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
-exectime_median <- aggregate(d$ExecTimeMS, by=list(Gene = d$Gene), FUN=median)
-exectime_median <- exectime_median[order(sort_vector_totcounts$x),]
+exectime_median <- aggregate(drunset$ExecTimeMS, by=list(Gene = drunset$Gene), FUN=median)
+exectime_median <- exectime_median[order(sort_vector$x),]
 par(new=TRUE);
 plot(bplt, exectime_median$x/(1000*60), type="l", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
 axis(4, las=2, col="white", col.axis="red", col.ticks="red", at=c(1,30,60), labels=c("1 min", "30 min", "1 h"));
@@ -158,8 +160,8 @@ par(new=TRUE);
 plot(bplt, drepl$r2$Accuracy, type="p", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
 par(new=TRUE);
 plot(bplt, drepl$r3$Accuracy, type="p", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
-accuracy_median <- aggregate(d$Accuracy, by=list(Gene = d$Gene), FUN=median)
-accuracy_median <- accuracy_median[order(sort_vector_totcounts$x),]
+accuracy_median <- aggregate(drunset$Accuracy, by=list(Gene = drunset$Gene), FUN=median)
+accuracy_median <- accuracy_median[order(sort_vector$x),]
 par(new=TRUE);
 plot(bplt, accuracy_median$x, type="l", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
 # --------------------------------------------------------------------------------
