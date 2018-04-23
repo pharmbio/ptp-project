@@ -406,12 +406,16 @@ func main() {
 		plotSummary.ParamInPort("runset").ConnectStr(runSet)
 	}
 
+	testObsFuzzDiff := wf.NewProc("test_obsfuzz_diff", "Rscript bin/test_ofdiff.r -i {i:summary} -o {o:stats}")
+	testObsFuzzDiff.SetPathExtend("summary", "stats", ".obsfuzz_diff_stats.txt")
+	testObsFuzzDiff.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
+
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
 	//wf.RunTo(procsToRun...)
 	//wf.RunToRegex("extract_assumed_n_.*")
-	wf.RunToRegex("plot_summary_.*")
+	wf.Run()
 }
 
 // --------------------------------------------------------------------------------

@@ -36,7 +36,7 @@ ofDiffs <- ofFillMean$x - ofOrigMean$x
 # non-active compounds
 wilcoxStats <- wilcox.test(ofFillMean$x, ofOrigMean$x, paired = TRUE, alternative = "less")
 
-write(wilcoxStats, opt$outfile)
+lapply(wilcoxStats, write, opt$outfile, append=TRUE, ncolumns=1000)
 
 # Avoid sending non-zero exit values on exit
 quit(save = "no", status = 0, runLast = FALSE)
