@@ -34,7 +34,7 @@ d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 # Read in file manually for debugging:
 # --------------------------------------------------------------------------------
 # dev.off()
-# setwd(dir = "/media/samuel/SAMUELLAMPA/proj/ptp/exp/20171003-train/")
+# setwd(dir = "/home/samuel/mnt/ptp/exp/20171003-train/")
 # d <- read.csv("res/final_models_summary.sorted.tsv", sep = '\t', dec=".", header = TRUE, quote="")
 # --------------------------------------------------------------------------------
 
@@ -61,12 +61,12 @@ bplt <- barplot(counts,
         main = "Compound counts, training time and observed fuzziness per target",
         las=2,
         cex.names=0.8,
-        ylim=c(0,10000),
+        ylim=c(0,21000),
         legend = FALSE,
         xlab=NA,
         ylab=NA,
         axes=FALSE);
-axis(2, las=2, col.axis="black", at=c(0, 1000, 5000, 10000, 100000, 200000, 300000, 400000), labels=c("0", "1 k", "5 k", "10 k", "100 k", "200 k", "300 k", "400 k"));
+axis(2, las=2, col.axis="black", at=c(0, 1000, 5000, 10000, 20000, 100000, 200000, 300000, 400000), labels=c("0", "1 k", "5 k", "10 k", "20 k", "100 k", "200 k", "300 k", "400 k"));
 mtext("Compounds",
       side=2,
       line=3.6);
