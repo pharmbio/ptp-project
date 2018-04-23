@@ -392,7 +392,7 @@ func main() {
 		} // end: runset
 	} // end: for gene
 
-	sortSummaryOnDataSize := wf.NewProc("sort_summary", "head -n 1 {i:summary} > {o:sorted} && tail -n +2 {i:summary} | sort -nk 16 >> {o:sorted}")
+	sortSummaryOnDataSize := wf.NewProc("sort_summary", "head -n 1 {i:summary} > {o:sorted} && tail -n +2 {i:summary} | sort -nk 14 >> {o:sorted}")
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
 	sortSummaryOnDataSize.In("summary").Connect(finalModelsSummary.OutSummary())
 
