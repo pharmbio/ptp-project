@@ -14,7 +14,7 @@ opt = getopt(optspec);
 
 # if help was asked for print a friendly message
 # and exit with a non-zero error code
-if ( is.null(opt$format) || is.null(opt$infile) || is.null(opt$outfile) ) {
+if ( is.null(opt$runset) || is.null(opt$infile) || is.null(opt$outfile) || is.null(opt$format) ) {
   cat('Usage: Rscript plot_heatmap.r -r (orig|fill) -i infile -o outfile -f (png|pdf)\n');
   q(status=1);
 }
@@ -34,7 +34,7 @@ d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 # Read in file manually for debugging:
 # --------------------------------------------------------------------------------
 # dev.off()
-# setwd(dir = "/home/samuel/mnt/ptp/exp/20171003-train/")
+# setwd(dir = "/home/samuel/mnt/ptp/exp/20180419-fillup-vs-not/")
 # d <- read.csv("res/final_models_summary.sorted.tsv", sep = '\t', dec=".", header = TRUE, quote="")
 # --------------------------------------------------------------------------------
 
@@ -180,5 +180,6 @@ plot(bplt, accuracy_median$x, type="l", col="purple2", axes=FALSE, ylab=NA, xlab
 # --------------------------------------------------------------------------------
 
 dev.off()
+
 # Avoid sending non-zero exit values on exit
 quit(save = "no", status = 0, runLast = FALSE)
