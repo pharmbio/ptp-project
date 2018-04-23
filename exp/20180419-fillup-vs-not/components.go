@@ -368,6 +368,9 @@ func (p *FinalModelSummarizer) Run() {
 	totalCompounds := map[string]int64{}
 	for tdip := range p.InTargetDataCount().Chan {
 		gene := tdip.Param("gene")
+		runSet := tdip.Param("runset")
+		uniq := gene + "_" + runSet
+
 		strs := str.Split(string(tdip.Read()), "\t")
 		activeStr := str.TrimSuffix(strs[0], "\n")
 		activeCnt, err := strconv.ParseInt(activeStr, 10, 64)
@@ -375,14 +378,15 @@ func (p *FinalModelSummarizer) Run() {
 		nonActiveStr := str.TrimSuffix(strs[1], "\n")
 		nonActiveCnt, err := strconv.ParseInt(nonActiveStr, 10, 64)
 		sp.CheckWithMsg(err, "Could not parse non-active count value")
-		activeCounts[gene] = activeCnt
-		nonActiveCounts[gene] = nonActiveCnt
-		totalCompounds[gene] = activeCnt + nonActiveCnt
+		activeCounts[uniq] = activeCnt
+		nonActiveCounts[uniq] = nonActiveCnt
+		totalCompounds[uniq] = activeCnt + nonActiveCnt
 	}
 
 	rows := [][]string{[]string{
 		"Gene",
 		"Replicate",
+		"Runset",
 		"Accuracy",
 		"Efficiency",
 		"ObsFuzzClassAvg",
@@ -398,9 +402,11 @@ func (p *FinalModelSummarizer) Run() {
 		"NonactiveCnt",
 		"TotalCnt"}}
 	for iip := range p.InModel().Chan {
+		uniq := iip.Param("gene") + "_" + iip.Param("runset")
 		row := []string{
 			iip.Param("gene"),
 			iip.Param("replicate"),
+			iip.Param("runset"),
 			iip.Param("accuracy"),
 			iip.Param("efficiency"),
 			iip.Param("obsfuzz_classavg"),
@@ -412,9 +418,9 @@ func (p *FinalModelSummarizer) Run() {
 			iip.Param("cost"),
 			fmt.Sprintf("%d", iip.AuditInfo().ExecTimeMS),
 			fmt.Sprintf("%d", iip.Size()),
-			fmt.Sprintf("%d", activeCounts[iip.Param("gene")]),
-			fmt.Sprintf("%d", nonActiveCounts[iip.Param("gene")]),
-			fmt.Sprintf("%d", totalCompounds[iip.Param("gene")]),
+			fmt.Sprintf("%d", activeCounts[uniq]),
+			fmt.Sprintf("%d", nonActiveCounts[uniq]),
+			fmt.Sprintf("%d", totalCompounds[uniq]),
 		}
 		rows = append(rows, row)
 	}
