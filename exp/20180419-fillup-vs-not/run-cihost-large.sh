@@ -8,4 +8,4 @@
 #SBATCH --mail-type BEGIN,FAIL,END
 module load java/sun_jdk1.8.0_92
 module load R/3.4.0
-go run fillup_vs_not.go components.go -threads 1 -maxtasks 4 -geneset bowes44min100percls_large 2>&1 | tee scipipe-$(date +%Y%m%d-%H%M%S).log # -debug
+go run fillup_vs_not.go components.go -threads 1 -maxtasks 4 -geneset bowes44min100percls_large 2>&1 | tee log/scipipe-$(date +%Y%m%d-%H%M%S).log # -debug
