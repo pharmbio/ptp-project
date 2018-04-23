@@ -149,6 +149,7 @@ func main() {
 
 		runSets := []string{"orig", "fill"}
 		for _, runSet := range runSets {
+			uniqStrRunSet := uniqStrGene + "_" + runSet
 			doFillUp := false
 			if runSet == "fill" {
 				doFillUp = true
@@ -157,7 +158,7 @@ func main() {
 			countProcs := map[string]*sp.Process{}
 			for i, replicate := range replicates {
 				seed := i + 1 // Not sure if safe to use 0 as seed in CPSign, so ...(?)
-				uniqStrRepl := uniqStrGene + "_" + runSet + "_" + replicate
+				uniqStrRepl := uniqStrRunSet + "_" + replicate
 
 				var assumedNonActive *sp.OutPort
 
@@ -207,18 +208,18 @@ func main() {
 					if doFillUp {
 						catPart = `cat {i:targetdata} {i:assumed_n}`
 					}
-					countProcs[geneLowerCase] = wf.NewProc("cnt_targetdata_rows_"+uniqStrRepl, catPart+` | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:runset} {p:gene} {p:replicate}`)
-					//countProcs[geneLowerCase].SetPathExtend("targetdata", "count", ".count")
-					countProcs[geneLowerCase].SetPathCustom("count", func(t *sp.Task) string {
+					countProcs[uniqStrRunSet] = wf.NewProc("cnt_targetdata_rows_"+uniqStrRepl, catPart+` | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:runset} {p:gene} {p:replicate}`)
+					//countProcs[uniqStrRunSet].SetPathExtend("targetdata", "count", ".count")
+					countProcs[uniqStrRunSet].SetPathCustom("count", func(t *sp.Task) string {
 						return "dat/" + t.Param("replicate") + "/" + t.Param("runset") + "/" + str.ToLower(t.Param("gene")) + ".cnt"
 					})
-					countProcs[geneLowerCase].In("targetdata").Connect(extractTargetData.Out("target_data"))
+					countProcs[uniqStrRunSet].In("targetdata").Connect(extractTargetData.Out("target_data"))
 					if doFillUp {
-						countProcs[geneLowerCase].In("assumed_n").Connect(assumedNonActive)
+						countProcs[uniqStrRunSet].In("assumed_n").Connect(assumedNonActive)
 					}
-					countProcs[geneLowerCase].ParamInPort("runset").ConnectStr(runSet)
-					countProcs[geneLowerCase].ParamInPort("gene").ConnectStr(geneUppercase)
-					countProcs[geneLowerCase].ParamInPort("replicate").ConnectStr(replicate)
+					countProcs[uniqStrRunSet].ParamInPort("runset").ConnectStr(runSet)
+					countProcs[uniqStrRunSet].ParamInPort("gene").ConnectStr(geneUppercase)
+					countProcs[uniqStrRunSet].ParamInPort("replicate").ConnectStr(replicate)
 				}
 
 				// --------------------------------------------------------------------------------
@@ -388,7 +389,7 @@ func main() {
 
 				finalModelsSummary.InModel().Connect(cpSignTrain.Out("model"))
 			} // end: for replicate
-			finalModelsSummary.InTargetDataCount().Connect(countProcs[geneLowerCase].Out("count"))
+			finalModelsSummary.InTargetDataCount().Connect(countProcs[uniqStrRunSet].Out("count"))
 		} // end: runset
 	} // end: for gene
 
