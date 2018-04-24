@@ -447,7 +447,7 @@ We concluded:
 
 So, we have basically two major things we will try to do:
 
-- [ ] Run both with and without fillup assumed negatives
+- [x] Run both with and without fillup assumed negatives
   so that we can compare how the fillup affects performance.
   - [x] Make sure to not use assumed negatives in calibration and validation,
   with the help of functionality in Staffan's latest version of CPSign
@@ -512,7 +512,7 @@ We concluded that the next steps are:
 - [ ] Samuel tries as soon as possible to get to predicting
   with the built models, so we can get data for the second type of models
   (based on target binding profiles).
-- [ ] Staffan to develop component which takes data in the form of target panel
+- [x] Staffan to develop component which takes data in the form of target panel
   binding profiles on the form below, ad builds a conformal prediction model
   from it.
 - [ ] Staffan also develops a small REST service which can run this model file,
@@ -544,14 +544,15 @@ Attending: Ola, Jonathan, Staffan, Samuel (via Hangout)
 
 ## Decided action steps:
 
-- [ ] @olas to mail frontiers about extension to May 31.
+- [x] @olas to mail frontiers about extension to May 31.
   - (If doesn't work, try to submit to other non-jcheminf journal)
-- [ ] We go with using the Observed Fuzziness (Overall) score *only*, for the cost-estimation.
+- [x] We go with using the Observed Fuzziness (Overall) score *only*, for the cost-estimation.
   - We can still report the class-avergaed Observed Fuzziness, but will not use
     it for deciding on cost value.
-- [ ] First re-run all datasets with and without fill-up of assumed non-actives 
-  - Do some proper statistics to say with confideince which one is (significantly) better.
-- [ ] Based on the result of non-fillup vs fillup above, choose the best for the following runs:
+- [x] First re-run all datasets (edit: the small datasets, as the large ones
+  are never filled-up) with and without fill-up of assumed non-actives
+  - [x] Do some proper statistics to say with confideince which one is (significantly) better.
+- [x] Based on the result of non-fillup vs fillup above, choose the best for the following runs
 - [ ] Remove molecules included in DrugBank, and train models.
 - [ ] Use these trained models to train target profile models
 - [ ] Use these target profile-based models to predict Active/Withdrawn in drugbank.
