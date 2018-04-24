@@ -566,4 +566,26 @@ Attending: Ola, Jonathan, Staffan, Samuel (via Hangout)
 Attending: Ola, Staffan, Samuel
 Olas Room, kl 13:35
 
-- We got extension about a month.
+- We got extension about a month, for submission to Frontiers.
+
+## Decisions
+
+- We don't run replicates / triplicates now when building the final models (without drugbank)
+- We don't do cost-optimization either, but chooses cost per target/model,
+  based on median of cost values obtained in previous experiments.
+- For the final workflow, we aim to create a virtual machine with the
+  workflows, that include the CPSign jar file, but not the license. This will
+  make it possible to easily reproduce the study, given a CPSign license.
+
+## Action steps
+
+(Remember to check the decisions above, about how to modify the workflow!)
+
+- [ ] We remove the 101 "Withdrawn" molecules in DrugBank from ExcapeDB, and
+  899 "Approved" ones, so we get a dataset of 1000 molecules for which we have
+  DrugBank data.
+- [ ] Do prediction using cpsign cli.
+- [ ] Predict Active / Non-active on the withdrawn dataset (1000 molecules
+  ... ~10k interactions(?))
+- [ ] Build the target profiles, and use to predict Approved/Withdrawn on the
+  Drugbank dataset, and compare.
