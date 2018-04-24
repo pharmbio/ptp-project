@@ -558,4 +558,11 @@ Attending: Ola, Jonathan, Staffan, Samuel (via Hangout)
 
 ## Next meeting:
 
-- On Monday, April 23, after morning meeting, but before 10 
+- On Monday, April 23, after morning meeting, but before 10
+
+# Project meeting 2018-04-24
+
+Attending: Ola, Staffan, Samuel
+Olas Room, kl 13:35
+
+- We got extension about a month.
