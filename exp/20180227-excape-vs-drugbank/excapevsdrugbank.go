@@ -17,26 +17,27 @@ import (
 func main() {
 	wf := sp.NewWorkflow("exvsdb", 2)
 
-	// DrugBank XML
+	// Download the full DrugBank database
 	dlDrugBank := wf.NewProc("dl", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/all-full-database")
 	dlDrugBank.SetPathStatic("zip", "dat/drugbank.zip")
 
+	// UnZip the full DrugBank database
 	unzipDrugBank := wf.NewProc("unzip_drugbank", `unzip -d dat/ {i:zip}; mv "dat/full database.xml" {o:xml}`)
 	unzipDrugBank.SetPathStatic("xml", "dat/drugbank.xml")
 	unzipDrugBank.In("zip").Connect(dlDrugBank.Out("zip"))
 
-	// Approved
+	// Download chemical structures and "links" (references) for *approved* (small molecule) drugs
 	dlApproved := wf.NewProc("dl_approv", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/approved-structure-links")
 	dlApproved.SetPathStatic("zip", "dat/drugbank_approved_csv.zip")
-
+	// Unzip the above file
 	unzipApproved := wf.NewProc("unzip_approved", `unzip -d dat/approved/ {i:zip}; mv "dat/approved/structure links.csv" {o:csv}`)
 	unzipApproved.SetPathStatic("csv", "dat/drugbank_approved.csv")
 	unzipApproved.In("zip").Connect(dlApproved.Out("zip"))
 
-	// Withdrawn
+	// Download chemical structures and "links" (references) for *withdrawn* (small molecule) drugs
 	dlWithdrawn := wf.NewProc("dl_withdrawn", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/withdrawn-structure-links")
 	dlWithdrawn.SetPathStatic("zip", "dat/drugbank_withdrawn_csv.zip")
-
+	// Unzip the above file
 	unzipWithdrawn := wf.NewProc("unzip_withdrawn", `unzip -d dat/withdrawn/ {i:zip}; mv "dat/withdrawn/structure links.csv" {o:csv}`)
 	unzipWithdrawn.SetPathStatic("csv", "dat/drugbank_withdrawn.csv")
 	unzipWithdrawn.In("zip").Connect(dlWithdrawn.Out("zip"))
