@@ -8,4 +8,4 @@
 #SBATCH --mail-type BEGIN,FAIL,END
 module load java/sun_jdk1.8.0_92
 module load R/3.4.0
-go run excapedbvsdrugbank.go
+go run excapevsdrugbank.go
