@@ -59,19 +59,40 @@ var (
 			"PDE3A", "SCN5A", "CCKAR", "ADRB1",
 		},
 	}
-	costVals = []string{
-		"1",
-		"10",
-		"100",
-	}
-	gammaVals = []string{
-		"0.1",
-		"0.01",
-		"0.001",
+	//costVals = []string{
+	//	"1",
+	//	"10",
+	//	"100",
+	//}
+	costsPerTarget = map[string][]string{
+		"PDE3A":   []string{"1"},
+		"SCN5A":   []string{"10"},
+		"PTGS1":   []string{"1"},
+		"CCKAR":   []string{"1"},
+		"MAOA":    []string{"1"},
+		"ADRB1":   []string{"1"},
+		"CHRM3":   []string{"10"},
+		"CHRM2":   []string{"1"},
+		"EDNRA":   []string{"1"},
+		"NR3C1":   []string{"1"},
+		"AR":      []string{"1"},
+		"PTGS2":   []string{"1"},
+		"LCK":     []string{"10"},
+		"ACHE":    []string{"1"},
+		"SLC6A2":  []string{"1"},
+		"CNR2":    []string{"1"},
+		"OPRD1":   []string{"1"},
+		"ADORA2A": []string{"1"},
+		"CNR1":    []string{"1"},
+		"OPRM1":   []string{"1"},
+		"SLC6A4":  []string{"1"},
 	}
 	replicates = []string{
-		"r1", "r2", "r3",
+		"r1",
 	}
+	//replicates = []string{
+	//	"r1", "r2", "r3",
+	//}
 )
 
 func main() {
@@ -127,11 +148,21 @@ func main() {
 	removeConflicting.SetPathReplace("gene_smiles_activity", "gene_smiles_activity", ".tsv", ".dedup.tsv")
 	removeConflicting.In("gene_smiles_activity").Connect(extractGSA.Out("gene_smiles_activity"))
 
+	// ################################################################################
+	// ################################################################################
+	// ################################################################################
+	// [ ] TODO: Create process for subtracting the DrugBank compounds HERE
+	// ################################################################################
+	// ################################################################################
+	// ################################################################################
+
 	finalModelsSummary := NewFinalModelSummarizer(wf, "finalmodels_summary_creator", "res/final_models_summary.tsv", '\t')
 
 	genRandomProcs := map[string]*sp.Process{}
 
-	runSets := []string{"orig", "fill"}
+	// We only do the fill run-set here (filling up for "small" datasets)
+	runSets := []string{"fill"} // []string{"orig", "fill"}
+
 	// --------------------------------
 	// Set up gene-specific workflow branches
 	// --------------------------------
@@ -152,7 +183,7 @@ func main() {
 			uniqStrRunSet := uniqStrGene + "_" + runSet
 
 			doFillUp := false
-			if runSet == "fill" {
+			if runSet == "fill" && strInSlice(geneUppercase, geneSets["bowes44min100percls_small"]) {
 				doFillUp = true
 			}
 
@@ -190,18 +221,6 @@ func main() {
 					extractAssumedNonBinding.ParamInPort("replicate").ConnectStr(replicate)
 					extractAssumedNonBinding.In("randsrc").Connect(genRandomProcs[genRandomID].Out("rand"))
 					assumedNonActive = extractAssumedNonBinding.Out("assumed_n")
-
-					// --------------------
-					//fillAssumedNonbinding := wf.NewProc("fillup_"+uniqStrRepl , `cat {i:targetdata} {i:assumed_n} > {o:filledup} # gene:{p:gene} replicate:{p:replicate}`)
-					//fillAssumedNonbinding.SetPathCustom("filledup", func(t *sp.Task) string {
-					//	geneLC := str.ToLower(t.Param("gene"))
-					//	return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + filepath.Base(t.InIP("targetdata").Path()) + "." + t.Param("replicate") + ".fill_assumed_n" + ".tsv"
-					//})
-					//fillAssumedNonbinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
-					//fillAssumedNonbinding.In("assumed_n").Connect(extractAssumedNonBinding.Out("assumed_n"))
-					//fillAssumedNonbinding.ParamInPort("gene").ConnectStr(geneUppercase)
-					//fillAssumedNonbinding.ParamInPort("replicate").ConnectStr(replicate)
-					//filledUp = fillAssumedNonbinding.Out("filledup")
 				}
 
 				if replicate == "r1" {
@@ -210,7 +229,6 @@ func main() {
 						catPart = `cat {i:targetdata} {i:assumed_n}`
 					}
 					countProcs[uniqStrRunSet] = wf.NewProc("cnt_targetdata_rows_"+uniqStrRepl, catPart+` | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:runset} {p:gene} {p:replicate}`)
-					//countProcs[uniqStrRunSet].SetPathExtend("targetdata", "count", ".count")
 					countProcs[uniqStrRunSet].SetPathCustom("count", func(t *sp.Task) string {
 						return "dat/" + t.Param("replicate") + "/" + t.Param("runset") + "/" + str.ToLower(t.Param("gene")) + ".cnt"
 					})
@@ -258,7 +276,7 @@ func main() {
 					"dat/"+runSet+"/"+geneLowerCase+"/"+replicate+"/"+geneLowerCase+"_cost_gamma_perf_stats.tsv",
 					includeGamma)
 
-				for _, cost := range costVals {
+				for _, cost := range costsPerTarget[geneUppercase] {
 					uniqStrCost := uniqStrRepl + "_" + cost
 					// If Liblinear
 					evalCostCmd := `java -jar ` + cpSignPath + ` crossvalidate \
@@ -330,9 +348,6 @@ func main() {
 					summarize.In().Connect(extractCostGammaStats.Out())
 				} // end for cost
 
-				// TODO: Let select best operate directly on the stream of IPs, not
-				// via the summarize component, so that we can retain the keys in
-				// the IP!
 				selectBest := NewBestCostGamma(wf,
 					"select_best_cost_gamma_"+uniqStrRepl,
 					'\t',
@@ -406,15 +421,9 @@ func main() {
 		plotSummary.ParamInPort("runset").ConnectStr(runSet)
 	}
 
-	testObsFuzzDiff := wf.NewProc("test_obsfuzz_diff", "Rscript bin/test_ofdiff.r -i {i:summary} -o {o:stats}")
-	testObsFuzzDiff.SetPathExtend("summary", "stats", ".obsfuzz_diff_stats.txt")
-	testObsFuzzDiff.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
-
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
-	//wf.RunTo(procsToRun...)
-	//wf.RunToRegex("extract_assumed_n_.*")
 	wf.Run()
 }
 
@@ -458,16 +467,3 @@ func strInSlice(searchStr string, strings []string) bool {
 	}
 	return false
 }
-
-// ------------------------------------------------------------------------
-// CURRENTLY INACTIVE PROCESSES
-// ------------------------------------------------------------------------
-//createSQLiteDB := wf.NewProc("CreateSQLiteDB", `sqlite3 {o:dbfile} 'CREATE TABLE {p:tablename} (Ambit_InchiKey TEXT, Original_Entry_ID TEXT, Entrez_ID INTEGER, Activity_Flag TEXT, pXC50 REAL, DB TEXT, Original_Assay_ID INTEGER, Tax_ID INTEGER, Gene_Symbol TEXT, Ortholog_Group INTEGER, InChI TEXT, SMILES TEXT);'`)
-//createSQLiteDB.SetPathStatic("dbfile", "../../raw/excapedb.db")
-//createSQLiteDB.ParamInPort("tablename").ConnectStr("excapedb")
-
-//importIntoSQLite := wf.NewProc("importIntoSQLite", `(echo '.mode tabs'; echo '.import {i:tsvfile} {p:tablename}'; echo 'CREATE INDEX Gene_Symbol ON excapedb(Gene_Symbol);'; echo 'CREATE INDEX Activity_Flag ON excapedb(Activity_Flag);') | sqlite3 {i:dbfile} && echo done > {o:doneflagfile};`)
-//importIntoSQLite.SetPathExtend("tsvfile", "doneflagfile", ".importdone")
-//importIntoSQLite.ParamInPort("tablename").ConnectStr("excapedb")
-//importIntoSQLite.In("dbfile").Connect(createSQLiteDB.Out("dbfile"))
-//importIntoSQLite.In("tsvfile").Connect(unPackDB.Out("unxzed"))
