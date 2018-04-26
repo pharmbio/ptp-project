@@ -243,8 +243,15 @@ func main() {
 				if doFillUp {
 					cpSignPrecomp.In("propertraindata").Connect(assumedNonActive)
 				}
-				cpSignPrecomp.SetPathExtend("traindata", "precomp", "."+runSet+".precomp")
-				cpSignPrecomp.SetPathExtend("traindata", "logfile", "."+runSet+".precomp.cpsign.log")
+				precompPathFunc := func(t *sp.Task) string {
+					repl := t.Param("replicate")
+					rset := t.Param("runset")
+					return "dat/" + repl + "/" + rset + "/" + rset + "." + repl + ".precomp"
+				}
+				cpSignPrecomp.SetPathCustom("precomp", precompPathFunc)
+				cpSignPrecomp.SetPathCustom("logfile", func(t *sp.Task) string {
+					return precompPathFunc(t) + ".precomp.cpsign.log"
+				})
 				if *runSlurm {
 					cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLowerCase // SLURM string
 				}
