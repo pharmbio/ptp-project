@@ -1,6 +1,7 @@
 # Without Drugbank Experiment - TODO and Journal
 
 - [x] Copy Go files from fillup-vs-not experiment
+- [ ] Copy Go files again, after bugfixing in fillup-vs-not experiment
 - [>] Clean up copied Go files of stuff not relevant to this experiment
 - [>] Implement a map for looking up target/gene-specific cost values
   - [ ] Decide if we should do this by referring to the output of the
