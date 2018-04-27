@@ -238,19 +238,24 @@ func main() {
 					cpSignPrecompCmd += ` \
 									--proper-trainfile {i:propertraindata}`
 				}
+				cpSignPrecompCmd += ` # {p:gene} {p:runset} {p:replicate}`
 				cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrRepl, cpSignPrecompCmd)
 				cpSignPrecomp.In("traindata").Connect(extractTargetData.Out("target_data"))
 				if doFillUp {
 					cpSignPrecomp.In("propertraindata").Connect(assumedNonActive)
 				}
+				cpSignPrecomp.ParamInPort("gene").ConnectStr(geneLowerCase)
+				cpSignPrecomp.ParamInPort("replicate").ConnectStr(replicate)
+				cpSignPrecomp.ParamInPort("runset").ConnectStr(runSet)
 				precompPathFunc := func(t *sp.Task) string {
+					gene := t.Param("gene")
 					repl := t.Param("replicate")
 					rset := t.Param("runset")
-					return "dat/" + repl + "/" + rset + "/" + rset + "." + repl + ".precomp"
+					return "dat/" + repl + "/" + rset + "/" + gene + "." + rset + "." + repl + ".precomp"
 				}
 				cpSignPrecomp.SetPathCustom("precomp", precompPathFunc)
 				cpSignPrecomp.SetPathCustom("logfile", func(t *sp.Task) string {
-					return precompPathFunc(t) + ".precomp.cpsign.log"
+					return precompPathFunc(t) + ".cpsign.log"
 				})
 				if *runSlurm {
 					cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLowerCase // SLURM string
