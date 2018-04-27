@@ -151,7 +151,27 @@ func main() {
 	// ################################################################################
 	// ################################################################################
 	// ################################################################################
-	// [ ] TODO: Create process for subtracting the DrugBank compounds HERE
+
+	// Download chemical structures and "links" (references) for *approved* (small molecule) drugs
+	dlApproved := wf.NewProc("dl_approv", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/approved-structure-links")
+	dlApproved.SetPathStatic("zip", "dat/drugbank_approved_csv.zip")
+	// Unzip the above file
+	unzipApproved := wf.NewProc("unzip_approved", `unzip -d dat/approved/ {i:zip}; mv "dat/approved/structure links.csv" {o:csv}`)
+	unzipApproved.SetPathStatic("csv", "dat/drugbank_approved.csv")
+	unzipApproved.In("zip").Connect(dlApproved.Out("zip"))
+
+	// Download chemical structures and "links" (references) for *withdrawn* (small molecule) drugs
+	dlWithdrawn := wf.NewProc("dl_withdrawn", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/withdrawn-structure-links")
+	dlWithdrawn.SetPathStatic("zip", "dat/drugbank_withdrawn_csv.zip")
+	// Unzip the above file
+	unzipWithdrawn := wf.NewProc("unzip_withdrawn", `unzip -d dat/withdrawn/ {i:zip}; mv "dat/withdrawn/structure links.csv" {o:csv}`)
+	unzipWithdrawn.SetPathStatic("csv", "dat/drugbank_withdrawn.csv")
+	unzipWithdrawn.In("zip").Connect(dlWithdrawn.Out("zip"))
+
+	// [>] TODO: Create process for subtracting the DrugBank compounds HERE
+	removeDrugBankCompounds := wf.NewProc("remove_drugbank_compounds", "# Remove {i:gene_smiles_activity} > {o:gene_smiles_activity}")
+	removeDrugBankCompounds.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_smiles_activity"))
+
 	// ################################################################################
 	// ################################################################################
 	// ################################################################################
