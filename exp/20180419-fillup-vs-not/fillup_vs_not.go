@@ -169,7 +169,7 @@ func main() {
 					if _, ok := genRandomProcs[genRandomID]; !ok {
 						genRandomProcs[genRandomID] = wf.NewProc(genRandomID, "dd if=/dev/urandom of={o:rand} bs=1048576 count=1024")
 					}
-					genRandomProcs[genRandomID].SetPathStatic("rand", "dat/"+replicate+"_random_bytes.bin")
+					genRandomProcs[genRandomID].SetPathStatic("rand", "dat/rand."+replicate+".bin")
 
 					// Here we fill up TO the double amount of non-actives compared
 					// to number of actives, by multiplying the number of actives
@@ -181,8 +181,9 @@ func main() {
 					| sort -uV \
 					| shuf --random-source={i:randsrc} -n $fillup_lines_cnt > {o:assumed_n} # replicate:{p:replicate}`)
 					extractAssumedNonBinding.SetPathCustom("assumed_n", func(t *sp.Task) string {
-						geneLC := str.ToLower(t.Param("gene"))
-						return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + geneLC + "." + t.Param("replicate") + ".assumed_n.tsv"
+						gene := str.ToLower(t.Param("gene"))
+						repl := t.Param("replicate")
+						return "dat/" + gene + "/" + repl + "/" + gene + "." + repl + ".assumed_n.tsv"
 					})
 					extractAssumedNonBinding.In("rawdata").Connect(removeConflicting.Out("gene_smiles_activity"))
 					extractAssumedNonBinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
@@ -212,7 +213,10 @@ func main() {
 					countProcs[uniqStrRunSet] = wf.NewProc("cnt_targetdata_rows_"+uniqStrRepl, catPart+` | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:runset} {p:gene} {p:replicate}`)
 					//countProcs[uniqStrRunSet].SetPathExtend("targetdata", "count", ".count")
 					countProcs[uniqStrRunSet].SetPathCustom("count", func(t *sp.Task) string {
-						return "dat/" + t.Param("replicate") + "/" + t.Param("runset") + "/" + str.ToLower(t.Param("gene")) + ".cnt"
+						gene := str.ToLower(t.Param("gene"))
+						repl := t.Param("replicate")
+						rset := t.Param("runset")
+						return "dat/" + gene + "/" + repl + "/" + rset + "/" + gene + "." + repl + "." + rset + ".cnt"
 					})
 					countProcs[uniqStrRunSet].In("targetdata").Connect(extractTargetData.Out("target_data"))
 					if doFillUp {
@@ -251,7 +255,7 @@ func main() {
 					gene := t.Param("gene")
 					repl := t.Param("replicate")
 					rset := t.Param("runset")
-					return "dat/" + repl + "/" + rset + "/" + gene + "." + rset + "." + repl + ".precomp"
+					return "dat/" + gene + "/" + repl + "/" + rset + "/" + gene + "." + repl + "." + rset + ".precomp"
 				}
 				cpSignPrecomp.SetPathCustom("precomp", precompPathFunc)
 				cpSignPrecomp.SetPathCustom("logfile", func(t *sp.Task) string {
@@ -293,11 +297,12 @@ func main() {
 									--confidences "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:runset} {p:replicate}`
 					evalCost := wf.NewProc("crossval_"+uniqStrCost, evalCostCmd)
 					evalCostStatsPathFunc := func(t *sp.Task) string {
-						c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
+						cost, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 						sp.Check(err)
 						gene := str.ToLower(t.Param("gene"))
 						repl := t.Param("replicate")
-						return filepath.Dir(t.InPath("traindata")) + "/" + repl + "/" + t.Param("runset") + "/" + fmt.Sprintf("%s.%s.liblin_c%03d", gene, repl, c) + "_crossval_stats.json"
+						rset := t.Param("runset")
+						return filepath.Dir(t.InPath("traindata")) + "/" + repl + "/" + rset + "/" + fmt.Sprintf("%s.%s.%s.liblin_c%03d", gene, repl, rset, cost) + ".cvstats.json"
 					}
 					evalCost.SetPathCustom("stats", evalCostStatsPathFunc)
 					evalCost.SetPathCustom("logfile", func(t *sp.Task) string {
@@ -383,14 +388,16 @@ func main() {
 				cpSignTrain.ParamInPort("class_credibility").Connect(selectBest.OutBestClassCredibility())
 				cpSignTrain.ParamInPort("cost").Connect(selectBest.OutBestCost())
 				cpSignTrainModelPathFunc := func(t *sp.Task) string {
-					return fmt.Sprintf("dat/final_models/%s/%s/%s_%s_c%s_nrmdl%s_%s.mdl.jar",
+					return fmt.Sprintf("dat/final_models/%s/%s/%s/%s.%s.%s.%s_c%s_nrmdl%s.mdl.jar",
+						str.ToLower(t.Param("gene")),
 						t.Param("replicate"),
+						t.Param("runset"),
 						str.ToLower(t.Param("gene")),
-						str.ToLower(t.Param("gene")),
+						t.Param("replicate"),
+						t.Param("runset"),
 						"liblin",
 						t.Param("cost"),
-						t.Param("nrmdl"),
-						t.Param("runset"))
+						t.Param("nrmdl"))
 				}
 				cpSignTrain.SetPathCustom("model", cpSignTrainModelPathFunc)
 				cpSignTrain.SetPathCustom("logfile", func(t *sp.Task) string {
