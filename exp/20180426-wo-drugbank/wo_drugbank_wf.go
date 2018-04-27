@@ -212,8 +212,9 @@ func main() {
 					| sort -uV \
 					| shuf --random-source={i:randsrc} -n $fillup_lines_cnt > {o:assumed_n} # replicate:{p:replicate}`)
 					extractAssumedNonBinding.SetPathCustom("assumed_n", func(t *sp.Task) string {
-						geneLC := str.ToLower(t.Param("gene"))
-						return "dat/" + geneLC + "/" + t.Param("replicate") + "/" + geneLC + "." + t.Param("replicate") + ".assumed_n.tsv"
+						gene := str.ToLower(t.Param("gene"))
+						repl := t.Param("replicate")
+						return "dat/" + gene + "/" + repl + "/" + gene + "." + repl + ".assumed_n.tsv"
 					})
 					extractAssumedNonBinding.In("rawdata").Connect(removeConflicting.Out("gene_smiles_activity"))
 					extractAssumedNonBinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
@@ -230,7 +231,10 @@ func main() {
 					}
 					countProcs[uniqStrRunSet] = wf.NewProc("cnt_targetdata_rows_"+uniqStrRepl, catPart+` | awk '$2 == "A" { a += 1 } $2 == "N" { n += 1 } END { print a "\t" n }' > {o:count} # {p:runset} {p:gene} {p:replicate}`)
 					countProcs[uniqStrRunSet].SetPathCustom("count", func(t *sp.Task) string {
-						return "dat/" + t.Param("replicate") + "/" + t.Param("runset") + "/" + str.ToLower(t.Param("gene")) + ".cnt"
+						gene := str.ToLower(t.Param("gene"))
+						repl := t.Param("replicate")
+						rset := t.Param("runset")
+						return "dat/" + gene + "/" + repl + "/" + rset + "/" + gene + "." + repl + "." + rset + ".cnt"
 					})
 					countProcs[uniqStrRunSet].In("targetdata").Connect(extractTargetData.Out("target_data"))
 					if doFillUp {
@@ -256,13 +260,25 @@ func main() {
 					cpSignPrecompCmd += ` \
 									--proper-trainfile {i:propertraindata}`
 				}
+				cpSignPrecompCmd += ` # {p:gene} {p:runset} {p:replicate}`
 				cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrRepl, cpSignPrecompCmd)
 				cpSignPrecomp.In("traindata").Connect(extractTargetData.Out("target_data"))
 				if doFillUp {
 					cpSignPrecomp.In("propertraindata").Connect(assumedNonActive)
 				}
-				cpSignPrecomp.SetPathExtend("traindata", "precomp", "."+runSet+".precomp")
-				cpSignPrecomp.SetPathExtend("traindata", "logfile", "."+runSet+".precomp.cpsign.log")
+				cpSignPrecomp.ParamInPort("gene").ConnectStr(geneLowerCase)
+				cpSignPrecomp.ParamInPort("replicate").ConnectStr(replicate)
+				cpSignPrecomp.ParamInPort("runset").ConnectStr(runSet)
+				precompPathFunc := func(t *sp.Task) string {
+					gene := t.Param("gene")
+					repl := t.Param("replicate")
+					rset := t.Param("runset")
+					return "dat/" + gene + "/" + repl + "/" + rset + "/" + gene + "." + repl + "." + rset + ".precomp"
+				}
+				cpSignPrecomp.SetPathCustom("precomp", precompPathFunc)
+				cpSignPrecomp.SetPathCustom("logfile", func(t *sp.Task) string {
+					return precompPathFunc(t) + ".cpsign.log"
+				})
 				if *runSlurm {
 					cpSignPrecomp.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J precmp_" + geneLowerCase // SLURM string
 				}
@@ -299,15 +315,16 @@ func main() {
 									--confidences "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:runset} {p:replicate}`
 					evalCost := wf.NewProc("crossval_"+uniqStrCost, evalCostCmd)
 					evalCostStatsPathFunc := func(t *sp.Task) string {
-						c, err := strconv.ParseInt(t.Param("cost"), 10, 0)
+						cost, err := strconv.ParseInt(t.Param("cost"), 10, 0)
 						sp.Check(err)
 						gene := str.ToLower(t.Param("gene"))
 						repl := t.Param("replicate")
-						return filepath.Dir(t.InPath("traindata")) + "/" + repl + "/" + t.Param("runset") + "/" + fmt.Sprintf("%s.%s.liblin_c%03d", gene, repl, c) + "_crossval_stats.json"
+						rset := t.Param("runset")
+						return filepath.Dir(t.InPath("traindata")) + "/" + repl + "/" + rset + "/" + fmt.Sprintf("%s.%s.%s.liblin_c%03d", gene, repl, rset, cost) + ".cvstats.json"
 					}
 					evalCost.SetPathCustom("stats", evalCostStatsPathFunc)
 					evalCost.SetPathCustom("logfile", func(t *sp.Task) string {
-						return evalCostStatsPathFunc(t) + ".cpsign.crossval.log"
+						return evalCostStatsPathFunc(t) + ".cpsign.log"
 					})
 					if doFillUp {
 						evalCost.In("propertraindata").Connect(assumedNonActive)
@@ -386,14 +403,16 @@ func main() {
 				cpSignTrain.ParamInPort("class_credibility").Connect(selectBest.OutBestClassCredibility())
 				cpSignTrain.ParamInPort("cost").Connect(selectBest.OutBestCost())
 				cpSignTrainModelPathFunc := func(t *sp.Task) string {
-					return fmt.Sprintf("dat/final_models/%s/%s/%s_%s_c%s_nrmdl%s_%s.mdl.jar",
+					return fmt.Sprintf("dat/final_models/%s/%s/%s/%s.%s.%s.%s_c%s_nrmdl%s.mdl.jar",
+						str.ToLower(t.Param("gene")),
 						t.Param("replicate"),
+						t.Param("runset"),
 						str.ToLower(t.Param("gene")),
-						str.ToLower(t.Param("gene")),
+						t.Param("replicate"),
+						t.Param("runset"),
 						"liblin",
 						t.Param("cost"),
-						t.Param("nrmdl"),
-						t.Param("runset"))
+						t.Param("nrmdl"))
 				}
 				cpSignTrain.SetPathCustom("model", cpSignTrainModelPathFunc)
 				cpSignTrain.SetPathCustom("logfile", func(t *sp.Task) string {
