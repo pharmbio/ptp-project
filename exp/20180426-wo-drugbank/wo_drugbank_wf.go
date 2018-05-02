@@ -156,7 +156,7 @@ func main() {
 	unzipWithdrawn.In("zip").Connect(dlWithdrawn.Out("zip"))
 
 	// Extract only CHEMBL and PubChem IDs from DrugBank TSV files and merge into one file
-	drugBankCompIDCmd := "csvcut -K 1 -c 11,14 {i:drugbankcsv} | sed '/^,$/d' | sort -V > {o:compids}"
+	drugBankCompIDCmd := `csvcut -K 1 -c 11,14 {i:drugbankcsv} | sed '/^,$/d' | tr "," "\n" | sed '/^$/d' | sort -V > {o:compids}`
 	drugBankCompIDsApprov := wf.NewProc("drugbank_compids_appr", drugBankCompIDCmd)
 	drugBankCompIDsApprov.SetPathExtend("drugbankcsv", "compids", ".compids.csv")
 	drugBankCompIDsApprov.In("drugbankcsv").Connect(unzipApproved.Out("csv"))

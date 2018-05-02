@@ -16,3 +16,5 @@
   - [ ] Create filtering component
     - Some hints on how to do it:
       https://stackoverflow.com/questions/14062402/awk-using-a-file-to-filter-another-one-out-tr
+    - [x] Make the merge ID file have only one column
+    - [ ] Extract only withdrawn, and approved only as to fill up to 1000 molecules
