@@ -157,13 +157,13 @@ func main() {
 
 	// extractIGSA extracts a file with only (orig entry) ID, Gene symbol, SMILES and the Activity flag
 	// into a .tsv file, for easier subsequent parsing
-	extractIGSA := wf.NewProc("extract_id_gene_smiles_activity", `awk -F "\t" '{ print $2 "\t" $9 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {o:id_gene_smiles_activity}`)
-	extractIGSA.SetPathReplace("excapedb", "id_gene_smiles_activity", ".tsv", ".ext_id_gene_smiles_activity.tsv")
+	extractIGSA := wf.NewProc("extract_gene_id_smiles_activity", `awk -F "\t" '{ print $9 "\t" $2 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {o:gene_id_smiles_activity}`)
+	extractIGSA.SetPathReplace("excapedb", "gene_id_smiles_activity", ".tsv", ".ext_gene_id_smiles_activity.tsv")
 	extractIGSA.In("excapedb").Connect(unPackDB.Out("unxzed"))
 
 	// [>] TODO: Create process for subtracting the DrugBank compounds HERE
 	removeDrugBankCompounds := wf.NewProc("remove_drugbank_compounds", "# Remove {i:gene_smiles_activity} > {o:gene_smiles_activity}")
-	removeDrugBankCompounds.In("gene_smiles_activity").Connect(extractIGSA.Out("id_gene_smiles_activity"))
+	removeDrugBankCompounds.In("gene_smiles_activity").Connect(extractIGSA.Out("gene_id_smiles_activity"))
 	// Steps:
 	// - How do we know which compounds to remove?
 	// - What IDs do we have in the raw dataset? - SMILES, it seems

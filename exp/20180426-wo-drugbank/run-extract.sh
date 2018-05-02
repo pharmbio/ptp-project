@@ -8,4 +8,4 @@
 #SBATCH --mail-type BEGIN,FAIL,END
 module load java/sun_jdk1.8.0_92
 module load R/3.4.0
-go run wo_drugbank_wf.go components.go -threads 1 -maxtasks 1 -geneset bowes44min100percls_small -procs "extract_id_gene_smiles_activity" 2>&1 | tee log/scipipe-$(date +%Y%m%d-%H%M%S).log # -debug
+go run wo_drugbank_wf.go components.go -threads 1 -maxtasks 1 -geneset bowes44min100percls_small -procs "extract_gene_id_smiles_activity" 2>&1 | tee log/scipipe-$(date +%Y%m%d-%H%M%S).log # -debug
