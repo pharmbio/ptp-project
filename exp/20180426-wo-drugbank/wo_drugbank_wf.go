@@ -169,15 +169,17 @@ func main() {
 	mergeApprWithdr.In("in1").Connect(drugBankCompIDsApprov.Out("compids"))
 	mergeApprWithdr.In("in2").Connect(drugBankCompIDsWithdr.Out("compids"))
 
-	// extractIGSA extracts a file with only (orig entry) ID, Gene symbol, SMILES and the Activity flag
+	// extractGISA extracts a file with only (orig entry) ID, Gene symbol, SMILES and the Activity flag
 	// into a .tsv file, for easier subsequent parsing
-	extractIGSA := wf.NewProc("extract_gene_id_smiles_activity", `awk -F "\t" '{ print $9 "\t" $2 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {o:gene_id_smiles_activity}`)
-	extractIGSA.SetPathReplace("excapedb", "gene_id_smiles_activity", ".tsv", ".ext_gene_id_smiles_activity.tsv")
-	extractIGSA.In("excapedb").Connect(unPackDB.Out("unxzed"))
+	extractGISA := wf.NewProc("extract_gene_id_smiles_activity", `awk -F "\t" '{ print $9 "\t" $2 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {o:gene_id_smiles_activity}`)
+	extractGISA.SetPathReplace("excapedb", "gene_id_smiles_activity", ".tsv", ".gisa.tsv")
+	extractGISA.In("excapedb").Connect(unPackDB.Out("unxzed"))
 
 	// [>] TODO: Create process for subtracting the DrugBank compounds HERE
-	removeDrugBankCompounds := wf.NewProc("remove_drugbank_compounds", "# Remove {i:gene_smiles_activity} > {o:gene_smiles_activity}")
-	removeDrugBankCompounds.In("gene_smiles_activity").Connect(extractIGSA.Out("gene_id_smiles_activity"))
+	remDrugBankComps := wf.NewProc("remove_drugbank_compounds", `awk 'FNR==NR { db[$2]; next } !($2 in db) { print $1 "\t" $3 "\t" $4 }' {i:compids_to_remove} {i:gisa} | sort -uV > {o:gsa_wo_drugbank}`)
+	remDrugBankComps.SetPathExtend("gisa", "gsa_wo_drugbank", ".gsa_wo_drugbank.tsv")
+	remDrugBankComps.In("compids_to_remove").Connect(extractGISA.Out("gene_id_smiles_activity"))
+	remDrugBankComps.In("gisa").Connect(extractGISA.Out("gene_id_smiles_activity"))
 	// Steps:
 	// - How do we know which compounds to remove?
 	// - What IDs do we have in the raw dataset? - SMILES, it seems
@@ -191,9 +193,9 @@ func main() {
 
 	// extractGSA extracts a file with only Gene symbol, SMILES and the
 	// Activity flag, into a .tsv file, for easier subsequent parsing
-	extractGSA := wf.NewProc("extract_gene_smiles_activity", `awk -F "\t" '{ print $9 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {os:gene_smiles_activity}`) // os = output (streaming) ... stream output via a fifo file
-	extractGSA.SetPathReplace("excapedb", "gene_smiles_activity", ".tsv", ".ext_gene_smiles_activity.tsv")
-	extractGSA.In("excapedb").Connect(unPackDB.Out("unxzed"))
+	//extractGSA := wf.NewProc("extract_gene_smiles_activity", `awk -F "\t" '{ print $9 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {os:gene_smiles_activity}`) // os = output (streaming) ... stream output via a fifo file
+	//extractGSA.SetPathReplace("excapedb", "gene_smiles_activity", ".tsv", ".gsa.tsv")
+	//extractGSA.In("excapedb").Connect(unPackDB.Out("unxzed"))
 
 	// removeConflicting removes (or, SHOULD remove) rows which have the same values on both row 1 and 2 (I think ...)
 	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '(( $1 != p1 ) || ( $2 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print p1 "\t" p2 "\t" p3 }
@@ -201,7 +203,7 @@ func main() {
 																	  END { print $1 "\t" $2 "\t" $3 }' \
 																	  {i:gene_smiles_activity} > {o:gene_smiles_activity}`)
 	removeConflicting.SetPathReplace("gene_smiles_activity", "gene_smiles_activity", ".tsv", ".dedup.tsv")
-	removeConflicting.In("gene_smiles_activity").Connect(extractGSA.Out("gene_smiles_activity"))
+	removeConflicting.In("gene_smiles_activity").Connect(remDrugBankComps.Out("gsa_wo_drugbank"))
 
 	finalModelsSummary := NewFinalModelSummarizer(wf, "finalmodels_summary_creator", "res/final_models_summary.tsv", '\t')
 
