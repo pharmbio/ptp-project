@@ -155,6 +155,20 @@ func main() {
 	unzipWithdrawn.SetPathStatic("csv", "dat/drugbank_withdrawn.csv")
 	unzipWithdrawn.In("zip").Connect(dlWithdrawn.Out("zip"))
 
+	// Extract only CHEMBL and PubChem IDs from DrugBank TSV files and merge into one file
+	drugBankCompIDCmd := "csvcut -K 1 -c 11,14 {i:drugbankcsv} | sed '/^,$/d' | sort -V > {o:compids}"
+	drugBankCompIDsApprov := wf.NewProc("drugbank_compids_appr", drugBankCompIDCmd)
+	drugBankCompIDsApprov.SetPathExtend("drugbankcsv", "compids", ".compids.csv")
+	drugBankCompIDsApprov.In("drugbankcsv").Connect(unzipApproved.Out("csv"))
+	drugBankCompIDsWithdr := wf.NewProc("drugbank_compids_withdr", drugBankCompIDCmd)
+	drugBankCompIDsWithdr.SetPathExtend("drugbankcsv", "compids", ".compids.csv")
+	drugBankCompIDsWithdr.In("drugbankcsv").Connect(unzipWithdrawn.Out("csv"))
+
+	mergeApprWithdr := wf.NewProc("merge_appr_withdr", "cat {i:in1} {i:in2} | sort -V | uniq > {o:out}")
+	mergeApprWithdr.SetPathStatic("out", "dat/drugbank_compids_all.csv")
+	mergeApprWithdr.In("in1").Connect(drugBankCompIDsApprov.Out("compids"))
+	mergeApprWithdr.In("in2").Connect(drugBankCompIDsWithdr.Out("compids"))
+
 	// extractIGSA extracts a file with only (orig entry) ID, Gene symbol, SMILES and the Activity flag
 	// into a .tsv file, for easier subsequent parsing
 	extractIGSA := wf.NewProc("extract_gene_id_smiles_activity", `awk -F "\t" '{ print $9 "\t" $2 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {o:gene_id_smiles_activity}`)
@@ -169,6 +183,7 @@ func main() {
 	// - What IDs do we have in the raw dataset? - SMILES, it seems
 	// - [ ] So, it turns out we have to do the removal before the GSA extraction,
 	// while we still have access to PubChem/CHEMBL IDs...
+	// - [ ] Do the filtering (See: https://stackoverflow.com/questions/14062402/awk-using-a-file-to-filter-another-one-out-tr)
 
 	// ################################################################################
 	// ################################################################################
