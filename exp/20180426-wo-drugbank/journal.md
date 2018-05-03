@@ -23,3 +23,7 @@
     to be kept together when we want to select how many to pick, etc)
   - [x] Fix bug from the fact that approved/withdrawn status in drugbank raw
     data is not mutually exclusive
+  - [x] Fix out of memory error from SLURM, on the remove_conflicting step
+  - [ ] Fix bug: We want to select drugbank molecules to remove that are
+    available in ExcapeDB, otherwise our withdrawn molecules are too few (right
+    now 918 instead of 1000)

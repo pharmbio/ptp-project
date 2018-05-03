@@ -196,7 +196,7 @@ func main() {
 	// Merge the (sometimes) two comma-separated columns of compound IDs into one
 	// column, so it can be used as a skip-list for filtering out the selected
 	// DrugBank compounds in AWK later
-	makeOneColumn := wf.NewProc("make_one_column", `cat {i:infile} | tr "," "\n" | sed '/^,$/d' | sed '/^$/d' > {o:onecol}`)
+	makeOneColumn := wf.NewProc("make_one_column", `cat {i:infile} | tr "," "\n" | sed '/^,$/d' | sed '/^$/d' | sort -V > {o:onecol}`)
 	makeOneColumn.SetPathExtend("infile", "onecol", ".onecol.csv")
 	makeOneColumn.In("infile").Connect(mergeApprWithdr.Out("out"))
 

@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH -A snic2017-7-89
 #SBATCH -p core
-#SBATCH -n 2
+#SBATCH -n 4
 #SBATCH -J rem_conflicting
 #SBATCH -t 4:00:00
 #SBATCH --mail-user samuel.lampa@farmbio.uu.se
