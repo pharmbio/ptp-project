@@ -21,5 +21,5 @@
   - [x] Fix bug that duplicate IDs of the same molecule can occur, because
     both CHEMBL and PubChem IDs are merged too simply right now (molecules need
     to be kept together when we want to select how many to pick, etc)
-  - [>] Fix bug from the fact that approved/withdrawn status in drugbank raw
+  - [x] Fix bug from the fact that approved/withdrawn status in drugbank raw
     data is not mutually exclusive

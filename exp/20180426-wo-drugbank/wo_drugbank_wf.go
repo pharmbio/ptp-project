@@ -167,13 +167,21 @@ func main() {
 	genRandSrcForDrugBankSelection := wf.NewProc("gen_randsrc_for_drugbank_selection", "dd if=/dev/urandom of={o:rand} bs=1024 count=1024") // HERE
 	genRandSrcForDrugBankSelection.SetPathStatic("rand", "dat/randsrc_for_drugbank_selection.bin")
 
+	// Approved/Withdrawn status in DrugBank is not mutually exclusive, so we need
+	// to filter out the approved ones that are only approved, but NOT also
+	// withdrawn
+	extractUniquelyApproved := wf.NewProc("extract_uniquely_approved", `awk 'FNR==NR { withdr[$0]; next } !($1 in withdr)' {i:withdr} {i:approv} > {o:uniqapprov}`)
+	extractUniquelyApproved.SetPathExtend("approv", "uniqapprov", ".uniq_appr.csv")
+	extractUniquelyApproved.In("withdr").Connect(drugBankCompIDsWithdr.Out("compids"))
+	extractUniquelyApproved.In("approv").Connect(drugBankCompIDsApprov.Out("compids"))
+
 	// Extract the approved compounds in DrugBank that we want to add to our set of
 	// DrugBank compounds to remove from the dataset before training
 	extractApprovedToAdd := wf.NewProc("extract_approved_to_add", `shuf --random-source={i:randsrc} -n $(awk 'END { print {p:nrcomp}-NR }' {i:withdr}) {i:approv} > {o:approved_to_add}`)
 	extractApprovedToAdd.SetPathCustom("approved_to_add", func(t *sp.Task) string {
 		return "dat/drugbank_compids_appr_to_add_for_tot_n" + t.Param("nrcomp") + ".csv"
 	})
-	extractApprovedToAdd.In("approv").Connect(drugBankCompIDsApprov.Out("compids"))
+	extractApprovedToAdd.In("approv").Connect(extractUniquelyApproved.Out("uniqapprov"))
 	extractApprovedToAdd.In("withdr").Connect(drugBankCompIDsWithdr.Out("compids"))
 	extractApprovedToAdd.In("randsrc").Connect(genRandSrcForDrugBankSelection.Out("rand"))
 	extractApprovedToAdd.ParamInPort("nrcomp").ConnectStr("1000")
@@ -181,7 +189,7 @@ func main() {
 	// Simply merge the withdrawn compounds from DrugBank, with the selected
 	// approved ones, into one file
 	mergeApprWithdr := wf.NewProc("merge_appr_withdr", "cat {i:approv} {i:withdr} | sort -V | uniq > {o:out}")
-	mergeApprWithdr.SetPathStatic("out", "dat/drugbank_compids_selected.csv")
+	mergeApprWithdr.SetPathStatic("out", "dat/drugbank_compids_to_remove.csv")
 	mergeApprWithdr.In("approv").Connect(extractApprovedToAdd.Out("approved_to_add"))
 	mergeApprWithdr.In("withdr").Connect(drugBankCompIDsWithdr.Out("compids"))
 
@@ -515,7 +523,7 @@ func main() {
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
-	wf.RunTo(*procsRegex)
+	wf.RunToRegex(*procsRegex)
 }
 
 // --------------------------------------------------------------------------------
