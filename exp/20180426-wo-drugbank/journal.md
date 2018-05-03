@@ -33,3 +33,44 @@
       - `wc -l ../../raw/pubchem.chembl.dataset4publication_inchi_smiles.gisa.tsv`
       - `wc -l dat/drugbank_compids_to_remove.csv.onecol.csv`
       - Difference was: 70448221−70447303=918
+    - Turns out: Maybe not(?!!). See chat log:
+      > @channel: Vi måste välja ett annat antal än 1000 att dra bort från ExcapeDB.
+      >
+      > Bara 807 approved och 66 withdrawn, i DrugBank, som inte finns i ExcapeDB.
+      >
+      > ```bash
+      > [dat]$ wc -l drugbank_withdrawn.csv.compids.csv{,.inexcapedb.csv}
+      >  200 drugbank_withdrawn.csv.compids.csv
+      >   66 drugbank_withdrawn.csv.compids.csv.inexcapedb.csv
+      >  266 total
+      > [dat]$ wc -l drugbank_approved.csv.compids.csv.uniq_appr.csv{,.inexcapedb.csv}
+      >  2089 drugbank_approved.csv.compids.csv.uniq_appr.csv
+      >   807 drugbank_approved.csv.compids.csv.uniq_appr.csv.inexcapedb.csv```
+      > ```
+      >
+      > staffan [5:51 PM]
+      > @saml varför måste alla finnas i ExcapeDB med? räcker det inte med att vi har 1000 som vi vet utfallet för och så tränar vi på resterande data? är väl inget egenvärde i att kunna plocka bort dem från ExcapeDB-data?
+      >
+      > saml [5:52 PM]
+      > @staffan Hmm, det har du kanske rätt i ja :slightly_smiling_face: (edited)
+      > Körde faktiskt så först, men fick sedan för mig att vi behövde plocka från dem som finns i excapedb ... hmm ...
+      >
+      > staffan [5:57 PM]
+      > känns som att huvud-idéen är att vi inte tränar på samma compounds som vi använder i valideringen
+      >
+      > saml [5:57 PM]
+      > Nu inser jag dessutom att jag inverterat uttrycket ...
+      > Det är snarare så att 66 st withdrawn, och 807 approved *inte* finns med i excapedb ...
+      > ... så om vi skulle validera mot bara dessa, så skulle vi inte ens behöva ta bort nåt från excapedb
+      > Det ter sig ju nästan lockande :slightly_smiling_face:
+      >
+      > staffan [5:59 PM]
+      > hur många har vi då som vi kan validera med? var det drugbank som hade typ 11k totalt?
+      >
+      > saml [6:00 PM]
+      > Mjao, fast av dessa är bara 2550 approved small molecule drugs (edited)
+      > Men vi skulle alltså kunna validera mot 873 st (807 approved + 66 withdrawn) drugbank compounds helt utan att göra nåt åt excapedb-datat (edited)
+      > Man skulle kanske vilja åtminstone se till att börja med dessa i det man plockar ut ... och sedan komplettera med compounds som finns i excapedb, tills man når 1000. Men workflowet blir å andra sidan alltmer komplext då ... (edited)
+      > (Man anar inte riktigt hur komplexa operationer det blir av att göra nåt som verkar så intuitivt på vita tavlan :thinking_face:) (edited)
+      >
+      > Alternativt så backar jag tillbaka till hur jag gjorde från början: D.v.s. bryr mig inte i om valda drugbank compounds finns i excapedb eller inte ... men tar bort dem därifrån ifall de finns där. (edited)

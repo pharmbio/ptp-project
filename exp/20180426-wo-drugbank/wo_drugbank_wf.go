@@ -169,6 +169,7 @@ func main() {
 	excapeDBCompIDs := wf.NewProc("ext_excape_compids", `awk '{ print $2 }' {i:excapedb} | tail -n +2 | sort -V | uniq > {o:excape_compids}`)
 	excapeDBCompIDs.SetPathStatic("excape_compids", "dat/excapedb_compids.csv")
 	excapeDBCompIDs.In("excapedb").Connect(dataExcapeDB)
+	dataExcapeDBCompIDs := excapeDBCompIDs.Out("excape_compids")
 
 	genRandSrcForDrugBankSelection := wf.NewProc("gen_randsrc_for_drugbank_selection", "dd if=/dev/urandom of={o:rand} bs=1024 count=1024") // HERE
 	genRandSrcForDrugBankSelection.SetPathStatic("rand", "dat/randsrc_for_drugbank_selection.bin")
@@ -180,6 +181,17 @@ func main() {
 	extractUniquelyApproved.SetPathExtend("approv", "uniqapprov", ".uniq_appr.csv")
 	extractUniquelyApproved.In("withdr").Connect(drugBankCompIDsWithdr.Out("compids"))
 	extractUniquelyApproved.In("approv").Connect(drugBankCompIDsApprov.Out("compids"))
+
+	// Filter out only the DrugBank compound IDs available in DrugBank
+	drugBankCompIDsInExcapeDBCmd := `awk -F"," 'FNR==NR { edb[$1]; next } ($1 in edb) || ($2 in edb)' {i:excape_compids} {i:drugbank} > {o:out}`
+	drugBankCompIDsInExcapeDBApprov := wf.NewProc("drugbank_compids_in_excapedb_approv", drugBankCompIDsInExcapeDBCmd)
+	drugBankCompIDsInExcapeDBApprov.SetPathExtend("drugbank", "out", ".inexcapedb.csv")
+	drugBankCompIDsInExcapeDBApprov.In("excape_compids").Connect(dataExcapeDBCompIDs)
+	drugBankCompIDsInExcapeDBApprov.In("drugbank").Connect(extractUniquelyApproved.Out("uniqapprov"))
+	drugBankCompIDsInExcapeDBWithdr := wf.NewProc("drugbank_compids_in_excapedb_withdr", drugBankCompIDsInExcapeDBCmd)
+	drugBankCompIDsInExcapeDBWithdr.SetPathExtend("drugbank", "out", ".inexcapedb.csv")
+	drugBankCompIDsInExcapeDBWithdr.In("excape_compids").Connect(dataExcapeDBCompIDs)
+	drugBankCompIDsInExcapeDBWithdr.In("drugbank").Connect(drugBankCompIDsWithdr.Out("compids"))
 
 	// Extract the approved compounds in DrugBank that we want to add to our set of
 	// DrugBank compounds to remove from the dataset before training
