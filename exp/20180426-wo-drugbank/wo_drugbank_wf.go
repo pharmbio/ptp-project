@@ -133,6 +133,8 @@ func main() {
 	unPackDB := wf.NewProc("unPackDB", "xzcat {i:xzfile} > {o:unxzed}")
 	unPackDB.SetPathReplace("xzfile", "unxzed", ".xz", "")
 	unPackDB.In("xzfile").Connect(dlExcapeDB.Out("excapexz"))
+
+	dataExcapeDB := unPackDB.Out("unxzed")
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
 	// ################################################################################
@@ -163,6 +165,10 @@ func main() {
 	drugBankCompIDsWithdr := wf.NewProc("drugbank_compids_withdr", drugBankCompIDCmd)
 	drugBankCompIDsWithdr.SetPathExtend("drugbankcsv", "compids", ".compids.csv")
 	drugBankCompIDsWithdr.In("drugbankcsv").Connect(unzipWithdrawn.Out("csv"))
+
+	excapeDBCompIDs := wf.NewProc("ext_excape_compids", `awk '{ print $2 }' {i:excapedb} | tail -n +2 | sort -V | uniq > {o:excape_compids}`)
+	excapeDBCompIDs.SetPathStatic("excape_compids", "dat/excapedb_compids.csv")
+	excapeDBCompIDs.In("excapedb").Connect(dataExcapeDB)
 
 	genRandSrcForDrugBankSelection := wf.NewProc("gen_randsrc_for_drugbank_selection", "dd if=/dev/urandom of={o:rand} bs=1024 count=1024") // HERE
 	genRandSrcForDrugBankSelection.SetPathStatic("rand", "dat/randsrc_for_drugbank_selection.bin")
@@ -204,7 +210,7 @@ func main() {
 	// into a .tsv file, for easier subsequent parsing
 	extractGISA := wf.NewProc("extract_gene_id_smiles_activity", `awk -F "\t" '{ print $9 "\t" $2 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {o:gene_id_smiles_activity}`)
 	extractGISA.SetPathReplace("excapedb", "gene_id_smiles_activity", ".tsv", ".gisa.tsv")
-	extractGISA.In("excapedb").Connect(unPackDB.Out("unxzed"))
+	extractGISA.In("excapedb").Connect(dataExcapeDB)
 
 	// [x] TODO: Create process for subtracting the DrugBank compounds HERE
 	remDrugBankComps := wf.NewProc("remove_drugbank_compounds", `awk 'FNR==NR { db[$2]; next } !($2 in db) { print $1 "\t" $3 "\t" $4 }' {i:compids_to_remove} {i:gisa} | sort -uV > {o:gsa_wo_drugbank}`)
@@ -226,7 +232,7 @@ func main() {
 	// Activity flag, into a .tsv file, for easier subsequent parsing
 	//extractGSA := wf.NewProc("extract_gene_smiles_activity", `awk -F "\t" '{ print $9 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {os:gene_smiles_activity}`) // os = output (streaming) ... stream output via a fifo file
 	//extractGSA.SetPathReplace("excapedb", "gene_smiles_activity", ".tsv", ".gsa.tsv")
-	//extractGSA.In("excapedb").Connect(unPackDB.Out("unxzed"))
+	//extractGSA.In("excapedb").Connect(dataExcapeDB)
 
 	// removeConflicting removes (or, SHOULD remove) rows which have the same values on both row 1 and 2 (I think ...)
 	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '(( $1 != p1 ) || ( $2 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print p1 "\t" p2 "\t" p3 }

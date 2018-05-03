@@ -24,6 +24,8 @@
   - [x] Fix bug from the fact that approved/withdrawn status in drugbank raw
     data is not mutually exclusive
   - [x] Fix out of memory error from SLURM, on the remove_conflicting step
+  - [x] Save excapeDB dataset port as a variable representing the excapedb
+    dataset (new approach to easier workflow authoring I just realized)
   - [ ] Fix bug: We want to select drugbank molecules to remove that are
     available in ExcapeDB, otherwise our withdrawn molecules are too few (right
     now 918 instead of 1000)
