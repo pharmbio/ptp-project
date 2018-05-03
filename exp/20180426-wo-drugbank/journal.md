@@ -27,3 +27,7 @@
   - [ ] Fix bug: We want to select drugbank molecules to remove that are
     available in ExcapeDB, otherwise our withdrawn molecules are too few (right
     now 918 instead of 1000)
+    - Compared with:
+      - `wc -l ../../raw/pubchem.chembl.dataset4publication_inchi_smiles.gisa.tsv`
+      - `wc -l dat/drugbank_compids_to_remove.csv.onecol.csv`
+      - Difference was: 70448221−70447303=918
