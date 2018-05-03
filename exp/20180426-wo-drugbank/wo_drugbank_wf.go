@@ -156,7 +156,7 @@ func main() {
 	unzipWithdrawn.In("zip").Connect(dlWithdrawn.Out("zip"))
 
 	// Extract only CHEMBL and PubChem IDs from DrugBank TSV files and merge into one file
-	drugBankCompIDCmd := `csvcut -K 1 -c 11,14 {i:drugbankcsv} | sed '/^(,)?$/d' | sort -V > {o:compids}`
+	drugBankCompIDCmd := `csvcut -K 1 -c 11,14 {i:drugbankcsv} | sed '/^,$/d' | sed '/^$/d' | sort -V > {o:compids}`
 	drugBankCompIDsApprov := wf.NewProc("drugbank_compids_appr", drugBankCompIDCmd)
 	drugBankCompIDsApprov.SetPathExtend("drugbankcsv", "compids", ".compids.csv")
 	drugBankCompIDsApprov.In("drugbankcsv").Connect(unzipApproved.Out("csv"))
@@ -169,11 +169,12 @@ func main() {
 
 	// Extract the approved compounds in DrugBank that we want to add to our set of
 	// DrugBank compounds to remove from the dataset before training
-	extractApprovedToAdd := wf.NewProc("extract_approved_to_add", `shuf --random-source={i:randsrc} -n $(awk 'END { print {p:nrcomp}-NR }') {i:approv} > {o:approved_to_add}`)
+	extractApprovedToAdd := wf.NewProc("extract_approved_to_add", `shuf --random-source={i:randsrc} -n $(awk 'END { print {p:nrcomp}-NR }' {i:withdr}) {i:approv} > {o:approved_to_add}`)
 	extractApprovedToAdd.SetPathCustom("approved_to_add", func(t *sp.Task) string {
-		return "dat/drugbank_compids_allwithdr_fillto" + t.Param("nrcomp") + "totapprov.csv"
+		return "dat/drugbank_compids_appr_to_add_for_tot_n" + t.Param("nrcomp") + ".csv"
 	})
 	extractApprovedToAdd.In("approv").Connect(drugBankCompIDsApprov.Out("compids"))
+	extractApprovedToAdd.In("withdr").Connect(drugBankCompIDsWithdr.Out("compids"))
 	extractApprovedToAdd.In("randsrc").Connect(genRandSrcForDrugBankSelection.Out("rand"))
 	extractApprovedToAdd.ParamInPort("nrcomp").ConnectStr("1000")
 
@@ -187,7 +188,7 @@ func main() {
 	// Merge the (sometimes) two comma-separated columns of compound IDs into one
 	// column, so it can be used as a skip-list for filtering out the selected
 	// DrugBank compounds in AWK later
-	makeOneColumn := wf.NewProc("make_one_column", `cat {i:infile} | tr "," "\n" > {o:onecol}`)
+	makeOneColumn := wf.NewProc("make_one_column", `cat {i:infile} | tr "," "\n" | sed '/^,$/d' | sed '/^$/d' > {o:onecol}`)
 	makeOneColumn.SetPathExtend("infile", "onecol", ".onecol.csv")
 	makeOneColumn.In("infile").Connect(mergeApprWithdr.Out("out"))
 
