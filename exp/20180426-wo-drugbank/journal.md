@@ -14,7 +14,10 @@
   the drugbank-vs-not experiment
   - [x] Add extraction and merge components from excapedb-vs-drugbank experiement
   - [x] Make the merge ID file have only one column
-  - [ ] Extract only withdrawn, and approved only as to fill up to 1000 molecules
+  - [x] Extract only withdrawn, and approved only as to fill up to 1000 molecules
+  - [ ] Fix bug that duplicate IDs of the same molecule can occur, because
+    both CHEMBL and PubChem IDs are merged too simply right now (molecules need
+    to be kept together when we want to select how many to pick, etc)
   - [x] Create filtering component
     - Some hints on how to do it:
       https://stackoverflow.com/questions/14062402/awk-using-a-file-to-filter-another-one-out-tr

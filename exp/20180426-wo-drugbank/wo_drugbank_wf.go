@@ -164,10 +164,21 @@ func main() {
 	drugBankCompIDsWithdr.SetPathExtend("drugbankcsv", "compids", ".compids.csv")
 	drugBankCompIDsWithdr.In("drugbankcsv").Connect(unzipWithdrawn.Out("csv"))
 
-	mergeApprWithdr := wf.NewProc("merge_appr_withdr", "cat {i:in1} {i:in2} | sort -V | uniq > {o:out}")
-	mergeApprWithdr.SetPathStatic("out", "dat/drugbank_compids_all.csv")
-	mergeApprWithdr.In("in1").Connect(drugBankCompIDsApprov.Out("compids"))
-	mergeApprWithdr.In("in2").Connect(drugBankCompIDsWithdr.Out("compids"))
+	genRandSrcForDrugBankSelection := wf.NewProc("gen_randsrc_for_drugbank_selection", "dd if=/dev/urandom of={o:rand} bs=1024 count=1024") // HERE
+	genRandSrcForDrugBankSelection.SetPathStatic("rand", "dat/randsrc_for_drugbank_selection.bin")
+
+	extractApprovedToAdd := wf.NewProc("extract_approved_to_add", `shuf --random-source={i:randsrc} -n $(awk 'END { print {p:nrcomp}-NR }') {i:approv} > {o:approved_to_add}`)
+	extractApprovedToAdd.SetPathCustom("approved_to_add", func(t *sp.Task) string {
+		return "dat/drugbank_compids_allwithdr_fillto" + t.Param("nrcomp") + "totapprov.csv"
+	})
+	extractApprovedToAdd.In("approv").Connect(drugBankCompIDsApprov.Out("compids"))
+	extractApprovedToAdd.In("randsrc").Connect(genRandSrcForDrugBankSelection.Out("rand"))
+	extractApprovedToAdd.ParamInPort("nrcomp").ConnectStr("1000")
+
+	mergeApprWithdr := wf.NewProc("merge_appr_withdr", "cat {i:approv} {i:withdr} | sort -V | uniq > {o:out}")
+	mergeApprWithdr.SetPathStatic("out", "dat/drugbank_compids_selected.csv")
+	mergeApprWithdr.In("approv").Connect(extractApprovedToAdd.Out("approved_to_add"))
+	mergeApprWithdr.In("withdr").Connect(drugBankCompIDsWithdr.Out("compids"))
 
 	// extractGISA extracts a file with only (orig entry) ID, Gene symbol, SMILES and the Activity flag
 	// into a .tsv file, for easier subsequent parsing
