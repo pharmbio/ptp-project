@@ -15,7 +15,7 @@
   - [x] Add extraction and merge components from excapedb-vs-drugbank experiement
   - [x] Make the merge ID file have only one column
   - [x] Extract only withdrawn, and approved only as to fill up to 1000 molecules
-  - [ ] Fix bug that duplicate IDs of the same molecule can occur, because
+  - [x] Fix bug that duplicate IDs of the same molecule can occur, because
     both CHEMBL and PubChem IDs are merged too simply right now (molecules need
     to be kept together when we want to select how many to pick, etc)
   - [x] Create filtering component

@@ -156,7 +156,7 @@ func main() {
 	unzipWithdrawn.In("zip").Connect(dlWithdrawn.Out("zip"))
 
 	// Extract only CHEMBL and PubChem IDs from DrugBank TSV files and merge into one file
-	drugBankCompIDCmd := `csvcut -K 1 -c 11,14 {i:drugbankcsv} | sed '/^,$/d' | tr "," "\n" | sed '/^$/d' | sort -V > {o:compids}`
+	drugBankCompIDCmd := `csvcut -K 1 -c 11,14 {i:drugbankcsv} | sed '/^(,)?$/d' | sort -V > {o:compids}`
 	drugBankCompIDsApprov := wf.NewProc("drugbank_compids_appr", drugBankCompIDCmd)
 	drugBankCompIDsApprov.SetPathExtend("drugbankcsv", "compids", ".compids.csv")
 	drugBankCompIDsApprov.In("drugbankcsv").Connect(unzipApproved.Out("csv"))
@@ -167,6 +167,8 @@ func main() {
 	genRandSrcForDrugBankSelection := wf.NewProc("gen_randsrc_for_drugbank_selection", "dd if=/dev/urandom of={o:rand} bs=1024 count=1024") // HERE
 	genRandSrcForDrugBankSelection.SetPathStatic("rand", "dat/randsrc_for_drugbank_selection.bin")
 
+	// Extract the approved compounds in DrugBank that we want to add to our set of
+	// DrugBank compounds to remove from the dataset before training
 	extractApprovedToAdd := wf.NewProc("extract_approved_to_add", `shuf --random-source={i:randsrc} -n $(awk 'END { print {p:nrcomp}-NR }') {i:approv} > {o:approved_to_add}`)
 	extractApprovedToAdd.SetPathCustom("approved_to_add", func(t *sp.Task) string {
 		return "dat/drugbank_compids_allwithdr_fillto" + t.Param("nrcomp") + "totapprov.csv"
@@ -175,10 +177,19 @@ func main() {
 	extractApprovedToAdd.In("randsrc").Connect(genRandSrcForDrugBankSelection.Out("rand"))
 	extractApprovedToAdd.ParamInPort("nrcomp").ConnectStr("1000")
 
+	// Simply merge the withdrawn compounds from DrugBank, with the selected
+	// approved ones, into one file
 	mergeApprWithdr := wf.NewProc("merge_appr_withdr", "cat {i:approv} {i:withdr} | sort -V | uniq > {o:out}")
 	mergeApprWithdr.SetPathStatic("out", "dat/drugbank_compids_selected.csv")
 	mergeApprWithdr.In("approv").Connect(extractApprovedToAdd.Out("approved_to_add"))
 	mergeApprWithdr.In("withdr").Connect(drugBankCompIDsWithdr.Out("compids"))
+
+	// Merge the (sometimes) two comma-separated columns of compound IDs into one
+	// column, so it can be used as a skip-list for filtering out the selected
+	// DrugBank compounds in AWK later
+	makeOneColumn := wf.NewProc("make_one_column", `cat {i:infile} | tr "," "\n" > {o:onecol}`)
+	makeOneColumn.SetPathExtend("infile", "onecol", ".onecol.csv")
+	makeOneColumn.In("infile").Connect(mergeApprWithdr.Out("out"))
 
 	// extractGISA extracts a file with only (orig entry) ID, Gene symbol, SMILES and the Activity flag
 	// into a .tsv file, for easier subsequent parsing
@@ -186,17 +197,17 @@ func main() {
 	extractGISA.SetPathReplace("excapedb", "gene_id_smiles_activity", ".tsv", ".gisa.tsv")
 	extractGISA.In("excapedb").Connect(unPackDB.Out("unxzed"))
 
-	// [>] TODO: Create process for subtracting the DrugBank compounds HERE
+	// [x] TODO: Create process for subtracting the DrugBank compounds HERE
 	remDrugBankComps := wf.NewProc("remove_drugbank_compounds", `awk 'FNR==NR { db[$2]; next } !($2 in db) { print $1 "\t" $3 "\t" $4 }' {i:compids_to_remove} {i:gisa} | sort -uV > {o:gsa_wo_drugbank}`)
-	remDrugBankComps.SetPathExtend("gisa", "gsa_wo_drugbank", ".gsa_wo_drugbank.tsv")
-	remDrugBankComps.In("compids_to_remove").Connect(extractGISA.Out("gene_id_smiles_activity"))
+	remDrugBankComps.SetPathStatic("gsa_wo_drugbank", "dat/excapedb.gsa_wo_drugbank.tsv")
+	remDrugBankComps.In("compids_to_remove").Connect(makeOneColumn.Out("onecol"))
 	remDrugBankComps.In("gisa").Connect(extractGISA.Out("gene_id_smiles_activity"))
 	// Steps:
 	// - How do we know which compounds to remove?
 	// - What IDs do we have in the raw dataset? - SMILES, it seems
-	// - [ ] So, it turns out we have to do the removal before the GSA extraction,
+	// - [x] So, it turns out we have to do the removal before the GSA extraction,
 	// while we still have access to PubChem/CHEMBL IDs...
-	// - [ ] Do the filtering (See: https://stackoverflow.com/questions/14062402/awk-using-a-file-to-filter-another-one-out-tr)
+	// - [x] Do the filtering (See: https://stackoverflow.com/questions/14062402/awk-using-a-file-to-filter-another-one-out-tr)
 
 	// ################################################################################
 	// ################################################################################
