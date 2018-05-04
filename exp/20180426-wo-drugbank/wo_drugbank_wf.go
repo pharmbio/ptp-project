@@ -169,7 +169,6 @@ func main() {
 	excapeDBCompIDs := wf.NewProc("ext_excape_compids", `awk '{ print $2 }' {i:excapedb} | tail -n +2 | sort -V | uniq > {o:excape_compids}`)
 	excapeDBCompIDs.SetPathStatic("excape_compids", "dat/excapedb_compids.csv")
 	excapeDBCompIDs.In("excapedb").Connect(dataExcapeDB)
-	dataExcapeDBCompIDs := excapeDBCompIDs.Out("excape_compids")
 
 	genRandSrcForDrugBankSelection := wf.NewProc("gen_randsrc_for_drugbank_selection", "dd if=/dev/urandom of={o:rand} bs=1024 count=1024") // HERE
 	genRandSrcForDrugBankSelection.SetPathStatic("rand", "dat/randsrc_for_drugbank_selection.bin")
@@ -186,11 +185,11 @@ func main() {
 	drugBankCompIDsInExcapeDBCmd := `awk -F"," 'FNR==NR { edb[$1]; next } ($1 in edb) || ($2 in edb)' {i:excape_compids} {i:drugbank} > {o:out}`
 	drugBankCompIDsInExcapeDBApprov := wf.NewProc("drugbank_compids_in_excapedb_approv", drugBankCompIDsInExcapeDBCmd)
 	drugBankCompIDsInExcapeDBApprov.SetPathExtend("drugbank", "out", ".inexcapedb.csv")
-	drugBankCompIDsInExcapeDBApprov.In("excape_compids").Connect(dataExcapeDBCompIDs)
+	drugBankCompIDsInExcapeDBApprov.In("excape_compids").Connect(excapeDBCompIDs.Out("excape_compids"))
 	drugBankCompIDsInExcapeDBApprov.In("drugbank").Connect(extractUniquelyApproved.Out("uniqapprov"))
 	drugBankCompIDsInExcapeDBWithdr := wf.NewProc("drugbank_compids_in_excapedb_withdr", drugBankCompIDsInExcapeDBCmd)
 	drugBankCompIDsInExcapeDBWithdr.SetPathExtend("drugbank", "out", ".inexcapedb.csv")
-	drugBankCompIDsInExcapeDBWithdr.In("excape_compids").Connect(dataExcapeDBCompIDs)
+	drugBankCompIDsInExcapeDBWithdr.In("excape_compids").Connect(excapeDBCompIDs.Out("excape_compids"))
 	drugBankCompIDsInExcapeDBWithdr.In("drugbank").Connect(drugBankCompIDsWithdr.Out("compids"))
 
 	// Extract the approved compounds in DrugBank that we want to add to our set of
@@ -199,8 +198,8 @@ func main() {
 	extractApprovedToAdd.SetPathCustom("approved_to_add", func(t *sp.Task) string {
 		return "dat/drugbank_compids_appr_to_add_for_tot_n" + t.Param("nrcomp") + ".csv"
 	})
-	extractApprovedToAdd.In("approv").Connect(extractUniquelyApproved.Out("uniqapprov"))
-	extractApprovedToAdd.In("withdr").Connect(drugBankCompIDsWithdr.Out("compids"))
+	extractApprovedToAdd.In("approv").Connect(drugBankCompIDsInExcapeDBApprov.Out("out"))
+	extractApprovedToAdd.In("withdr").Connect(drugBankCompIDsInExcapeDBWithdr.Out("out"))
 	extractApprovedToAdd.In("randsrc").Connect(genRandSrcForDrugBankSelection.Out("rand"))
 	extractApprovedToAdd.ParamInPort("nrcomp").ConnectStr("1000")
 
@@ -209,7 +208,7 @@ func main() {
 	mergeApprWithdr := wf.NewProc("merge_appr_withdr", "cat {i:approv} {i:withdr} | sort -V | uniq > {o:out}")
 	mergeApprWithdr.SetPathStatic("out", "dat/drugbank_compids_to_remove.csv")
 	mergeApprWithdr.In("approv").Connect(extractApprovedToAdd.Out("approved_to_add"))
-	mergeApprWithdr.In("withdr").Connect(drugBankCompIDsWithdr.Out("compids"))
+	mergeApprWithdr.In("withdr").Connect(drugBankCompIDsInExcapeDBWithdr.Out("compids"))
 
 	// Merge the (sometimes) two comma-separated columns of compound IDs into one
 	// column, so it can be used as a skip-list for filtering out the selected
