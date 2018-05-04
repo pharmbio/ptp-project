@@ -29,3 +29,5 @@
 - [x] Fix bug: We want to select drugbank molecules for removal, that
   actually are available in ExcapeDB, so that we can use it to validate both
   excapedb active/nonactive, and drugbank approved/withdrawn.
+- [x] Add cost values for gene names not in the "bowes44min100percls_small" dataset, from
+      exp/20180326-fillup-propertrain/res/final_models_summary_sorted.tsv

@@ -87,6 +87,16 @@ var (
 		"CNR1":    []string{"1"},
 		"OPRM1":   []string{"1"},
 		"SLC6A4":  []string{"1"},
+		"HTR1A":   []string{"1"},
+		"SLC6A3":  []string{"1"},
+		"OPRK1":   []string{"1"},
+		"AVPR1A":  []string{"100"},
+		"ADRB2":   []string{"10"},
+		"DRD2":    []string{"1"},
+		"KCNH2":   []string{"1"},
+		"DRD1":    []string{"1"},
+		"HTR2A":   []string{"1"},
+		"CHRM1":   []string{"1"},
 	}
 	replicates = []string{
 		"r1",
