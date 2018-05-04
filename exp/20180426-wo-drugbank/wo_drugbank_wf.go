@@ -208,7 +208,7 @@ func main() {
 	mergeApprWithdr := wf.NewProc("merge_appr_withdr", "cat {i:approv} {i:withdr} | sort -V | uniq > {o:out}")
 	mergeApprWithdr.SetPathStatic("out", "dat/drugbank_compids_to_remove.csv")
 	mergeApprWithdr.In("approv").Connect(extractApprovedToAdd.Out("approved_to_add"))
-	mergeApprWithdr.In("withdr").Connect(drugBankCompIDsInExcapeDBWithdr.Out("compids"))
+	mergeApprWithdr.In("withdr").Connect(drugBankCompIDsInExcapeDBWithdr.Out("out"))
 
 	// Merge the (sometimes) two comma-separated columns of compound IDs into one
 	// column, so it can be used as a skip-list for filtering out the selected
