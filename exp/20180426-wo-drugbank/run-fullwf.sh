@@ -1,6 +1,7 @@
 #!/bin/bash -l
 #SBATCH -A snic2017-7-89
 #SBATCH -p node
+#SBATCH -C mem256GB
 #SBATCH -n 20
 #SBATCH -J ptp_fullwf_wo_drugbank
 #SBATCH -t 2-00:00:00
