@@ -31,3 +31,4 @@
   excapedb active/nonactive, and drugbank approved/withdrawn.
 - [x] Add cost values for gene names not in the "bowes44min100percls_small" dataset, from
       exp/20180326-fillup-propertrain/res/final_models_summary_sorted.tsv
+- [ ] Include audit log in model files
