@@ -493,7 +493,7 @@ func main() {
 									--cost {p:cost} \
 									--model-out {o:model} \
 									--logfile {o:logfile} \
-									--model-name "{p:gene} target profile" # {p:runset} {p:replicate} Accuracy: {p:accuracy} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
+									--model-name "{p:gene}" # {p:runset} {p:replicate} Accuracy: {p:accuracy} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
 				cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
 				cpSignTrain.ParamInPort("seed").ConnectStr(fmt.Sprintf("%d", seed))
 				cpSignTrain.ParamInPort("nrmdl").ConnectStr("10")
