@@ -1,0 +1,23 @@
+{
+    "ID": "1gd5wwtp6sj0slbw1sw9",
+    "ProcessName": "sort_summary",
+    "Command": "head -n 1 res/final_models_summary.tsv \u003e res/final_models_summary.sorted.tsv.tmp \u0026\u0026 tail -n +2 res/final_models_summary.tsv | sort -k 15n,15 -k 2,2 -k 3r,3 \u003e\u003e res/final_models_summary.sorted.tsv.tmp",
+    "Params": {},
+    "Keys": {},
+    "StartTime": "2018-05-05T11:29:22.759077864+02:00",
+    "FinishTime": "2018-05-05T11:29:23.333332183+02:00",
+    "ExecTimeMS": 574,
+    "Upstream": {
+        "res/final_models_summary.tsv": {
+            "ID": "xh4cukv1gwfq8297p3yq",
+            "ProcessName": "",
+            "Command": "",
+            "Params": {},
+            "Keys": {},
+            "StartTime": "0001-01-01T00:00:00Z",
+            "FinishTime": "0001-01-01T00:00:00Z",
+            "ExecTimeMS": -1,
+            "Upstream": {}
+        }
+    }
+}
