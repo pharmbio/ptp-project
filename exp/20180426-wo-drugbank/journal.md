@@ -31,5 +31,9 @@
   excapedb active/nonactive, and drugbank approved/withdrawn.
 - [x] Add cost values for gene names not in the "bowes44min100percls_small" dataset, from
       exp/20180326-fillup-propertrain/res/final_models_summary_sorted.tsv
-- [ ] Include audit log in model files
+- [x] Implement component to include audit log in model files
+  - But there's something weird with SciPipe. In 0.6.1, the workflow ends in
+    a deadlock when files exist, and in the latest commit in develop, it seems
+    tasks are not finished correctly.
+- [x] Include audit log in .jar files.
 - [ ] Create calibration plots

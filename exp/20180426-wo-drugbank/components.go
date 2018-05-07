@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
+	"path/filepath"
 	"strconv"
 
 	str "strings"
@@ -436,4 +437,33 @@ func (p *FinalModelSummarizer) Run() {
 	fh.Close()
 	oip.Atomize()
 	p.OutSummary().Send(oip)
+}
+
+// ================================================================================
+
+type EmbedAuditLogInJar struct {
+	*sp.Process
+}
+
+func (p *EmbedAuditLogInJar) InJarFile() *sp.InPort   { return p.In("in_jar") }
+func (p *EmbedAuditLogInJar) OutJarFile() *sp.OutPort { return p.Out("out_jar") }
+
+func NewEmbedAuditLogInJar(wf *sp.Workflow, procName string) *EmbedAuditLogInJar {
+	p := &EmbedAuditLogInJar{
+		wf.NewProc(procName, "# EmbedAuditLogInJar custom process. Ports: {i:in_jar} {o:out_jar}"),
+	}
+	p.SetPathExtend("in_jar", "out_jar", ".withaudit.jar")
+	p.CustomExecute = func(t *sp.Task) {
+		jarFilePath := t.InPath("in_jar")
+		unpackDirPath := jarFilePath + ".unpack"
+		auditFilePath := filepath.Base(t.InIP("in_jar").AuditFilePath())
+		sp.ExecCmd(fmt.Sprintf(`origDir=$(pwd)/$(dirname %s); mkdir %s && cd %s && jar xvf ../%s && cp ../%s . && jar cf $origDir/%s *`,
+			t.OutIP("out_jar").TempPath(),
+			unpackDirPath,
+			unpackDirPath,
+			filepath.Base(t.InPath("in_jar")),
+			auditFilePath,
+			filepath.Base(t.OutIP("out_jar").TempPath())))
+	}
+	return p
 }

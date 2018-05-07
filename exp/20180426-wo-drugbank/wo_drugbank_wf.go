@@ -509,6 +509,9 @@ func main() {
 					cpSignTrain.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J train_" + uniqStrRepl // SLURM string
 				}
 
+				embedAuditLog := NewEmbedAuditLogInJar(wf, "embed_auditlog_"+uniqStrRepl)
+				embedAuditLog.InJarFile().Connect(cpSignTrain.Out("model"))
+
 				finalModelsSummary.InModel().Connect(cpSignTrain.Out("model"))
 			} // end: for replicate
 			finalModelsSummary.InTargetDataCount().Connect(countProcs[uniqStrRunSet].Out("count"))
