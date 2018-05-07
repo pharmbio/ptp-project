@@ -147,10 +147,6 @@ func main() {
 	dataExcapeDB := unPackDB.Out("unxzed")
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
-	// ################################################################################
-	// ################################################################################
-	// ################################################################################
-
 	// Download chemical structures and "links" (references) for *approved* (small molecule) drugs
 	dlApproved := wf.NewProc("dl_approv", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/approved-structure-links")
 	dlApproved.SetPathStatic("zip", "dat/drugbank_approved_csv.zip")
@@ -233,27 +229,11 @@ func main() {
 	extractGISA.SetPathReplace("excapedb", "gene_id_smiles_activity", ".tsv", ".gisa.tsv")
 	extractGISA.In("excapedb").Connect(dataExcapeDB)
 
-	// [x] TODO: Create process for subtracting the DrugBank compounds HERE
+	// Create process for subtracting the DrugBank compounds HERE
 	remDrugBankComps := wf.NewProc("remove_drugbank_compounds", `awk 'FNR==NR { db[$2]; next } !($2 in db) { print $1 "\t" $3 "\t" $4 }' {i:compids_to_remove} {i:gisa} | sort -uV > {o:gsa_wo_drugbank}`)
 	remDrugBankComps.SetPathStatic("gsa_wo_drugbank", "dat/excapedb.gsa_wo_drugbank.tsv")
 	remDrugBankComps.In("compids_to_remove").Connect(makeOneColumn.Out("onecol"))
 	remDrugBankComps.In("gisa").Connect(extractGISA.Out("gene_id_smiles_activity"))
-	// Steps:
-	// - How do we know which compounds to remove?
-	// - What IDs do we have in the raw dataset? - SMILES, it seems
-	// - [x] So, it turns out we have to do the removal before the GSA extraction,
-	// while we still have access to PubChem/CHEMBL IDs...
-	// - [x] Do the filtering (See: https://stackoverflow.com/questions/14062402/awk-using-a-file-to-filter-another-one-out-tr)
-
-	// ################################################################################
-	// ################################################################################
-	// ################################################################################
-
-	// extractGSA extracts a file with only Gene symbol, SMILES and the
-	// Activity flag, into a .tsv file, for easier subsequent parsing
-	//extractGSA := wf.NewProc("extract_gene_smiles_activity", `awk -F "\t" '{ print $9 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {os:gene_smiles_activity}`) // os = output (streaming) ... stream output via a fifo file
-	//extractGSA.SetPathReplace("excapedb", "gene_smiles_activity", ".tsv", ".gsa.tsv")
-	//extractGSA.In("excapedb").Connect(dataExcapeDB)
 
 	// removeConflicting removes (or, SHOULD remove) rows which have the same values on both row 1 and 2 (I think ...)
 	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '(( $1 != p1 ) || ( $2 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print p1 "\t" p2 "\t" p3 }
