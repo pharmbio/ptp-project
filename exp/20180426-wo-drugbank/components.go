@@ -449,9 +449,7 @@ func (p *EmbedAuditLogInJar) InJarFile() *sp.InPort   { return p.In("in_jar") }
 func (p *EmbedAuditLogInJar) OutJarFile() *sp.OutPort { return p.Out("out_jar") }
 
 func NewEmbedAuditLogInJar(wf *sp.Workflow, procName string) *EmbedAuditLogInJar {
-	p := &EmbedAuditLogInJar{
-		wf.NewProc(procName, "# EmbedAuditLogInJar custom process. Ports: {i:in_jar} {o:out_jar}"),
-	}
+	p := &EmbedAuditLogInJar{wf.NewProc(procName, "# EmbedAuditLogInJar custom process. Ports: {i:in_jar} {o:out_jar}")}
 	p.SetPathExtend("in_jar", "out_jar", ".withaudit.jar")
 	p.CustomExecute = func(t *sp.Task) {
 		jarFilePath := t.InPath("in_jar")

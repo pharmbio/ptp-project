@@ -23,7 +23,7 @@ var (
 	debug      = flag.Bool("debug", false, "Increase logging level to include DEBUG messages")
 	procsRegex = flag.String("procs", "plot_summary.*", "A regex specifying which processes (by name) to run up to")
 
-	cpSignPath = "../../bin/cpsign-0.6.12.jar"
+	cpSignPath = "../../bin/cpsign-0.6.14.jar"
 	geneSets   = map[string][]string{
 		"bowes44": []string{
 			// Not available in dataset: "CHRNA1".
@@ -471,10 +471,13 @@ func main() {
 									--impl liblinear \
 									--nr-models {p:nrmdl} \
 									--cost {p:cost} \
+									--percentilesfile {i:percentilesfile} \
+									--percentiles {p:nrpercentiles} \
 									--model-out {o:model} \
 									--logfile {o:logfile} \
 									--model-name "{p:gene}" # {p:runset} {p:replicate} Accuracy: {p:accuracy} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
 				cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
+				cpSignTrain.In("percentilesfile").Connect(extractTargetData.Out("target_data"))
 				cpSignTrain.ParamInPort("seed").ConnectStr(fmt.Sprintf("%d", seed))
 				cpSignTrain.ParamInPort("nrmdl").ConnectStr("10")
 				cpSignTrain.ParamInPort("gene").ConnectStr(geneUppercase)
@@ -489,6 +492,7 @@ func main() {
 				cpSignTrain.ParamInPort("class_confidence").Connect(selectBest.OutBestClassConfidence())
 				cpSignTrain.ParamInPort("class_credibility").Connect(selectBest.OutBestClassCredibility())
 				cpSignTrain.ParamInPort("cost").Connect(selectBest.OutBestCost())
+				cpSignTrain.ParamInPort("nrpercentiles").ConnectStr("200") // Reasonable number according to staffan
 				cpSignTrainModelPathFunc := func(t *sp.Task) string {
 					return fmt.Sprintf("dat/final_models/%s/%s/%s/%s.%s.%s.%s_c%s_nrmdl%s.mdl.jar",
 						str.ToLower(t.Param("gene")),
