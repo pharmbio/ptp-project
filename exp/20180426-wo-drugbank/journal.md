@@ -35,5 +35,7 @@
   - But there's something weird with SciPipe. In 0.6.1, the workflow ends in
     a deadlock when files exist, and in the latest commit in develop, it seems
     tasks are not finished correctly.
+  - In concrete terms, it seems the problem is with CustomExecute, in the
+    latest develop commit.
 - [x] Include audit log in .jar files.
 - [ ] Create calibration plots
