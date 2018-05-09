@@ -230,18 +230,18 @@ func main() {
 	extractGISA.In("excapedb").Connect(dataExcapeDB)
 
 	// Create process for subtracting the DrugBank compounds HERE
-	remDrugBankComps := wf.NewProc("remove_drugbank_compounds", `awk 'FNR==NR { db[$1]; next } !($2 in db) { print $1 "\t" $3 "\t" $4 }' {i:compids_to_remove} {i:gisa} | sort -uV > {o:gsa_wo_drugbank}`)
-	remDrugBankComps.SetPathStatic("gsa_wo_drugbank", "dat/excapedb.gsa_wo_drugbank.tsv")
+	remDrugBankComps := wf.NewProc("remove_drugbank_compounds", `awk 'FNR==NR { db[$1]; next } !($2 in db)' {i:compids_to_remove} {i:gisa} | sort -uV > {o:gisa_wo_drugbank}`)
+	remDrugBankComps.SetPathStatic("gisa_wo_drugbank", "dat/excapedb.gisa_wo_drugbank.tsv")
 	remDrugBankComps.In("compids_to_remove").Connect(makeOneColumn.Out("onecol"))
 	remDrugBankComps.In("gisa").Connect(extractGISA.Out("gene_id_smiles_activity"))
 
 	// removeConflicting removes (or, SHOULD remove) rows which have the same values on both row 1 and 2 (I think ...)
-	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '(( $1 != p1 ) || ( $2 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print p1 "\t" p2 "\t" p3 }
-																	  { c[$1,$2]++; p1 = $1; p2 = $2; p3 = $3 }
-																	  END { print $1 "\t" $2 "\t" $3 }' \
+	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '(( $1 != p1 ) || ( $3 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print p1 "\t" p2 "\t" p3 }
+																	  { c[$1,$3]++; p1 = $1; p2 = $3; p3 = $4 }
+																	  END { print $1 "\t" $3 "\t" $4 }' \
 																	  {i:gene_smiles_activity} > {o:gene_smiles_activity}`)
 	removeConflicting.SetPathReplace("gene_smiles_activity", "gene_smiles_activity", ".tsv", ".dedup.tsv")
-	removeConflicting.In("gene_smiles_activity").Connect(remDrugBankComps.Out("gsa_wo_drugbank"))
+	removeConflicting.In("gene_smiles_activity").Connect(remDrugBankComps.Out("gisa_wo_drugbank"))
 
 	finalModelsSummary := NewFinalModelSummarizer(wf, "finalmodels_summary_creator", "res/final_models_summary.tsv", '\t')
 
@@ -258,7 +258,7 @@ func main() {
 		uniqStrGene := geneLowerCase
 
 		// extractTargetData extract all data for the specific target, into a separate file
-		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk -F"\t" '$1 == "{p:gene}" { print $2"\t"$3 }' {i:raw_data} > {o:target_data}`)
+		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk -F"\t" '$1 == "{p:gene}" { print $3"\t"$4 }' {i:raw_data} > {o:target_data}`)
 		extractTargetData.ParamInPort("gene").ConnectStr(geneUppercase)
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLowerCase, geneLowerCase))
 		extractTargetData.In("raw_data").Connect(removeConflicting.Out("gene_smiles_activity"))
