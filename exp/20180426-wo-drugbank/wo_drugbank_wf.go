@@ -230,7 +230,7 @@ func main() {
 	extractGISA.In("excapedb").Connect(dataExcapeDB)
 
 	// Create process for subtracting the DrugBank compounds HERE
-	remDrugBankComps := wf.NewProc("remove_drugbank_compounds", `awk 'FNR==NR { db[$2]; next } !($2 in db) { print $1 "\t" $3 "\t" $4 }' {i:compids_to_remove} {i:gisa} | sort -uV > {o:gsa_wo_drugbank}`)
+	remDrugBankComps := wf.NewProc("remove_drugbank_compounds", `awk 'FNR==NR { db[$1]; next } !($2 in db) { print $1 "\t" $3 "\t" $4 }' {i:compids_to_remove} {i:gisa} | sort -uV > {o:gsa_wo_drugbank}`)
 	remDrugBankComps.SetPathStatic("gsa_wo_drugbank", "dat/excapedb.gsa_wo_drugbank.tsv")
 	remDrugBankComps.In("compids_to_remove").Connect(makeOneColumn.Out("onecol"))
 	remDrugBankComps.In("gisa").Connect(extractGISA.Out("gene_id_smiles_activity"))
