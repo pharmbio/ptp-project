@@ -258,7 +258,7 @@ func main() {
 		uniqStrGene := geneLowerCase
 
 		// extractTargetData extract all data for the specific target, into a separate file
-		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk -F"\t" '$1 == "{p:gene}" { print $3"\t"$4 }' {i:raw_data} > {o:target_data}`)
+		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk 'END { print "smiles\tactivity" }' /dev/null > {o:target_data} && awk -F"\t" '$1 == "{p:gene}" { print $3"\t"$4 }' {i:raw_data} >> {o:target_data}`)
 		extractTargetData.ParamInPort("gene").ConnectStr(geneUppercase)
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLowerCase, geneLowerCase))
 		extractTargetData.In("raw_data").Connect(removeConflicting.Out("gene_smiles_activity"))
@@ -387,6 +387,7 @@ func main() {
 									--seed {p:seed} \
 									--cptype 1 \
 									--trainfile {i:traindata} \
+									--response-name activity \
 									--impl liblinear \
 									--labels A, N \
 									--nr-models {p:nrmdl} \
