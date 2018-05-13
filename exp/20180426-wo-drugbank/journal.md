@@ -38,7 +38,7 @@
   - In concrete terms, it seems the problem is with CustomExecute, in the
     latest develop commit.
 - [x] Include audit log in .jar files.
-- [ ] Implement usage of staffan's new `--percentiles` and
+- [x] Implement usage of staffan's new `--percentiles` and
       `--percentilesfile` flags, to make coloring work in the chemical graph in the
       web UI etc.
 - [ ] Create calibration plots

@@ -239,9 +239,9 @@ func main() {
 	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '(( $1 != p1 ) || ( $3 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print }
 																	  { c[$1,$3]++; p1 = $1; p2 = $3; p3 = $4 }
 																	  END { print }' \
-																	  {i:gene_smiles_activity} > {o:gene_smiles_activity}`)
-	removeConflicting.SetPathReplace("gene_smiles_activity", "gene_smiles_activity", ".tsv", ".dedup.tsv")
-	removeConflicting.In("gene_smiles_activity").Connect(remDrugBankComps.Out("gisa_wo_drugbank"))
+																	  {i:gene_id_smiles_activity} > {o:gene_id_smiles_activity}`)
+	removeConflicting.SetPathReplace("gene_id_smiles_activity", "gene_id_smiles_activity", ".tsv", ".dedup.tsv")
+	removeConflicting.In("gene_id_smiles_activity").Connect(remDrugBankComps.Out("gisa_wo_drugbank"))
 
 	finalModelsSummary := NewFinalModelSummarizer(wf, "finalmodels_summary_creator", "res/final_models_summary.tsv", '\t')
 
@@ -261,7 +261,7 @@ func main() {
 		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk 'END { print "smiles\tactivity" }' /dev/null > {o:target_data} && awk -F"\t" '$1 == "{p:gene}" { print $3"\t"$4 }' {i:raw_data} >> {o:target_data}`)
 		extractTargetData.ParamInPort("gene").ConnectStr(geneUppercase)
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLowerCase, geneLowerCase))
-		extractTargetData.In("raw_data").Connect(removeConflicting.Out("gene_smiles_activity"))
+		extractTargetData.In("raw_data").Connect(removeConflicting.Out("gene_id_smiles_activity"))
 		if *runSlurm {
 			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_extract_" + geneLowerCase // SLURM string
 		}
@@ -295,7 +295,7 @@ func main() {
 					// non-actices (See "A*2-N" in the AWK-script below).
 					extractAssumedNonBinding := wf.NewProc("extract_assumed_n_"+uniqStrRepl, `
 					let "fillup_lines_cnt = "$(awk -F"\t" '$2 == "A" { A += 1 } $2 == "N" { N += 1 } END { print A*2-N }' {i:targetdata}) \
-					&& awk -F"\t" 'FNR==NR{target_smiles[$1]; next} ($1 != "{p:gene}") && !($2 in target_smiles) { print $2 "\tN" }' {i:targetdata} {i:rawdata} \
+					&& awk -F"\t" 'FNR==NR{target_smiles[$1]; next} ($1 != "{p:gene}") && !($3 in target_smiles) { print $3 "\tN" }' {i:targetdata} {i:rawdata} \
 					| sort -uV \
 					| shuf --random-source={i:randsrc} -n $fillup_lines_cnt > {o:assumed_n} # replicate:{p:replicate}`)
 					extractAssumedNonBinding.SetPathCustom("assumed_n", func(t *sp.Task) string {
@@ -303,7 +303,7 @@ func main() {
 						repl := t.Param("replicate")
 						return "dat/" + gene + "/" + repl + "/" + gene + "." + repl + ".assumed_n.tsv"
 					})
-					extractAssumedNonBinding.In("rawdata").Connect(removeConflicting.Out("gene_smiles_activity"))
+					extractAssumedNonBinding.In("rawdata").Connect(removeConflicting.Out("gene_id_smiles_activity"))
 					extractAssumedNonBinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
 					extractAssumedNonBinding.ParamInPort("gene").ConnectStr(geneUppercase)
 					extractAssumedNonBinding.ParamInPort("replicate").ConnectStr(replicate)
@@ -339,6 +339,7 @@ func main() {
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
 									--trainfile {i:traindata} \
+									--response-name activity \
 									--labels A, N \
 									--model-out {o:precomp} \
 									--model-name "` + geneUppercase + `" \
@@ -531,7 +532,7 @@ func main() {
 		plotSummary := wf.NewProc("plot_summary_"+runSet, "Rscript bin/plot_summary.r -i {i:summary} -o {o:plot} -f png # gene:{i:gene_smiles_activity} runset:{p:runset}")
 		plotSummary.SetPathExtend("summary", "plot", "."+runSet+".png")
 		plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
-		plotSummary.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_smiles_activity"))
+		plotSummary.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_id_smiles_activity"))
 		plotSummary.ParamInPort("runset").ConnectStr(runSet)
 	}
 
