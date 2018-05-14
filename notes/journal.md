@@ -164,12 +164,12 @@ in the chat, at 9:02, Sep 29 2017:
 
 - [ ] Read up on Norinder's paper on imbalanced datasetes in conformal
   prediction (Jonathan, and Samuel)
-- [ ] Look closer at the "other" efficiency measure, available in:
+- [x] Look closer at the "other" efficiency measure, available in:
   - Vovk, V., Fedorova, V., Nouretdinov, I., Gammerman, A., 2016. Criteria of
     efficiency for conformal prediction. In: Symposium on Conformal and
     Probabilistic Prediction with Applications. Springer, pp. 23–39.
 - [x] Samuel to start writing the methods section in manuscript.
-- [ ] Next meeting: Probably on Monday, Oct 30
+- Next meeting: Probably on Monday, Oct 30
 
 ## Main conclusions
 
@@ -368,7 +368,6 @@ Attending: Ola, Jonathan, Samuel, Ernst
 - [x] Check with with Staffan about calibration plots from cross validation
 - [x] Check with Staffan about not including presumed negatives in the neither
       test (and probably not in calibration either)
-- [ ] ...
 
 # Project meeting 2018-03-19
 
@@ -456,8 +455,8 @@ So, we have basically two major things we will try to do:
 - [ ] Rebuild everything without drugbank, so that we can try to predict target
   binding, and later also approved/withdrawn status for drugbank molecules
   based on the rest of the training data in ExcapeDB.
-  - [ ] Take out drugbank compounds from excapedb
-  - [ ] Train models without drugbank
+  - [x] Take out drugbank compounds from excapedb
+  - [x] Train models without drugbank
   - [ ] Use the models to predict binding to each of the targets in our "Bowes"
     profile
     - [ ] Compare with the known binding values for the drugbank compounds in
@@ -465,7 +464,7 @@ So, we have basically two major things we will try to do:
 
 ## Misc. notes
 
-- [ ] Samuel to try to put reproducibility info into model jar files
+- [x] Samuel to try to put reproducibility info into model jar files
 - [x] Samuel to remove 'target profile' from the names when training
 
 We also discussed the "Class-averaged Observed Fuzziness" measure that we have used. We concluded the following:
@@ -501,7 +500,7 @@ Samuel mentioned that he has:
 
 We concluded that the next steps are:
 
-- [ ] Samuel to continue running all targets, with and without fillup.
+- [x] Samuel to continue running all targets, with and without fillup.
   - Since UPPMAX has service stop until at least next week, he'll try to run on
     cihost as much as possible, at least when developing workflows.
   - Samuel proposed (after the meeting) that we could book a g3.8xlarge
@@ -515,7 +514,7 @@ We concluded that the next steps are:
 - [x] Staffan to develop component which takes data in the form of target panel
   binding profiles on the form below, ad builds a conformal prediction model
   from it.
-- [ ] Staffan also develops a small REST service which can run this model file,
+- [x] Staffan also develops a small REST service which can run this model file,
   on modelling-web.
 
 Some further notes:
@@ -553,7 +552,7 @@ Attending: Ola, Jonathan, Staffan, Samuel (via Hangout)
   are never filled-up) with and without fill-up of assumed non-actives
   - [x] Do some proper statistics to say with confideince which one is (significantly) better.
 - [x] Based on the result of non-fillup vs fillup above, choose the best for the following runs
-- [ ] Remove molecules included in DrugBank, and train models.
+- [x] Remove molecules included in DrugBank, and train models.
 - [ ] Use these trained models to train target profile models
 - [ ] Use these target profile-based models to predict Active/Withdrawn in drugbank.
 
@@ -581,10 +580,9 @@ Olas Room, kl 13:35
 
 (Remember to check the decisions above, about how to modify the workflow!)
 
-- [ ] We remove the 101 "Withdrawn" molecules in DrugBank from ExcapeDB, and
-  899 "Approved" ones, so we get a dataset of 1000 molecules for which we have
-  DrugBank data.
-- [ ] Do prediction using cpsign cli.
+- [x] We remove the 101 "Withdrawn" molecules in DrugBank which are available
+  in ExcapeDB, from ExcapeDB, and 899 "Approved" ones, so we get a dataset of
+  1000 molecules for which we have DrugBank data.
 - [ ] Predict Active / Non-active on the withdrawn dataset (1000 molecules
   ... ~10k interactions(?))
 - [ ] Build the target profiles, and use to predict Approved/Withdrawn on the
