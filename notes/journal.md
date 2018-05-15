@@ -583,6 +583,7 @@ Olas Room, kl 13:35
 - [x] We remove the 101 "Withdrawn" molecules in DrugBank which are available
   in ExcapeDB, from ExcapeDB, and 899 "Approved" ones, so we get a dataset of
   1000 molecules for which we have DrugBank data.
+- [>] Create calibration plots
 - [ ] Predict Active / Non-active on the withdrawn dataset (1000 molecules
   ... ~10k interactions(?))
 - [ ] Build the target profiles, and use to predict Approved/Withdrawn on the

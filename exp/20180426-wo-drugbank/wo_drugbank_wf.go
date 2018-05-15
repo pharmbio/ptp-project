@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/csv"
 	"flag"
 	"fmt"
 	"math"
@@ -429,6 +430,28 @@ func main() {
 					evalCost.ParamInPort("cost").ConnectStr(cost)
 					if *runSlurm {
 						evalCost.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + uniqStrCost // SLURM string
+					}
+
+					createCalibrationPlotData := wf.NewProc("create_calibration_plot_data_"+uniqStrCost, "# {i:cvstats} {o:tsv}")
+					createCalibrationPlotData.SetPathExtend("cvstats", "tsv", ".calibration.tsv")
+					createCalibrationPlotData.In("cvstats").Connect(evalCost.Out("stats"))
+					createCalibrationPlotData.CustomExecute = func(t *sp.Task) {
+						tsvFh := t.OutIP("tsv").OpenWriteTemp()
+						defer tsvFh.Close()
+
+						tsvWrt := csv.NewWriter(tsvFh)
+						tsvWrt.Comma = '\t'
+
+						cvStatsRecords := &[]cpSignCrossValOutput{}
+						t.InIP("cvstats").UnMarshalJSON(cvStatsRecords)
+
+						tsvWrt.Write([]string{"confidence", "accuracty"})
+						for _, crossValOut := range *cvStatsRecords {
+							confidence := fmt.Sprintf("%.3f", crossValOut.Confidence)
+							accuracy := fmt.Sprintf("%.3f", crossValOut.Accuracy)
+							tsvWrt.Write([]string{confidence, accuracy})
+						}
+						tsvWrt.Flush()
 					}
 
 					extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniqStrCost, func(ip *sp.FileIP) map[string]string {
