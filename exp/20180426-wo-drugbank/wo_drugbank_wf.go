@@ -432,10 +432,10 @@ func main() {
 						evalCost.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + uniqStrCost // SLURM string
 					}
 
-					createCalibrationPlotData := wf.NewProc("create_calibration_plot_data_"+uniqStrCost, "# {i:cvstats} {o:tsv}")
-					createCalibrationPlotData.SetPathExtend("cvstats", "tsv", ".calibration.tsv")
-					createCalibrationPlotData.In("cvstats").Connect(evalCost.Out("stats"))
-					createCalibrationPlotData.CustomExecute = func(t *sp.Task) {
+					extractCalibrationData := wf.NewProc("extract_calibration_data_"+uniqStrCost, "# {i:cvstats} {o:tsv}")
+					extractCalibrationData.SetPathExtend("cvstats", "tsv", ".calibration.tsv")
+					extractCalibrationData.In("cvstats").Connect(evalCost.Out("stats"))
+					extractCalibrationData.CustomExecute = func(t *sp.Task) {
 						tsvFh := t.OutIP("tsv").OpenWriteTemp()
 						defer tsvFh.Close()
 
