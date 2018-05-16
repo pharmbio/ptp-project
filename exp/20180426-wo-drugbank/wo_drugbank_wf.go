@@ -251,6 +251,8 @@ func main() {
 	// We only do the fill run-set here (filling up for "small" datasets)
 	runSets := []string{"fill"} // []string{"orig", "fill"}
 
+	calibPlotPorts := []*sp.OutPort{}
+
 	// --------------------------------
 	// Set up gene-specific workflow branches
 	// --------------------------------
@@ -458,6 +460,7 @@ func main() {
 					plotCalibrationData.SetPathExtend("tsv", "png", ".png")
 					plotCalibrationData.ParamInPort("gene").ConnectStr(geneUppercase)
 					plotCalibrationData.In("tsv").Connect(extractCalibrationData.Out("tsv"))
+					calibPlotPorts = append(calibPlotPorts, plotCalibrationData.Out("png"))
 
 					extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniqStrCost, func(ip *sp.FileIP) map[string]string {
 						newKeys := map[string]string{}
@@ -551,6 +554,14 @@ func main() {
 			finalModelsSummary.InTargetDataCount().Connect(countProcs[uniqStrRunSet].Out("count"))
 		} // end: runset
 	} // end: for gene
+
+	sts := spc.NewStreamToSubStream(wf, "merge_plots_stream_to_substream")
+	for _, calibPlotPort := range calibPlotPorts {
+		sts.In().Connect(calibPlotPort)
+	}
+	mergeCalibPlots := wf.NewProc("merge_calibration_plots", "montage -tile 7x -geometry +2+2 {i:plots:r: } {o:merged}")
+	mergeCalibPlots.SetPathStatic("merged", "dat/calibration_plots.png")
+	mergeCalibPlots.In("plots").Connect(sts.OutSubStream())
 
 	sortSummaryOnDataSize := wf.NewProc("sort_summary", "head -n 1 {i:summary} > {o:sorted} && tail -n +2 {i:summary} | sort -k 15n,15 -k 2,2 -k 3r,3 >> {o:sorted}")
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")

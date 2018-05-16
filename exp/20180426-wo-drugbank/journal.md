@@ -41,4 +41,4 @@
 - [x] Implement usage of staffan's new `--percentiles` and
       `--percentilesfile` flags, to make coloring work in the chemical graph in the
       web UI etc.
-- [ ] Create calibration plots
+- [x] Create calibration plots
