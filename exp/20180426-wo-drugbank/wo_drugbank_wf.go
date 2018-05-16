@@ -224,11 +224,16 @@ func main() {
 	makeOneColumn.SetPathExtend("infile", "onecol", ".onecol.csv")
 	makeOneColumn.In("infile").Connect(mergeApprWithdr.Out("out"))
 
-	// extractGISA extracts a file with only (orig entry) ID, Gene symbol, SMILES and the Activity flag
+	// extractGISA extracts a file with only Gene symbol, id (orig entry), SMILES, and the Activity flag
 	// into a .tsv file, for easier subsequent parsing
 	extractGISA := wf.NewProc("extract_gene_id_smiles_activity", `awk -F "\t" '{ print $9 "\t" $2 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {o:gene_id_smiles_activity}`)
 	extractGISA.SetPathReplace("excapedb", "gene_id_smiles_activity", ".tsv", ".gisa.tsv")
 	extractGISA.In("excapedb").Connect(dataExcapeDB)
+
+	// prepareValidationData prepares a data file for use in validation at the end of the workflow
+	prepareValidationData := wf.NewProc("prepare_validation_data", `awk '{ print $3 "\t" $4 }' {i:gisa} > {o:sa}`)
+	prepareValidationData.In("gisa").Connect(extractGISA.Out("gene_id_smiles_activity"))
+	prepareValidationData.SetPathExtend("gisa", "sa", ".sa.tsv")
 
 	// Create process for subtracting the DrugBank compounds HERE
 	remDrugBankComps := wf.NewProc("remove_drugbank_compounds", `awk 'FNR==NR { db[$1]; next } !($2 in db)' {i:compids_to_remove} {i:gisa} | sort -uV > {o:gisa_wo_drugbank}`)
@@ -550,6 +555,37 @@ func main() {
 				embedAuditLog.InJarFile().Connect(cpSignTrain.Out("model"))
 
 				finalModelsSummary.InModel().Connect(cpSignTrain.Out("model"))
+
+				// ------------------------------------------
+				// Validate excluded DrugBank compounds (compare predicted and actual values)
+				// ------------------------------------------
+				// gisa: gene, id, smiles, activity. sa: smiles, activity
+				validateDrugBank := wf.NewProc("validate_drugbank_"+uniqStrRepl, `java -jar `+cpSignPath+` validate \
+									--license ../../bin/cpsign.lic \
+									--cptype 1 \
+									--modelfile {i:model} \
+									--predictfile {i:smiles} \
+									--validation-property activity \
+									--labels A, N \
+									--confidences {p:confidences} \
+									--output-format json \
+									--logfile {o:log} \
+									--output {o:json} # {p:gene} {p:replicate} {p:runset}`)
+				validateDrugBankJSONPathFunc := func(t *sp.Task) string {
+					uniqStrReplRunset := t.Param("gene") + "." + t.Param("replicate") + "." + t.Param("runset")
+					return "dat/predicted/" + uniqStrReplRunset + "/" + uniqStrReplRunset + ".predict_drugbank_1000.json"
+				}
+				validateDrugBank.SetPathCustom("json", validateDrugBankJSONPathFunc)
+				validateDrugBank.SetPathCustom("log", func(t *sp.Task) string {
+					return validateDrugBankJSONPathFunc(t) + ".cpsign.log"
+				})
+				validateDrugBank.In("model").Connect(cpSignTrain.Out("model"))
+				validateDrugBank.In("smiles").Connect(prepareValidationData.Out("sa"))
+				validateDrugBank.ParamInPort("gene").ConnectStr(geneLowerCase)
+				validateDrugBank.ParamInPort("replicate").ConnectStr(replicate)
+				validateDrugBank.ParamInPort("runset").ConnectStr(runSet)
+				validateDrugBank.ParamInPort("confidences").ConnectStr("0.8, 0.9")
+
 			} // end: for replicate
 			finalModelsSummary.InTargetDataCount().Connect(countProcs[uniqStrRunSet].Out("count"))
 		} // end: runset
