@@ -230,16 +230,17 @@ func main() {
 	extractGISA.SetPathReplace("excapedb", "gene_id_smiles_activity", ".tsv", ".gisa.tsv")
 	extractGISA.In("excapedb").Connect(dataExcapeDB)
 
-	// prepareValidationData prepares a data file for use in validation at the end of the workflow
-	prepareValidationData := wf.NewProc("prepare_validation_data", `awk '{ print $3 "\t" $4 }' {i:gisa} > {o:sa}`)
-	prepareValidationData.In("gisa").Connect(extractGISA.Out("gene_id_smiles_activity"))
-	prepareValidationData.SetPathExtend("gisa", "sa", ".sa.tsv")
-
 	// Create process for subtracting the DrugBank compounds HERE
 	remDrugBankComps := wf.NewProc("remove_drugbank_compounds", `awk 'FNR==NR { db[$1]; next } !($2 in db)' {i:compids_to_remove} {i:gisa} | sort -uV > {o:gisa_wo_drugbank}`)
 	remDrugBankComps.SetPathStatic("gisa_wo_drugbank", "dat/excapedb.gisa_wo_drugbank.tsv")
 	remDrugBankComps.In("compids_to_remove").Connect(makeOneColumn.Out("onecol"))
 	remDrugBankComps.In("gisa").Connect(extractGISA.Out("gene_id_smiles_activity"))
+
+	// prepareValidationData prepares a data file for use in validation at the end of the workflow
+	prepareValidationData := wf.NewProc("prepare_validation_data", `awk 'FNR==NR { db[$1]; next } ($2 in db) { print $3 "\t" $4 }' {i:removed_compids} {i:gisa} | sort -uV > {o:sa_drugbank}`)
+	prepareValidationData.In("gisa").Connect(extractGISA.Out("gene_id_smiles_activity"))
+	prepareValidationData.In("removed_compids").Connect(makeOneColumn.Out("onecol"))
+	prepareValidationData.SetPathExtend("gisa", "sa_drugbank", ".removed_sa.tsv")
 
 	// removeConflicting removes (or, SHOULD remove) rows which have the same values on both row 1 and 2 (I think ...)
 	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '(( $1 != p1 ) || ( $3 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print }
@@ -566,21 +567,20 @@ func main() {
 									--modelfile {i:model} \
 									--predictfile {i:smiles} \
 									--validation-property activity \
-									--labels A, N \
 									--confidences {p:confidences} \
 									--output-format json \
 									--logfile {o:log} \
 									--output {o:json} # {p:gene} {p:replicate} {p:runset}`)
 				validateDrugBankJSONPathFunc := func(t *sp.Task) string {
 					uniqStrReplRunset := t.Param("gene") + "." + t.Param("replicate") + "." + t.Param("runset")
-					return "dat/predicted/" + uniqStrReplRunset + "/" + uniqStrReplRunset + ".predict_drugbank_1000.json"
+					return "dat/validate/" + uniqStrReplRunset + "/" + uniqStrReplRunset + ".validate_drugbank_1000.json"
 				}
 				validateDrugBank.SetPathCustom("json", validateDrugBankJSONPathFunc)
 				validateDrugBank.SetPathCustom("log", func(t *sp.Task) string {
 					return validateDrugBankJSONPathFunc(t) + ".cpsign.log"
 				})
 				validateDrugBank.In("model").Connect(cpSignTrain.Out("model"))
-				validateDrugBank.In("smiles").Connect(prepareValidationData.Out("sa"))
+				validateDrugBank.In("smiles").Connect(prepareValidationData.Out("sa_drugbank"))
 				validateDrugBank.ParamInPort("gene").ConnectStr(geneLowerCase)
 				validateDrugBank.ParamInPort("replicate").ConnectStr(replicate)
 				validateDrugBank.ParamInPort("runset").ConnectStr(runSet)
