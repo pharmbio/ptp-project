@@ -42,3 +42,14 @@
       `--percentilesfile` flags, to make coloring work in the chemical graph in the
       web UI etc.
 - [x] Create calibration plots
+- Did some counting of entries in data files:
+
+  ```bash
+  70448221 ../../raw/pubchem.chembl.dataset4publication_inchi_smiles.gisa.tsv
+  70365153 dat/excapedb.gisa_wo_drugbank.tsv
+  70361830 dat/excapedb.gisa_wo_drugbank.dedup.tsv
+  ```
+
+  - Which means:
+    - 83068 entries were removed because of filtering out 1000 drugbank molecules
+    - 3323 entries were removed in the deduplication step (to create  the .dedup.tsv file)
