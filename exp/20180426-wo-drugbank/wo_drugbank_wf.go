@@ -230,25 +230,25 @@ func main() {
 	extractGISA.SetPathReplace("excapedb", "gene_id_smiles_activity", ".tsv", ".gisa.tsv")
 	extractGISA.In("excapedb").Connect(dataExcapeDB)
 
-	// Create process for subtracting the DrugBank compounds HERE
-	remDrugBankComps := wf.NewProc("remove_drugbank_compounds", `awk 'FNR==NR { db[$1]; next } !($2 in db)' {i:compids_to_remove} {i:gisa} | sort -uV > {o:gisa_wo_drugbank}`)
-	remDrugBankComps.SetPathStatic("gisa_wo_drugbank", "dat/excapedb.gisa_wo_drugbank.tsv")
-	remDrugBankComps.In("compids_to_remove").Connect(makeOneColumn.Out("onecol"))
-	remDrugBankComps.In("gisa").Connect(extractGISA.Out("gene_id_smiles_activity"))
-
-	// prepareValidationData prepares a data file for use in validation at the end of the workflow
-	prepareValidationData := wf.NewProc("prepare_validation_data", `awk 'FNR==NR { db[$1]; next } ($2 in db) { print $3 "\t" $4 }' {i:removed_compids} {i:gisa} | sort -uV > {o:sa_drugbank}`)
-	prepareValidationData.In("gisa").Connect(extractGISA.Out("gene_id_smiles_activity"))
-	prepareValidationData.In("removed_compids").Connect(makeOneColumn.Out("onecol"))
-	prepareValidationData.SetPathExtend("gisa", "sa_drugbank", ".removed_sa.tsv")
-
 	// removeConflicting removes (or, SHOULD remove) rows which have the same values on both row 1 and 2 (I think ...)
 	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '(( $1 != p1 ) || ( $3 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print }
 																	  { c[$1,$3]++; p1 = $1; p2 = $3; p3 = $4 }
 																	  END { print }' \
 																	  {i:gene_id_smiles_activity} > {o:gene_id_smiles_activity}`)
 	removeConflicting.SetPathReplace("gene_id_smiles_activity", "gene_id_smiles_activity", ".tsv", ".dedup.tsv")
-	removeConflicting.In("gene_id_smiles_activity").Connect(remDrugBankComps.Out("gisa_wo_drugbank"))
+	removeConflicting.In("gene_id_smiles_activity").Connect(extractGISA.Out("gene_id_smiles_activity"))
+
+	// Create process for subtracting the DrugBank compounds HERE
+	remDrugBankComps := wf.NewProc("remove_drugbank_compounds", `awk 'FNR==NR { db[$1]; next } !($2 in db)' {i:compids_to_remove} {i:gisa} | sort -uV > {o:gisa_wo_drugbank}`)
+	remDrugBankComps.SetPathStatic("gisa_wo_drugbank", "dat/excapedb.gisa_wo_drugbank.tsv")
+	remDrugBankComps.In("compids_to_remove").Connect(makeOneColumn.Out("onecol"))
+	remDrugBankComps.In("gisa").Connect(removeConflicting.Out("gene_id_smiles_activity"))
+
+	// prepareValidationData prepares a data file for use in validation at the end of the workflow
+	prepareValidationData := wf.NewProc("prepare_validation_data", `awk 'FNR==NR { db[$1]; next } ($2 in db) { print $3 "\t" $4 }' {i:removed_compids} {i:gisa} | sort -uV > {o:sa_drugbank}`)
+	prepareValidationData.In("gisa").Connect(removeConflicting.Out("gene_id_smiles_activity"))
+	prepareValidationData.In("removed_compids").Connect(makeOneColumn.Out("onecol"))
+	prepareValidationData.SetPathExtend("gisa", "sa_drugbank", ".removed_sa.tsv")
 
 	finalModelsSummary := NewFinalModelSummarizer(wf, "finalmodels_summary_creator", "res/final_models_summary.tsv", '\t')
 
@@ -270,7 +270,7 @@ func main() {
 		extractTargetData := wf.NewProc("extract_target_data_"+uniqStrGene, `awk 'END { print "smiles\tactivity" }' /dev/null > {o:target_data} && awk -F"\t" '$1 == "{p:gene}" { print $3"\t"$4 }' {i:raw_data} >> {o:target_data}`)
 		extractTargetData.ParamInPort("gene").ConnectStr(geneUppercase)
 		extractTargetData.SetPathStatic("target_data", fmt.Sprintf("dat/%s/%s.tsv", geneLowerCase, geneLowerCase))
-		extractTargetData.In("raw_data").Connect(removeConflicting.Out("gene_id_smiles_activity"))
+		extractTargetData.In("raw_data").Connect(remDrugBankComps.Out("gisa_wo_drugbank"))
 		if *runSlurm {
 			extractTargetData.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1:00:00 -J scipipe_extract_" + geneLowerCase // SLURM string
 		}
@@ -312,7 +312,7 @@ func main() {
 						repl := t.Param("replicate")
 						return "dat/" + gene + "/" + repl + "/" + gene + "." + repl + ".assumed_n.tsv"
 					})
-					extractAssumedNonBinding.In("rawdata").Connect(removeConflicting.Out("gene_id_smiles_activity"))
+					extractAssumedNonBinding.In("rawdata").Connect(remDrugBankComps.Out("gisa_wo_drugbank"))
 					extractAssumedNonBinding.In("targetdata").Connect(extractTargetData.Out("target_data"))
 					extractAssumedNonBinding.ParamInPort("gene").ConnectStr(geneUppercase)
 					extractAssumedNonBinding.ParamInPort("replicate").ConnectStr(replicate)
@@ -607,7 +607,7 @@ func main() {
 		plotSummary := wf.NewProc("plot_summary_"+runSet, "Rscript bin/plot_summary.r -i {i:summary} -o {o:plot} -f png # gene:{i:gene_smiles_activity} runset:{p:runset}")
 		plotSummary.SetPathExtend("summary", "plot", "."+runSet+".png")
 		plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
-		plotSummary.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_id_smiles_activity"))
+		plotSummary.In("gene_smiles_activity").Connect(remDrugBankComps.Out("gisa_wo_drugbank"))
 		plotSummary.ParamInPort("runset").ConnectStr(runSet)
 	}
 

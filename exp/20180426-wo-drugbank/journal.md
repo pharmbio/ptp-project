@@ -53,3 +53,5 @@
   - Which means:
     - 83068 entries were removed because of filtering out 1000 drugbank molecules
     - 3323 entries were removed in the deduplication step (to create  the .dedup.tsv file)
+- [x] Re-arrange workflow so that same 'remove conflicting' component is used
+      to prepare data for both training and validation
