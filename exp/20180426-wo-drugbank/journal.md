@@ -55,3 +55,8 @@
     - 3323 entries were removed in the deduplication step (to create  the .dedup.tsv file)
 - [x] Re-arrange workflow so that same 'remove conflicting' component is used
       to prepare data for both training and validation
+- [ ] Fix the broken removeConflicting component. Now, the conflict detection
+      doesn't work since the id column was added and messes up the sorting, so that
+      the same Gene / Smiles combinations don't end up close to each other.
+- [ ] Fix the broken extraction of removed drugbank compounds. We should select max one
+      SMILES per Chembl ID / PubChem ID pair.
