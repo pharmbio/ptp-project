@@ -588,3 +588,21 @@ Olas Room, kl 13:35
   ... ~10k interactions(?))
 - [ ] Build the target profiles, and use to predict Approved/Withdrawn on the
   Drugbank dataset, and compare.
+
+# Short-notice project meeting 2018-05-18
+
+Attending: Ola, Jonathan, Arvid, Samuel
+
+We discussed the problem that in the data to use for prediction, the number of
+unique SMILES strings were not adding up to 1000 compounds.
+
+Jonathan and Samuel had been thinking of selecting only one SMILES per selected
+DrugBank ID, and Ola suggested a concrete strategy: Think of the problem like
+having two columns: PubChem ID and Chembl ID, and join in a third column with
+the SMILES. This strategy by definition will give only one SMILES per compound,
+and thus was agreed to be a good way to go about the problem.
+
+Another note is that the deadline for Samuel's "Disputationsanmälan" is June
+1st, and all the manuscripts need to be in "publication ready status" by then.
+We'll try to have the manuscript in good shape for that date ("minor"
+modifications can be done after that).
