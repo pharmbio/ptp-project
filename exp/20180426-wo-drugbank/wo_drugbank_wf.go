@@ -231,8 +231,8 @@ func main() {
 	extractGISA.In("excapedb").Connect(dataExcapeDB)
 
 	// removeConflicting removes (or, SHOULD remove) rows which have the same values on both row 1 and 2 (I think ...)
-	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '(( $1 != p1 ) || ( $3 != p2)) && ( c[p1,p2] <= 1 ) && ( p1 != "" ) && ( p2 != "" ) { print }
-																	  { c[$1,$3]++; p1 = $1; p2 = $3; p3 = $4 }
+	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '(( $1 != p1 ) || ( $3 != p3)) && ( c[p1,p3] <= 1 ) && ( p1 != "" ) && ( p3 != "" ) { print }
+																	  { c[$1,$3]++; p1 = $1; p3 = $3; p4 = $4 }
 																	  END { print }' \
 																	  {i:gene_id_smiles_activity} > {o:gene_id_smiles_activity}`)
 	removeConflicting.SetPathReplace("gene_id_smiles_activity", "gene_id_smiles_activity", ".tsv", ".dedup.tsv")
