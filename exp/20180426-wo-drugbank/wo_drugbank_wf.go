@@ -224,17 +224,20 @@ func main() {
 	makeOneColumn.SetPathExtend("infile", "onecol", ".onecol.csv")
 	makeOneColumn.In("infile").Connect(mergeApprWithdr.Out("out"))
 
-	// extractGISA extracts a file with only Gene symbol, id (orig entry), SMILES, and the Activity flag
-	// into a .tsv file, for easier subsequent parsing
-	extractGISA := wf.NewProc("extract_gene_id_smiles_activity", `awk -F "\t" '{ print $9 "\t" $2 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {o:gene_id_smiles_activity}`)
+	// extractGISA extracts a file with only Gene symbol, id (orig entry), SMILES,
+	// and the Activity flag into a .tsv file, for easier subsequent parsing.
+	// ATTENTION: The sorting order (Gene, SMILES, Activity) is super important,
+	// for the following component, `removeConflicting` to function properly!
+	extractGISA := wf.NewProc("extract_gene_id_smiles_activity", `awk -F "\t" '{ print $9 "\t" $2 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV -k 1,1 -k 3,3 -k 4,4 > {o:gene_id_smiles_activity}`)
 	extractGISA.SetPathReplace("excapedb", "gene_id_smiles_activity", ".tsv", ".gisa.tsv")
 	extractGISA.In("excapedb").Connect(dataExcapeDB)
 
-	// removeConflicting removes (or, SHOULD remove) rows which have the same values on both row 1 and 2 (I think ...)
-	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '(( $1 != p1 ) || ( $3 != p3)) && ( c[p1,p3] <= 1 ) && ( p1 != "" ) && ( p3 != "" ) { print }
-																	  { c[$1,$3]++; p1 = $1; p3 = $3; p4 = $4 }
-																	  END { print }' \
-																	  {i:gene_id_smiles_activity} > {o:gene_id_smiles_activity}`)
+	// removeConflicting prints the previous line, unless it has the same values on
+	removeConflicting := wf.NewProc("remove_conflicting", `awk -F "\t" '((( prev1 != $1 ) && ( prev1 != "")) || (( prev3 != $3 ) && ( prev3 != "" ))) && !isconflicting[prev1,prev3] { print prev1 "\t" prev2 "\t" prev3 "\t" prev4 }
+																( seen[$1,$3] > 0 ) && ( activity[$1,$3] != $4 ) { isconflicting[$1,$3] = true }
+																{ seen[$1,$3]++; activity[$1,$3] = $4; prev1 = $1; prev2 = $2; prev3 = $3; prev4 = $4 }
+																END { print }' \
+															{i:gene_id_smiles_activity} > {o:gene_id_smiles_activity}`)
 	removeConflicting.SetPathReplace("gene_id_smiles_activity", "gene_id_smiles_activity", ".tsv", ".dedup.tsv")
 	removeConflicting.In("gene_id_smiles_activity").Connect(extractGISA.Out("gene_id_smiles_activity"))
 
