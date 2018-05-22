@@ -134,34 +134,34 @@ also the applicability of larger as well as focused target sets.
 
 The dataset used for information about binding association between ligands
 and targets, was ExcapeDB~\cite{Sun2017}. An extraction of only the columns
-for Gene name, SMILES and Activity flag was performed in order to make
-subsequent data transformation steps easier to implement and faster to
-process, given the relative large size of the uncompressed ExcapeDB data file
-(18 GB).
+for Gene name, Original entry ID (PubChem CID or CHEMBL ID), SMILES and
+Activity flag was performed in order to make subsequent data transformation
+steps easier to implement and faster to process, given the relative large
+size of the uncompressed ExcapeDB data file (18 GB).
 
-Also, from this extracted dataset, duplicate rows were removed. Also, all
-rows for which there were rows with a conflicting value for the activity
-flag, were completely removed.
+From this dataset, all rows for which there were rows with a conflicting
+value for the activity flag, were completely removed.
 
-As targets, a subset of the panel of 44 targets as suggested in
-\cite{Bowes2012} was used. Specifically, this list of 44 targets was filtered
-to remove any target for which the dataset contained less than 100 data
-points about either associated or non-associated ligands respectively. Thus,
-only targets with at least 100 associated, and at least 100 non-associated,
-compounds, where kept.
+A subset of the panel of 44 binding targets as suggested in \cite{Bowes2012}
+was selected, for which to include interaction data. Specifically, only
+targets with at least 100 associated and at least 100 non-associated
+compounds were kept.
 
-Some of the gene ids used in \cite{Bowes2012} was not found in their exact form in
-the ExcapeDB dataset. To resolve this, we did PubMed Entrez searches, to find
+Some of the gene ids used in \cite{Bowes2012} were not found in their exact
+form in the ExcapeDB dataset. To resolve this, PubMed was consulted to find
 synonymous gene IDs. The following replacements of gene ids were done:
 
-KCNE1 was replaced with MINK1 which is available in ExcapeDB. CHRNA1 (coding
-for the $\alpha1$ subunit of the Acetylcholine receptor) is skipped, as it was
-not found in the dataset. CHRNA4 (coding for the $\alpha4$ subunit of the
-Acetylcholine receptor) is included though.
+i) ``KCNE1'' was replaced with ``MINK1'' which is present in ExcapeDB.
 
-Both MINK1 and CHRNA4 were removed in the filtering step mentioned above, since
-the dataset did not contain more than 100 active and 100 non-active compounds
-for neither MINK1 nor CHRNA4.
+ii) CHRNA1 (coding for the $\alpha1$ subunit of the Acetylcholine receptor) is
+skipped, as it was not found in the dataset.
+
+iii) CHRNA4 (coding for the $\alpha4$ subunit of the Acetylcholine receptor) is
+included though.
+
+iv) Both MINK1 and CHRNA4 were removed in the filtering step mentioned above,
+since the dataset did not contain more than 100 active and 100 non-active
+compounds for MINK1 nor CHRNA4.
 
 \todoil{Lets make a table out of this! including number of negatives and
 positives and stuff //jonalv}
@@ -194,7 +194,7 @@ software, available from genettasoft.com [LINK].
 The computational workflows for orchestrating the extraction of data, running
 CPSign, and the collection of results for summarization and plotting, were
 implemented in the Go programming language, using the SciPipe workflow library
-developed in the group, and which is available as open source software on
+developed in the group, and which is available as open source software at
 scipipe.org and github.com/scipipe/scipipe [LINK].
 
 \subsection{Choice of cost value for liblinear}
