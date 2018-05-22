@@ -58,5 +58,6 @@
 - [x] Fix the broken removeConflicting component. Now, the conflict detection
       doesn't work since the id column was added and messes up the sorting, so that
       the same Gene / Smiles combinations don't end up close to each other.
-- [ ] Fix the broken extraction of removed drugbank compounds. We should select max one
-      SMILES per Chembl ID / PubChem ID pair.
+- [>] Fix the broken extraction of removed drugbank compounds. We should
+      select max one SMILES per Chembl ID / PubChem ID pair. We also need to
+      extract a separate file per target.

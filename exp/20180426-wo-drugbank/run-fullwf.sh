@@ -4,9 +4,9 @@
 #SBATCH -C mem256GB
 #SBATCH -n 20
 #SBATCH -J ptp_fullwf_wo_drugbank
-#SBATCH -t 2-00:00:00
+#SBATCH -t 4-00:00:00
 #SBATCH --mail-user samuel.lampa@farmbio.uu.se
 #SBATCH --mail-type BEGIN,FAIL,END
 module load java/sun_jdk1.8.0_92
 module load R/3.4.0
-go run wo_drugbank_wf.go components.go -threads 1 -maxtasks 19 -geneset "bowes44min100percls" -procs "plot_summary_.*" &> log/scipipe-$(date +%Y%m%d-%H%M%S).log # -debug
+go run wo_drugbank_wf.go components.go -threads 1 -maxtasks 19 -geneset "bowes44min100percls" -procs "validate_drugbank_.*" &> log/scipipe-$(date +%Y%m%d-%H%M%S).log # -debug

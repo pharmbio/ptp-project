@@ -224,6 +224,10 @@ func main() {
 	makeOneColumn.SetPathExtend("infile", "onecol", ".onecol.csv")
 	makeOneColumn.In("infile").Connect(mergeApprWithdr.Out("out"))
 
+	drugBankIdsCsvToTsv := wf.NewProc("drugbank_ids_csv_to_tsv", `cat {i:csv} | tr "," "\t" > {o:tsv}`)
+	drugBankIdsCsvToTsv.SetPathReplace("csv", "tsv", ".csv", ".tsv")
+	drugBankIdsCsvToTsv.In("csv").Connect(mergeApprWithdr.Out("out"))
+
 	// extractGISA extracts a file with only Gene symbol, id (orig entry), SMILES,
 	// and the Activity flag into a .tsv file, for easier subsequent parsing.
 	// ATTENTION: The sorting order (Gene, SMILES, Activity) is super important,
@@ -247,11 +251,11 @@ func main() {
 	remDrugBankComps.In("compids_to_remove").Connect(makeOneColumn.Out("onecol"))
 	remDrugBankComps.In("gisa").Connect(removeConflicting.Out("gene_id_smiles_activity"))
 
-	// prepareValidationData prepares a data file for use in validation at the end of the workflow
-	prepareValidationData := wf.NewProc("prepare_validation_data", `awk 'FNR==NR { db[$1]; next } ($2 in db) { print $3 "\t" $4 }' {i:removed_compids} {i:gisa} | sort -uV > {o:sa_drugbank}`)
-	prepareValidationData.In("gisa").Connect(removeConflicting.Out("gene_id_smiles_activity"))
-	prepareValidationData.In("removed_compids").Connect(makeOneColumn.Out("onecol"))
-	prepareValidationData.SetPathExtend("gisa", "sa_drugbank", ".removed_sa.tsv")
+	// extractValidationRawdata prepares a data file for use in validation at the end of the workflow
+	extractValidationRawdata := wf.NewProc("extract_validation_rawdata", `awk -F"\t" 'FNR==NR { cid[$1]; cbl[$2]; next } (( $2 in cid ) || ($2 in cbl )) { print }' {i:removed_compids} {i:gisa} | sort -uV > {o:drugbank_removed}`)
+	extractValidationRawdata.In("removed_compids").Connect(drugBankIdsCsvToTsv.Out("tsv"))
+	extractValidationRawdata.In("gisa").Connect(removeConflicting.Out("gene_id_smiles_activity"))
+	extractValidationRawdata.SetPathExtend("gisa", "drugbank_removed", ".drugbank_removed.tsv")
 
 	finalModelsSummary := NewFinalModelSummarizer(wf, "finalmodels_summary_creator", "res/final_models_summary.tsv", '\t')
 
@@ -564,6 +568,31 @@ func main() {
 				// Validate excluded DrugBank compounds (compare predicted and actual values)
 				// ------------------------------------------
 				// gisa: gene, id, smiles, activity. sa: smiles, activity
+
+				// extractTargetValidationData -----------------------------------
+				extractTargetValidationData := wf.NewProc("extract_target_validation_data_"+uniqStrRepl, `awk '
+					( $1 == "`+geneUppercase+`" ) { print $2 "\t" $3 "\t" $4 }' \
+				{i:raw} > {o:tgt} # {p:gene} {p:replicate} {p:runset}`)
+				extractTargetValidationData.SetPathCustom("tgt", func(t *sp.Task) string {
+					uniqStrReplRunset := t.Param("gene") + "." + t.Param("replicate") + "." + t.Param("runset")
+					return "dat/validate/" + uniqStrReplRunset + "/" + uniqStrReplRunset + ".validation_data.tsv"
+				})
+				extractTargetValidationData.In("raw").Connect(extractValidationRawdata.Out("drugbank_removed")) // HERE
+				extractTargetValidationData.ParamInPort("gene").ConnectStr(geneLowerCase)
+				extractTargetValidationData.ParamInPort("replicate").ConnectStr(replicate)
+				extractTargetValidationData.ParamInPort("runset").ConnectStr(runSet)
+
+				// dedupTargetValData --------------------------------------------
+				dedupTargetValData := wf.NewProc("dedup_target_validation_data_"+uniqStrRepl, `awk '
+					FNR == NR { ids[$1] = $2 "\t" $3; next }
+					( $1 in ids ) { print ids[$1] }
+					(!( $1 in ids ) && ( $2 in ids )) { print ids[$2] }' \
+				{i:target_val_data} {i:drugbank_compids} > {o:dedup}`)
+				dedupTargetValData.SetPathExtend("target_val_data", "dedup", ".dedup.tsv")
+				dedupTargetValData.In("target_val_data").Connect(extractTargetValidationData.Out("tgt"))
+				dedupTargetValData.In("drugbank_compids").Connect(drugBankIdsCsvToTsv.Out("tsv"))
+
+				// validateDrugBank ----------------------------------------------
 				validateDrugBank := wf.NewProc("validate_drugbank_"+uniqStrRepl, `java -jar `+cpSignPath+` validate \
 									--license ../../bin/cpsign.lic \
 									--cptype 1 \
@@ -583,7 +612,7 @@ func main() {
 					return validateDrugBankJSONPathFunc(t) + ".cpsign.log"
 				})
 				validateDrugBank.In("model").Connect(cpSignTrain.Out("model"))
-				validateDrugBank.In("smiles").Connect(prepareValidationData.Out("sa_drugbank"))
+				validateDrugBank.In("smiles").Connect(dedupTargetValData.Out("dedup")) // Create target specific data file
 				validateDrugBank.ParamInPort("gene").ConnectStr(geneLowerCase)
 				validateDrugBank.ParamInPort("replicate").ConnectStr(replicate)
 				validateDrugBank.ParamInPort("runset").ConnectStr(runSet)
