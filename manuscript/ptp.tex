@@ -136,11 +136,11 @@ The dataset used for information about binding association between ligands
 and targets, was ExcapeDB~\cite{Sun2017}. An extraction of only the columns
 for Gene name, Original entry ID (PubChem CID or CHEMBL ID), SMILES and
 Activity flag was performed in order to make subsequent data transformation
-steps easier to implement and faster to process, given the relative large
-size of the uncompressed ExcapeDB data file (18 GB).
+steps more performant, given the relative large size of the uncompressed
+ExcapeDB data file (18 GB).
 
-From this dataset, all rows for which there were rows with a conflicting
-value for the activity flag, were completely removed.
+From this dataset, all rows for which there existed rows with a conflicting
+activity value, were completely removed.
 
 A subset of the panel of 44 binding targets as suggested in \cite{Bowes2012}
 was selected, for which to include interaction data. Specifically, only
@@ -151,26 +151,26 @@ Some of the gene ids used in \cite{Bowes2012} were not found in their exact
 form in the ExcapeDB dataset. To resolve this, PubMed was consulted to find
 synonymous gene IDs. The following replacements of gene ids were done:
 
-i) ``KCNE1'' was replaced with ``MINK1'' which is present in ExcapeDB.
+i) \textit{KCNE1} was replaced with \textit{MINK1} which is present in ExcapeDB.
 
-ii) CHRNA1 (coding for the $\alpha1$ subunit of the Acetylcholine receptor) is
-skipped, as it was not found in the dataset.
+ii) \textit{CHRNA1} (coding for the $\alpha1$ subunit of the Acetylcholine
+receptor) is excluded, as it is not present in the dataset (\textit{CHRNA4},
+coding for the $\alpha4$ subunit of the Acetylcholine receptor, is present in
+the dataset).
 
-iii) CHRNA4 (coding for the $\alpha4$ subunit of the Acetylcholine receptor) is
-included though.
-
-iv) Both MINK1 and CHRNA4 were removed in the filtering step mentioned above,
-since the dataset did not contain more than 100 active and 100 non-active
-compounds for MINK1 nor CHRNA4.
+iv) Both \textit{MINK1} and \textit{CHRNA4} were removed in the filtering
+step mentioned above, since the dataset did not contain more than 100 active
+and 100 non-active compounds for \textit{MINK1} nor \textit{CHRNA}.
 
 \todoil{Lets make a table out of this! including number of negatives and
 positives and stuff //jonalv}
 The resulting panel consists of 31 targets, represented by the following gene
-IDs in the ExcapeDB dataset, and througout this article: PDE3A,
-SCN5A, CCKAR, ADRB1, PTGS1, CHRM3, CHRM2, EDNRA, MAOA, LCK,
-PTGS2, SLC6A2, ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR,
-SLC6A4, OPRM1, HTR1A, SLC6A3, OPRK1, AVPR1A, ADRB2, DRD2,
-KCNH2, DRD1, HTR2A, CHRM1.
+IDs in the ExcapeDB dataset, and througout this article:
+
+
+PDE3A, SCN5A, CCKAR, ADRB1, PTGS1, CHRM3, CHRM2, EDNRA, MAOA, LCK, PTGS2,
+SLC6A2, ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR, SLC6A4, OPRM1, HTR1A,
+SLC6A3, OPRK1, AVPR1A, ADRB2, DRD2, KCNH2, DRD1, HTR2A, CHRM1.
 
 For 21 of these targets, the dataset contained less than 100 non-active
 compounds, leading to imbalanced datasets. These 21 target genes are: PDE3A,
