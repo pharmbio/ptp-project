@@ -76,7 +76,7 @@
 \begin{abstract}
 
 %%% Leave the Abstract empty if your article does not require one, please see the Summary Table for full details.
-\section{}
+%\section{}
 %For full guidelines regarding your manuscript please refer to
 %    \href{http://www.frontiersin.org/about/AuthorGuidelines}{Author
 %    Guidelines}.
@@ -88,33 +88,38 @@
 %    \href{http://www.frontiersin.org/about/AuthorGuidelines#SummaryTable}{Summary
 %    Table} for details according to article type.
 
-\todoil{Can you really have refs in abstract?}
-\todoil{--- No not really, the abstract should probably be completely rewritten. // jonalv}
-Off-target pharmacology and polypharmacology has big implications on drug
-efficacy and safety, and prediction of target binding profiles for ligands is
-an important task that can aid early drug discovery \cite{Bowes2012}.
-However, available methods for ligand-based target profiling do not offer
-valid measures of confidence in predictions or well-calibrated probabilities.
-We present an approach for ligand-based target profiling using probabilistic
-predictions, delivering target profiles with valid predictions of the
-probability for the query compound to interact with each target. The
-probabilities are calculated using the Conformal Prediction methodology
-\cite{Vovk2005}, with support vector machines for modeling and chemical
-structures described by the signature molecular descriptor \cite{Faulon2003}.
-We study profiles for different sets of targets, including a subset of the
-minimal panel of 44 targets for broad early hazard assessment suggested by
-\cite{Bowes2012}, but also the applicability of larger as well as focused
-target sets. The resulting method is available as an online Web service via
-an API, and we also make the complete workflow for reproducing the study
-together with all models publicly available.
+%\todoil{Can you really have refs in abstract?}
+%\todoil{--- No not really, the abstract should probably be completely rewritten. // jonalv}
+%\todoil{--- No refs and no abbreviations. /Ola}
+%Off-target pharmacology and polypharmacology has big implications on drug
+%efficacy and safety, and prediction of target binding profiles for ligands is
+%an important task that can aid early drug discovery \cite{Bowes2012}.
+%However, available methods for ligand-based target profiling do not offer
+%valid measures of confidence in predictions or well-calibrated probabilities.
+%We present an approach for ligand-based target profiling using probabilistic
+%predictions, delivering target profiles with valid predictions of the
+%probability for the query compound to interact with each target. The
+%probabilities are calculated using the Conformal Prediction methodology
+%\cite{Vovk2005}, with support vector machines for modeling and chemical
+%structures described by the signature molecular descriptor \cite{Faulon2003}.
+%We study profiles for different sets of targets, including a subset of the
+%minimal panel of 44 targets for broad early hazard assessment suggested by
+%\cite{Bowes2012}, but also the applicability of larger as well as focused
+%target sets. The resulting method is available as an online Web service via
+%an API, and we also make the complete workflow for reproducing the study
+%together with all models publicly available.
+
+Multiple ligand-based models are widely used in drug discovery to obtain an early indication of potential off-target predictions that could be linked to drug efficacy and safety. Another application is to combine models into a profile allowing to compare and search for compounds with similar profile. Most contemporary methods and implementations however lack valid measures of confidence in predictions, outputting point predictions. We here describe the use of conformal prediction for predicting off-target interactions based on data from 44 targets from the ExCAPE database, selected for their value in broad early hazard assessment. We used upport vector machines as underlying modelling methodology and chemical structures were described by the signature molecular descriptor. With conformal prediction, the results are presented as prediction intervals. The entire preprocessing and model training process is openly available as a scientific workflow on github, rendering it completely reproducible. The resulting models are published online and are available via a graphical web page and an OpenAPI for programmatic access.
+
 
 \tiny
- \keyFont{ \section{Keywords:} drug discovery, qsar, molecular signatures, toxicity, predictive modelling, liblinear, machine learning} %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
+ \keyFont{ \section{Keywords:} drug discovery, predictive modelling, conformal prediction, machine learning, off-target, adverse effects} %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
 \end{abstract}
 
 \section{Introduction}
-
 \todoil{Expand the intro below which is just taken from the abstract}
+
+%Introduce off target binding as a problem, and the value of predictions
 Off-target pharmacology and polypharmacology has big implications on drug
 efficacy and safety, and prediction of target binding profiles for ligands is
 an important task that can aid early drug discovery \cite{Bowes2012}.
@@ -130,6 +135,18 @@ for different sets of targets, including a subset of the minimal panel of 44
 targets for broad early hazard assessment suggested by \cite{Bowes2012}, but
 also the applicability of larger as well as focused target sets.
 
+%Prior art - what has been done before?
+Earlier studies...
+
+
+%What is the motivation for the study, and what will we describe in this manuscript
+In this manuscript we...
+
+
+
+%%%%%%%%%%%%%%%%%%
+%Methods
+%%%%%%%%%%%%%%%%%%
 \section{Methods}
 
 The dataset used for information about binding association between ligands
