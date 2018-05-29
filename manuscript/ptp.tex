@@ -170,17 +170,18 @@ In this manuscript we...
 The dataset used for information about binding association between ligands
 and targets, was ExcapeDB~\cite{Sun2017}. An extraction of only the columns
 for Gene name, Original entry ID (PubChem CID or CHEMBL ID), SMILES and
-Activity flag was performed in order to make subsequent data transformation
-steps more performant, given the relative large size of the uncompressed
-ExcapeDB data file (18 GB).
+Activity flag was performed early in the workflow to make subsequent data
+transformation steps more performant, given the relative large size of the
+uncompressed ExcapeDB data file (18 GB).
 
 From this dataset, all rows for which there existed rows with a conflicting
-activity value, were completely removed.
+activity value, were completely removed (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L239-L246}{here}).
 
 A subset of the panel of 44 binding targets as suggested in \cite{Bowes2012}
-was selected, for which to include interaction data. Specifically, only
-targets with at least 100 associated and at least 100 non-associated
-compounds were kept.
+was selected, for which to include interaction data. Specifically, only targets
+with at least 100 associated and at least 100 non-associated compounds were
+kept. In addition some targets were excluded for which data was not found in
+ExcapeDB. This is described in detail below.
 
 Some of the gene ids used in \cite{Bowes2012} were not found in their exact
 form in the ExcapeDB dataset. To resolve this, PubMed was consulted to find
@@ -199,9 +200,9 @@ and 100 non-active compounds for \textit{MINK1} nor \textit{CHRNA}.
 
 \todoil{Lets make a table out of this! including number of negatives and
 positives and stuff //jonalv}
-The resulting panel consists of 31 targets, represented by the following gene
-IDs in the ExcapeDB dataset, and througout this article:
 
+The resulting set consists of 31 targets, identified by the following gene
+IDs in the ExcapeDB dataset, and througout this article:
 
 PDE3A, SCN5A, CCKAR, ADRB1, PTGS1, CHRM3, CHRM2, EDNRA, MAOA, LCK, PTGS2,
 SLC6A2, ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR, SLC6A4, OPRM1, HTR1A,
@@ -210,12 +211,14 @@ SLC6A3, OPRK1, AVPR1A, ADRB2, DRD2, KCNH2, DRD1, HTR2A, CHRM1.
 For 21 of these targets, the dataset contained less than 100 non-active
 compounds, leading to imbalanced datasets. These 21 target genes are: PDE3A,
 SCN5A, CCKAR, ADRB1, PTGS1, CHRM3, CHRM2, EDNRA, MAOA, LCK, PTGS2, SLC6A2,
-ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR, SLC6A4 and OPRM1. For these 21
-targets, we filled up their respective datasets with randomly selected
-examples from the raw dataset which were not reported to be active for this
-target, thus being ``assumed non-active''. The amount of such assumed
-non-active compounds were chosen to be twice the number of actives for each
-target in question.
+ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR, SLC6A4 and OPRM1.
+
+For these 21 targets, we filled up their respective datasets with randomly
+selected examples from the raw dataset which were not reported to be active for
+this target, thus being ``assumed non-active''. The amount of such assumed
+non-active compounds were chosen such that the total number of non-actives and
+assumed non-actives would be twice the number of actives, for each target
+respectively (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L308-L328}{here} for workflow code).
 
 \subsection{Software for training and cross-validation}
 
@@ -223,41 +226,50 @@ The software for training and cross-validation was the CPSign software
 \cite{CPSignDocs} previously developed in the group. Certain modifications
 were done based on needs identified in the project, which have been merged
 into the latest release of the CPSign software. CPSign is a commercial
-software, available from genettasoft.com [LINK].
+software, available from \href{http://www.genettasoft.com}{genettasoft.com}.
+
 \todoil{Add something about academic licenses?}
 
 The computational workflows for orchestrating the extraction of data, running
 CPSign, and the collection of results for summarization and plotting, were
 implemented in the Go programming language, using the SciPipe workflow library
 developed in the group, and which is available as open source software at
-scipipe.org and github.com/scipipe/scipipe [LINK].
+\href{http://scipipe.org}{scipipe.org} or \href{https://github.com/scipipe/scipipe}{github.com/scipipe/scipipe}.
 
 \subsection{Choice of cost value for liblinear}
 
-For each of the 31 targets, we ran a parameter sweep to find the value of the cost
-parameter of liblinear that gave the best efficiency measure. The efficiency
-measure we used, was a slightly modified version of observed fuzziness (OF)
-scores as described in \cite{Vovk2016}. Instead of using an overall OF, which
-would have been been influenced more by values in the larger class in case of
-imbalanced datasets, we first calculated the OF per class and divided it by
-the number of examples (compounds) in that class, and finally took the mean
-value of the resulting normalized OF values for each class. In other words,
-we could thus call our measure a ``class-normalized observed fuzziness''
-(CNOF).
+For each of the 31 targets, we ran a parameter sweep to find the value of the
+cost parameter of liblinear that gave the best efficiency measure. The
+efficiency measure used for the evaluation, was the observed fuzziness (OF)
+score described in \cite{Vovk2016}.
 
-The parameter sweep evaluated three values for the cost parameter, for each
-target; 1, 10 and 100.
+We also provide a slightly modified version of OF, which is constructed like
+so: Instead of using an overall OF, which is have been been influenced more
+by values in the larger class in case of imbalanced datasets, we first
+calculated the OF per class and divided it by the number of examples
+(compounds) in that class, and finally took the mean value of the resulting
+normalized OF values for each class. We call our measure ``class-normalized
+observed fuzziness'' (CNOF). CNOF was not used for cost selection, but is
+provided for information in the results from the workflow. The parameter sweep
+evaluated three values for the cost parameter for each target; 1, 10 and 100.
 
-for evaluation of the CNOF score mentioned above, we ran cross-validation
-through cpsign's built-in crossvalidate function, with 10 folds.  The training
+for evaluation of the OF score mentioned above, we ran cross-validation
+through CPSign's built-in crossvalidate function, with 10 folds. The training
 approach in the crossvalidation was the same as the one used to build the final
 model: Aggregated Conformal Prediction (ACP) with 10 aggregated models
 (specified to cpsign's crossvalidate and train commands using the
-\texttt{--nr-models} flag)
+\texttt{--nr-models} flag).
+
+From the crossvalidation, calibration plots were generated by predicting values
+for confidence values at 0.05 up to 0.05, with a step size of 0.05. These plots
+are added as supplementary material.
+
+\todoil{Add info about extraction of DrugBank data}
+\todoil{Add info about comparison of results for fillup vs non-fillup?}
 
 \subsection{Building final models}
 
-Before the final training the cpsign precompute command was run, in order to
+Before the final training the CPSign precompute command was run, in order to
 generate a sparse representation of the dataset for the final training.
 The final models were then built using the CPSign train command. The cost value
 used is the one obtained from the cross validation, as described above.
