@@ -25,7 +25,7 @@ if ( is.null(opt$format) || is.null(opt$infile) || is.null(opt$outfile) ) {
 if (opt$format == 'png') {
 	png(opt$outfile, width=1200, height=640, units="px")
 } else if (opt$format =='pdf') {
-	pdf(opt$outfile);
+	pdf(opt$outfile, width=12, height=6);
 }
 
 d <- read.csv(opt$infile, sep = '\t', header = TRUE);
