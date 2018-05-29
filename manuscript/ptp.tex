@@ -280,9 +280,10 @@ other drug statuses in DrugBank statuses such as ``investigational''.
 \subsection{Building final models}
 
 Before the final training the CPSign precompute command was run, in order to
-generate a sparse representation of the dataset for the final training.
-The final models were then built using the CPSign train command. The cost value
-used is the one obtained from the cross validation, as described above.
+generate a sparse representation of the dataset for the final training.  The
+final models were built using the CPSign train command. The cost value used is
+the one obtained from the cross validation, as described above. The cost values
+for each target is stored in the workflow code (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L69-L101}{here}).
 The training type was -- just as in the cross validation for selecting the cost
 value -- Aggregated Conformal Prediction (ACP), with 10 aggregated models.
 
