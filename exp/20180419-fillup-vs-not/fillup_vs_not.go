@@ -417,12 +417,15 @@ func main() {
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
 	sortSummaryOnDataSize.In("summary").Connect(finalModelsSummary.OutSummary())
 
-	for _, runSet := range runSets {
-		plotSummary := wf.NewProc("plot_summary_"+runSet, "Rscript bin/plot_summary.r -r {p:runset} -i {i:summary} -o {o:plot} -f png # {i:gene_smiles_activity}")
-		plotSummary.SetPathExtend("summary", "plot", "."+runSet+".png")
-		plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
-		plotSummary.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_smiles_activity"))
-		plotSummary.ParamInPort("runset").ConnectStr(runSet)
+	for _, imgType := range []string{"png", "pdf"} {
+		for _, runSet := range runSets {
+			plotSummary := wf.NewProc("plot_summary_"+runSet+"_"+imgType, "Rscript bin/plot_summary.r -r {p:runset} -i {i:summary} -o {o:plot} -f {p:imgtype} # {i:gene_smiles_activity}")
+			plotSummary.SetPathExtend("summary", "plot", "."+runSet+".png")
+			plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
+			plotSummary.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_smiles_activity"))
+			plotSummary.ParamInPort("runset").ConnectStr(runSet)
+			plotSummary.ParamInPort("imgtype").ConnectStr(imgType)
+		}
 	}
 
 	testObsFuzzDiff := wf.NewProc("test_obsfuzz_diff", "Rscript bin/test_ofdiff.r -i {i:summary} -o {o:stats}")

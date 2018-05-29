@@ -318,10 +318,13 @@ func main() {
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
 	sortSummaryOnDataSize.In("summary").Connect(finalModelsSummary.OutSummary())
 
-	plotSummary := wf.NewProc("plot_summary", "Rscript bin/plot_summary.r -i {i:summary} -o {o:plot} -f png # {i:gene_smiles_activity}")
-	plotSummary.SetPathExtend("summary", "plot", ".plot.png")
-	plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
-	plotSummary.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_smiles_activity"))
+	for _, imgType := range []string{"png", "pdf"} {
+		plotSummary := wf.NewProc("plot_summary_"+imgType, "Rscript bin/plot_summary.r -i {i:summary} -o {o:plot} -f {p:imgtype} # {i:gene_smiles_activity}")
+		plotSummary.SetPathExtend("summary", "plot", ".plot.png")
+		plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
+		plotSummary.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_smiles_activity"))
+		plotSummary.ParamInPort("imgtype").ConnectStr(imgType)
+	}
 
 	// --------------------------------
 	// Run the pipeline!
@@ -333,7 +336,7 @@ func main() {
 	//	}
 	//}
 	//wf.RunTo(procsToRun...)
-	wf.RunTo("plot_summary")
+	wf.RunToRegex("plot_summary.*")
 }
 
 // --------------------------------------------------------------------------------
