@@ -13,15 +13,15 @@ func main() {
 	sts := spc.NewStreamToSubStream(wf, "sts")
 	sts.In().Connect(validateFiles.Out())
 
-	extractValidationData := wf.NewProc("extract_validation_data", `cat {i:valjson:r: } \
+	extractValidationData := wf.NewProc("extract_validation_data", `echo -e "Anone\tAA\tAN\tAboth\tNnone\tNA\tNN\tNboth" > {o:valstats} \
+	&& cat {i:valjson:r: } \
     | jq -c '[.molecule.activity,.prediction.predictedLabels[0].labels[]]' \
     | tr -d "[" | tr -d "]" | tr -d '"' | \
     awk -F, '{ 
         d[$1][$2,$3]++ } 
         END { 
-            print d["A"]["",""] "\t" d["A"]["A",""] "\t" d["A"]["N",""] "\t" d["A"]["A","N"]
-            print d["N"]["",""] "\t" d["N"]["A",""] "\t" d["N"]["N",""] "\t" d["N"]["A","N"]
-		}' > {o:valstats}`)
+            print d["A"]["",""] "\t" d["A"]["A",""] "\t" d["A"]["N",""] "\t" d["A"]["A","N"] "\t" d["N"]["",""] "\t" d["N"]["A",""] "\t" d["N"]["N",""] "\t" d["N"]["A","N"]
+		}' >> {o:valstats}`)
 	extractValidationData.SetPathStatic("valstats", "valstats.tsv")
 	extractValidationData.In("valjson").Connect(sts.OutSubStream())
 
