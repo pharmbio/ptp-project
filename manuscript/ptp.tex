@@ -34,7 +34,7 @@
 
 \def\keyFont{\fontsize{8}{11}\helveticabold }
 \def\firstAuthorLast{Lampa {et~al.}} %use et al only if is more than 1 author
-\def\Authors{Samuel Lampa\,$^{1,*}$, Jonathan Alvarsson\,$^{1}$, Staffan Arvidsson\,$^{1}$, Arvid Berg\,$^{1}$, Arvid Berg\,$^{2}$  and Ola Spjuth\,$^{1}$}
+\def\Authors{Samuel Lampa\,$^{1,*}$, Jonathan Alvarsson\,$^{1}$, Staffan Arvidsson\,$^{1}$, Arvid Berg\,$^{1}$, Ernst Ahlberg\,$^{2}$  and Ola Spjuth\,$^{1}$}
 % Affiliations should be keyed to the author's name with superscript numbers
 % and be listed as follows: Laboratory, Institute, Department, Organization,
 % City, State abbreviation (USA, Canada, Australia), and Country (without
@@ -42,7 +42,8 @@
 % of the authors has a change of address, list the new address below the
 % correspondence details using a superscript symbol and use the same symbol to
 % indicate the author in the author list.
-\def\Address{$^{1}$Pharmaceutical Bioinformatics group, Department of Pharmaceutical Biosciences, Uppsala University, Uppsala, Sweden}
+\def\Address{$^{1}$Pharmaceutical Bioinformatics group, Department of Pharmaceutical Biosciences, Uppsala University, Uppsala, Sweden\\
+$^{2}$Predictive Compound ADME \& Safety, Drug Safety \& Metabolism, AstraZeneca IMED Biotech Unit, M"olndal, Sweden}
 % The Corresponding Author should be marked with an asterisk Provide the exact
 % contact address (this time including street name and city zip code) and email
 % of the corresponding author
@@ -221,12 +222,10 @@ non-active compounds were chosen such that the total number of non-actives and
 assumed non-actives would be twice the number of actives, for each target
 respectively (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L308-L328}{here} for workflow code).
 
-\subsection{Software for training and cross-validation}
-
 
 \subsection{Hyperparameter tuning}
 
-For each of the 31 targets, we ran a parameter sweep to find the optimal value of the
+For each of the 31 targets, a parameter sweep was run to find the optimal value of the
 cost parameter of liblinear, optimizing modeling efficiency using 10-fold cross validation. The training
 approach used an Aggregated Conformal Prediction (ACP) with 10 aggregated models.
 The parameter sweep evaluated three values for the cost parameter for each target; 1, 10 and 100. The
@@ -286,7 +285,7 @@ The cost values for each target is stored in the workflow code, available on git
 
 
 
-\subsection{Validation}
+\subsection{Model validation}
 
 In order to validate the predictive abilities of the trained models, data about
 1000 compounds were withheld from the ExcapeDB dataset. The compounds chosen to
@@ -304,7 +303,7 @@ of the 31 targets for all compounds for which we had known binding
 data for a particular target. The validation was done with CPSign's validate
 command, predicting values at confidence levels 0.8 and 0.9.
 
-
+\todoil{where are these results?}
 
 
 \section{Results}
