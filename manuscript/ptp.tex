@@ -111,8 +111,23 @@ Prediction}
 %an API, and we also make the complete workflow for reproducing the study
 %together with all models publicly available.
 
-Multiple ligand-based models are widely used in drug discovery to obtain an early indication of potential off-target predictions that could be linked to drug efficacy and safety. Another application is to combine models into a profile allowing to compare and search for compounds with similar profile. Most contemporary methods and implementations however lack valid measures of confidence in predictions, outputting point predictions. We here describe the use of conformal prediction for predicting off-target interactions based on data from 44 targets from the ExCAPE database, selected for their value in broad early hazard assessment. We used upport vector machines as underlying modelling methodology and chemical structures were described by the signature molecular descriptor. With conformal prediction, the results are presented as prediction intervals. The entire preprocessing and model training process is openly available as a scientific workflow on github, rendering it completely reproducible. The resulting models are published online and are available via a graphical web page and an OpenAPI for programmatic access.
-
+Multiple [Panels of?/SL] ligand-based models are widely used in drug discovery
+to obtain an early indication of potential off-target predictions that
+could be linked to drug efficacy and safety. Another application is to
+combine models into a profile allowing to compare and search for compounds
+with similar profile. Most contemporary methods and implementations however
+lack valid measures of confidence in predictions, yielding only point
+predictions. We here describe the use of conformal prediction for
+predicting off-target interactions based on data from the ExCAPE database
+about 31 binding targets, selected for their value in broad early hazard
+assessment. We used support vector machines, with chemical described by the
+signature molecular descriptor, to train predictive models.  Prediction
+results from the resulting models are presented as prediction intervals, as
+customary in conformal prediction. The full pre-processing and model
+training process is openly available as a scientific workflow on github,
+rendering it fully reproducible. The resulting models are published online
+and are available via a graphical web interface and an OpenAPI interface
+for programmatic access.
 
 \tiny
  \keyFont{ \section{Keywords:} drug discovery, predictive modelling, conformal prediction, machine learning, off-target, adverse effects} %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
