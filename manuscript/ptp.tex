@@ -296,11 +296,21 @@ command, predicting values at confidence levels 0.8 and 0.9.
 
 \section{Results}
 
+\subsection{Observed fuzziness}
+
+In figure \ref{fig:allmodels_fillup}, performance metrics for each model is
+presented in a plot. The plot shows Observed Fuzziness (OF), Class Observed OF
+(CNOF) as described in the methods section, training time and validation.
+
 \begin{figure}[h!]
 \includegraphics[width=0.9\textwidth]{figures/allmodels_fillup.png}
     \caption{All models with the smaller ones being filled up with assumed non-actives}
     \label{fig:allmodels_fillup}
 \end{figure}
+
+\subsection{Changes in class memberships}
+
+\todoil{Make a similar plot as Figure 3 in \cite{Norinder2014}}
 
 %For \textbf{Original Research} Articles \citep{conference}, Clinical Trial Articles
 %\citep{article}, and Technology Reports \citep{patent}, the introduction should
@@ -433,7 +443,6 @@ conflict of interest.
 \bibliographystyle{frontiersinSCNS_ENG_HUMS} % for Science, Engineering and Humanities and Social Sciences articles, for Humanities and Social Sciences articles please include page numbers in the in-text citations
 %\bibliographystyle{frontiersinHLTH&FPHY} % for Health, Physics and Mathematics articles
 \bibliography{ptp}
-
 
 % Make sure to upload the bib file along with the tex file and PDF Please see
 % the test.bib file for some examples of references
