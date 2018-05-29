@@ -34,7 +34,7 @@
 
 \def\keyFont{\fontsize{8}{11}\helveticabold }
 \def\firstAuthorLast{Lampa {et~al.}} %use et al only if is more than 1 author
-\def\Authors{Samuel Lampa\,$^{1,*}$, Jonathan Alvarsson\,$^{1}$, Staffan Arvidsson\,$^{1}$, Arvid Berg\,$^{1}$ and Ola Spjuth\,$^{1,2}$}
+\def\Authors{Samuel Lampa\,$^{1,*}$, Jonathan Alvarsson\,$^{1}$, Staffan Arvidsson\,$^{1}$, Arvid Berg\,$^{1}$, Arvid Berg\,$^{2}$  and Ola Spjuth\,$^{1}$}
 % Affiliations should be keyed to the author's name with superscript numbers
 % and be listed as follows: Laboratory, Institute, Department, Organization,
 % City, State abbreviation (USA, Canada, Australia), and Country (without
@@ -42,12 +42,12 @@
 % of the authors has a change of address, list the new address below the
 % correspondence details using a superscript symbol and use the same symbol to
 % indicate the author in the author list.
-\def\Address{$^{1}$Pharmaceutical Bioinformatics group, Department of Pharmaceutical Biosciences, Uppsala University, Uppsala, Sweden}
+\def\Address{$^{1}$Department of Pharmaceutical Biosciences and Science for Life Laboratory, Uppsala University, Uppsala, Sweden\\
+$^{2}$Predictive Compound ADME \& Safety, Drug Safety \& Metabolism, AstraZeneca IMED Biotech Unit, M\"olndal, Sweden}
 % The Corresponding Author should be marked with an asterisk Provide the exact
 % contact address (this time including street name and city zip code) and email
 % of the corresponding author
-\def\corrAuthor{Corresponding Author}
-
+\def\corrAuthor{Corresponding Author:}
 \def\corrEmail{samuel.lampa@farmbio.uu.se}
 
 
@@ -167,6 +167,7 @@ In this manuscript we...
 %%%%%%%%%%%%%%%%%%
 \section{Methods}
 
+\subsection{Training data}
 The dataset used for information about binding association between ligands
 and targets, was ExcapeDB~\cite{Sun2017}. An extraction of only the columns
 for Gene name, Original entry ID (PubChem CID or CHEMBL ID), SMILES and
@@ -220,51 +221,73 @@ non-active compounds were chosen such that the total number of non-actives and
 assumed non-actives would be twice the number of actives, for each target
 respectively (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L308-L328}{here} for workflow code).
 
-\subsection{Software for training and cross-validation}
+\subsection{Conformal prediction}
+Conformal Prediction (CP)~\cite{Vovk2005} provides a layer on top of an existing machine learning method and yields valid prediction regions for test examples. This contrasts to standard machine learning that delivers point estimates, and in conformal prediction a prediction region contains the true value with probability equal to a selected significance level $\epsilon$. Such a prediction region can be obtained under the assumption that the observed data is exchangeable. An important impact is that the size of this region directly relate to the 'strangeness' of the test example, and is an alternative to the concept of a model's 'applicability domain'~\cite{norinder2014introducing}. For the classification case, a prediction comes as a set of p-values (one for each class), and in a Mondrian setting then the classes are handled independently which has attractive properties when dealing with imbalanced datasets~\cite{Norinder:2017qc,Sun:2017qm}. In this study we used the Mondrian conformal prediction implementation in the software CPSign, utilizing the liblinear SVM implementation~\cite{CPSignDocs}.
 
-The software for training and cross-validation was the CPSign software
-\cite{CPSignDocs} previously developed in the group. Certain modifications
-were done based on needs identified in the project, which have been merged
-into the latest release of the CPSign software. CPSign is a commercial
-software, available from \href{http://www.genettasoft.com}{genettasoft.com}.
 
-\todoil{Add something about academic licenses?}
+\subsection{Hyperparameter tuning}
 
-The computational workflows for orchestrating the extraction of data, running
-CPSign, and the collection of results for summarization and plotting, were
-implemented in the Go programming language, using the SciPipe workflow library
-developed in the group, and which is available as open source software at
-\href{http://scipipe.org}{scipipe.org} or \href{https://github.com/scipipe/scipipe}{github.com/scipipe/scipipe}.
+For each of the 31 targets, we ran a parameter sweep to find the optimal value of the
+cost parameter of liblinear, optimizing modeling efficiency using 10-fold cross validation. The training
+approach used an Aggregated Conformal Prediction (ACP) with 10 aggregated models.
+The parameter sweep evaluated three values for the cost parameter for each target; 1, 10 and 100. The
+efficiency measure used for the evaluation was the observed fuzziness (OF)
+score described in \cite{Vovk2016} as
 
-\subsection{Choice of cost value for liblinear}
+\begin{equation}
+OF =\frac{ 1}{m} \sum\limits_{i=1}^{m} \sum\limits_{y_i \neq y }  p_i^y,		
+\end{equation}
 
-For each of the 31 targets, we ran a parameter sweep to find the value of the
-cost parameter of liblinear that gave the best efficiency measure. The
-efficiency measure used for the evaluation, was the observed fuzziness (OF)
-score described in \cite{Vovk2016}.
+where $p_i^y$ is the p-value of the $i^{th}$ test case for class $y$, and $m$ is the number of test examples.
 
-We also provide a slightly modified version of OF, which is constructed like
-so: Instead of using an overall OF, which is have been been influenced more
-by values in the larger class in case of imbalanced datasets, we first
-calculated the OF per class and divided it by the number of examples
-(compounds) in that class, and finally took the mean value of the resulting
-normalized OF values for each class. We call our measure ``class-normalized
-observed fuzziness'' (CNOF). CNOF was not used for cost selection, but is
-provided for information in the results from the workflow. The parameter sweep
-evaluated three values for the cost parameter for each target; 1, 10 and 100.
+To study the effect of imbalanced datasets on efficiency, we also implemented a modified version of OF, due to the fact that OF is influenced more
+by values in the larger class in case of imbalanced datasets referred to as ``class-normalized
+observed fuzziness'' (CNOF) as
 
-for evaluation of the OF score mentioned above, we ran cross-validation
-through CPSign's built-in crossvalidate function, with 10 folds. The training
-approach in the crossvalidation was the same as the one used to build the final
-model: Aggregated Conformal Prediction (ACP) with 10 aggregated models
-(specified to cpsign's crossvalidate and train commands using the
-\texttt{--nr-models} flag).
+\begin{equation}
+CNOF =\frac{ 1}{m} \sum\limits_{i=1}^{m} \sum\limits_{y_i \neq y }  p_i^y,		
+\end{equation}
+
+\todoil{Adapt EQ2 for CNOF}
+
+
+%We first calculated the OF per class and divided it by the number of examples
+%(compounds) in that class, and finally took the mean value of the resulting
+%normalized OF values for each class.
+
+%For evaluation of the OF score mentioned above, we ran cross-validation
+%through CPSign's built-in crossvalidate function, with 10 folds. 
+%(specified to cpsign's crossvalidate and train commands using the
+%\texttt{--nr-models} flag).
+
+CNOF was not used for cost selection, but is provided for information in the results from the workflow.
 
 From the crossvalidation, calibration plots were generated by predicting values
 for confidence values at 0.05 up to 0.05, with a step size of 0.05. These plots
-are added as supplementary material.
+are available as supplementary material.
 
-\subsection{Extract DrugBank data}
+\todoil{Present a few (1-3) calibration plots in the main manuscript and refer to them here as 'illustrative'. They constitute hard results.}
+
+
+
+\subsection{Modeling workflow}
+Before the training, the CPSign precompute command was run, in order to
+generate a sparse representation of each target's dataset.
+ACPs consisting of 10 models were then trained for each target using the CPSign software using the 'train' command.
+The cost value used was the one obtained from the hyperparameter tuning. 
+% (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L69-L101}{here}).
+The computational workflows for orchestrating the extraction of data, model building, 
+and the collection of results for summarization and plotting were
+implemented in the Go programming language using the SciPipe workflow library 
+that is available as open source software at
+\href{http://scipipe.org}{scipipe.org} or \href{https://github.com/scipipe/scipipe}{github.com/scipipe/scipipe}.
+The cost values for each target is stored in the workflow code, available on github (https://github.com/pharmbio/ptp-project).
+
+\todoil{We need an illustration of the workflow, either generated by software or a manually drawn figure}
+
+
+
+\subsection{Validation}
 
 In order to validate the predictive abilities of the trained models, data about
 1000 compounds were withheld from the ExcapeDB dataset. The compounds chosen to
@@ -275,24 +298,15 @@ DrugBank 5.0.11, with status ``approved'', for which we could also find PubChem 
 until a total number of 1000 compounds was reached.  No regard was paid to
 other drug statuses in DrugBank statuses such as ``investigational''.
 
-\todoil{Add info about comparison of results for fillup vs non-fillup?}
-
-\subsection{Building final models}
-
-Before the final training the CPSign precompute command was run, in order to
-generate a sparse representation of the dataset for the final training.  The
-final models were built using the CPSign train command. The cost value used is
-the one obtained from the cross validation, as described above. The cost values
-for each target is stored in the workflow code (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L69-L101}{here}).
-The training type was -- just as in the cross validation for selecting the cost
-value -- Aggregated Conformal Prediction (ACP), with 10 aggregated models.
-
-\subsection{Validation}
+\todoil{Add info about comparison of results for fillup vs non-fillup? YES! /Ola}
 
 The models built were validated by predicting the binding activity against each
-of the 31 targets for all withhelp compounds for which we had known binding
+of the 31 targets for all compounds for which we had known binding
 data for a particular target. The validation was done with CPSign's validate
 command, predicting values at confidence levels 0.8 and 0.9.
+
+
+
 
 \section{Results}
 
@@ -304,7 +318,7 @@ presented in a plot. The plot shows Observed Fuzziness (OF), Class Observed OF
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{figures/allmodels_fillup.pdf}
-    \caption{All models with the smaller ones being filled up with assumed non-actives}
+    \caption{All models with the smaller ones being filled up with assumed non-actives. EXTEND FIG CAPTION! }
     \label{fig:allmodels_fillup}
 \end{figure}
 
@@ -406,12 +420,12 @@ presented in a plot. The plot shows Observed Fuzziness (OF), Class Observed OF
 %the academic community as representing a potential conflict of interest must
 %be disclosed. If no such relationship exists, authors will be asked to confirm
 %the following statement:
-\todoil{Declare working for, having worked for, and other relationships with Genetta Soft}
-The authors declare that the research was conducted in the absence of any
-commercial or financial relationships that could be construed as a potential
-conflict of interest.
+OS, JA, AB, and SA are involved in Genetta Soft AB, a Swedish based company developing the CPSign software.
+
 
 \section*{Author Contributions}
+OS conceived the study. OS, JA, SA and SL designed the study, interpreted results, and wrote the manuscript. SL implemented the workflow and carried out the analysis. SA extended CPSign with new features. JA, SA and AB contributed with model deployment and APIs. EA contributed with expertise in target profiles and cheminformatics. All authors read and approved the manuscript.
+
 
 %The Author Contributions section is mandatory for all articles, including
 %articles by sole authors. If an appropriate statement is not provided on
@@ -426,6 +440,7 @@ conflict of interest.
 %Details of all funding sources should be provided, including grant numbers if
 %applicable. Please ensure to add all necessary funding information, as after
 %publication this is no longer possible.
+This study was supported by OpenRiskNet (Grant Agreement 731075), a project funded by the European Commission under the Horizon 2020 Programme.
 
 \section*{Acknowledgments}
 %This is a short text to acknowledge the contributions of specific colleagues,
@@ -439,6 +454,9 @@ conflict of interest.
 %LaTeX folder
 %
 %
+
+Calibration plots? More?
+
 \section*{References}
 \bibliographystyle{frontiersinSCNS_ENG_HUMS} % for Science, Engineering and Humanities and Social Sciences articles, for Humanities and Social Sciences articles please include page numbers in the in-text citations
 %\bibliographystyle{frontiersinHLTH&FPHY} % for Health, Physics and Mathematics articles
