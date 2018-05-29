@@ -287,7 +287,12 @@ for each target is stored in the workflow code (See \href{https://github.com/pha
 The training type was -- just as in the cross validation for selecting the cost
 value -- Aggregated Conformal Prediction (ACP), with 10 aggregated models.
 
-\todoil{Add info about validation against withheld compounds}
+\subsection{Validation}
+
+The models built were validated by predicting the binding activity against each
+of the 31 targets for all withhelp compounds for which we had known binding
+data for a particular target. The validation was done with CPSign's validate
+command, predicting values at confidence levels 0.8 and 0.9.
 
 \section{Results}
 
