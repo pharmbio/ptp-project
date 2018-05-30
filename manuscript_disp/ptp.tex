@@ -9,6 +9,7 @@
 \usepackage[cmintegrals,cmbraces]{newtxmath}
 \usepackage{ebgaramond-maths}
 \usepackage{booktabs}
+\usepackage{mathtools}
 \usepackage{amssymb}
 \usepackage{tikz}
 \usepackage{enumitem}
@@ -285,25 +286,35 @@ efficiency measure used for the evaluation was the observed fuzziness (OF)
 score described in \cite{Vovk2016} as
 
 \begin{equation}
-OF =\frac{ 1}{m} \sum\limits_{i=1}^{m} \sum\limits_{y_i \neq y }  p_i^y,		
+OF =\frac{ 1}{m} \sum\limits_{i=1}^{m} \sum\limits_{y_i \neq y }  p_i^{\kern1pt y},		
 \end{equation}
 
-where $p_i^y$ is the p-value of the $i^{th}$ test case for class $y$, and $m$ is the number of test examples.
+where $p_i^{\kern1pt y}$ is the p-value of the $i^{th}$ test case for class $y$, and $m$ is the number of test examples, or in our case with only two classes:
+
+\begin{equation}
+OF =  \frac
+        {\quad\sum\limits_{\mathclap{\substack{\scriptscriptstyle i,\ y_i=A}}}p_i^N \, + \;\sum\limits_{\mathclap{\substack{\scriptscriptstyle i,\ y_i=N}}}p_i^A}
+        {m_A + m_N} 
+\end{equation}
+
+where $p_i^N$ is the $i^{th}$ p-value for class $N$, $p_i^A$ is the $i^{th}$
+p-value for class $A$ and $m_A$ and $m_N$ is the number of test examples in
+class $A$ and $N$ respectively.
 
 To study the effect of imbalanced datasets on efficiency, we also implemented a
 modified version of OF, due to the fact that OF is influenced more
 by values in the larger class in case of imbalanced datasets referred to as
 ``class-normalized
-observed fuzziness'' (CNOF\todo{Jonathan and Staffan will look further at this equation}) as
-
-
+observed fuzziness'' (CNOF) as:
 \begin{equation}
-CNOF =\frac{1}{m_A} \sum\limits_{i=1}^{m_A} \sum\limits_{y_i \neq y }  p_i^y + 
-      \frac{1}{m_N} \sum\limits_{i=1}^{m_N} \sum\limits_{y_i \neq y }  p_i^y
+CNOF = \frac
+        {\quad\sum\limits_{\mathclap{\substack{\scriptscriptstyle i,\ y_i=A}}}p_i^N}
+        {m_A}
+       + \frac 
+        {\quad\sum\limits_{\mathclap{\substack{\scriptscriptstyle i,\ y_i=N}}}p_i^A}
+        {m_N} 
 \end{equation}
-where $p_i^y$ is the p-value of the $i^{th}$ test case for class $y$, and $m_A$
-is the number of test examples for class active and $m_N$ is the number of test
-examples for class non-active.
+with the same variable conventions as above.
 
 %We first calculated the OF per class and divided it by the number of examples
 %(compounds) in that class, and finally took the mean value of the resulting
