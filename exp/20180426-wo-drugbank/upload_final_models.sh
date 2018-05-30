@@ -8,12 +8,12 @@ read -p "Password: " PASSWORD
 echo "$USERNAME:$PASSWORD"
 MW_URL=http://modelingweb.service.pharmb.io
 
-KC_COMMAND="curl --data grant_type=password&client_id=modelingweb&username=$USERNAME&password=$PASSWORD ${KEYCLOAK_URL}/realms/toxhq/protocol/openid-connect/token"
-echo "Executing Keycloak command: $KC_COMMAND";
-RESULT=$($KC_COMMAND)
+RESULT=$(curl --data "grant_type=password&client_id=modelingweb&username=$USERNAME&password=$PASSWORD" "${KEYCLOAK_URL}/realms/toxhq/protocol/openid-connect/token")
 echo "Keycloak result: "$RESULT
 TOKEN=$(echo $RESULT | jq -r '.access_token')
 echo "Keycloak token: "$TOKEN
+
+sleep 5
 
 for mdl in dat/final_models/*/r1/fill/*r1*jar; do
     echo "--------------------------------------------------------------------------------";
