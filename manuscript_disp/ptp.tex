@@ -27,6 +27,8 @@
         {\kern-.0em\mathchar47\kern-.08em\penalty\UrlBigBreakPenalty}}
         \def\Url@underscore{\nfss@text{\leavevmode \kern.06em\vbox{\hrule\@width.3em}}}
 \makeatother
+\captionnamefont{\small\bfseries}
+\captiontitlefont{\small}
 
 \makeatletter
     \renewcommand{\@todonotes@drawMarginNoteWithLine}{%
@@ -135,18 +137,22 @@ access.
 
 Off-target pharmacology and polypharmacology has big implications on drug
 efficacy and safety, and prediction of target binding profiles for ligands is
-an important task that can aid early drug discovery \cite{Bowes2012}.
-However, available methods for ligand-based target profiling do not offer
-valid measures of confidence in predictions or well-calibrated probabilities.
-We present an approach for ligand-based target profiling using probabilistic
-predictions, delivering target profiles with valid predictions of the
-probability for the query compound to interact with each target. The
-probabilities are calculated using the Conformal Prediction methodology
-\cite{Vovk2005}, with support vector machines for modeling and chemical structures
-described by the signature descriptor \cite{Faulon2003}. We study profiles
-for different sets of targets, including a subset of the minimal panel of 44
-targets for broad early hazard assessment suggested by \cite{Bowes2012}, but
-also the applicability of larger as well as focused target sets.
+an important task that can aid early drug discovery~\cite{Bowes2012}. Drugs
+often does not interact with just one target but with multiple
+targets~\cite{hopkins2008network}. However, available methods for ligand-based
+target profiling often do not offer valid measures of confidence in
+predictions. We present an approach for ligand-based target profiling using a
+confidence framework, delivering target profiles with confidence score for the
+predictions of whether a query compound interact with each target. The
+confidence scores are calculated using the Conformal Prediction
+methodology~\cite{Vovk2005}, with support vector machines for modeling and
+chemical structures described by the molecular signature
+descriptor~\cite{Faulon2003}. The molecular signatures have previously been
+sucessfully used for ligand-based target prediction~\cite{alvarsson2014ligand}
+We study profiles for different sets of targets, including a subset of the
+minimal panel of 44 targets for broad early hazard assessment suggested
+by~\cite{Bowes2012}, but also the applicability of larger as well as focused
+target sets.
 
 \todo{Expand the intro above which is just taken from the abstract}
 
@@ -172,13 +178,13 @@ uncompressed ExcapeDB data file (18 GB).
 From this dataset, all rows for which there existed rows with a conflicting
 activity value, were completely removed (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L239-L246}{here}).
 
-A subset of the panel of 44 binding targets as suggested in \cite{Bowes2012}
+A subset of the panel of 44 binding targets as suggested in~\cite{Bowes2012}
 was selected, for which to include interaction data. Specifically, only targets
 with at least 100 associated and at least 100 non-associated compounds were
 kept. In addition some targets were excluded for which data was not found in
 ExcapeDB. This is described in detail below.
 
-Some of the gene ids used in \cite{Bowes2012} were not found in their exact
+Some of the gene ids used in~\cite{Bowes2012} were not found in their exact
 form in the ExcapeDB dataset. To resolve this, PubMed was consulted to find
 synonymous gene IDs. The following replacements of gene ids were done:
 
@@ -283,7 +289,7 @@ cost parameter of liblinear, optimizing modeling efficiency using 10-fold cross 
 approach used an Aggregated Conformal Prediction (ACP) with 10 aggregated models.
 The parameter sweep evaluated three values for the cost parameter for each target; 1, 10 and 100. The
 efficiency measure used for the evaluation was the observed fuzziness (OF)
-score described in \cite{Vovk2016} as
+score described in~\cite{Vovk2016} as
 
 \begin{equation}
 OF =\frac{ 1}{m} \sum\limits_{i=1}^{m} \sum\limits_{y_i \neq y }  p_i^{\kern1pt y},		
@@ -400,7 +406,7 @@ presented in a plot. The plot shows Observed Fuzziness (OF), Class Observed OF
 
 \subsection{Changes in class memberships}
 
-\todo{Make a similar plot as Figure 3 in \cite{Norinder2014}}
+\todo{Make a similar plot as Figure 3 in~\cite{Norinder2014}}
 
 
 \section*{Conflict of Interest Statement}
