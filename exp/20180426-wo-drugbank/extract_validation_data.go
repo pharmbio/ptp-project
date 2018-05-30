@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	wf := sp.NewWorkflow("extract_valdata", 1)
+	wf := sp.NewWorkflow("extract_valdata", 4)
 
 	validateFiles := spc.NewFileGlobber(wf, "valstat_files", "dat/validate/*/*1000.json")
 
@@ -29,18 +29,24 @@ func main() {
 	})
 	valDataPerTarget.In("valjson").Connect(validateFiles.Out())
 
+	plotValData := wf.NewProc("plot_valdata", `Rscript bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g "N/A"`)
+	plotValData.SetPathExtend("valdata", "plot", ".pdf")
+	plotValData.In("valdata").Connect(valDataPerTarget.Out("valstats"))
+	plotValData.In("valdata").Connect(valDataAll.Out("valstats"))
+
 	wf.Run()
 }
 
 func getExtractCmd(infilePtn string) string {
-	cmd := `echo -e "A->none\tA->A\tA->N\tA->both\tN->none\tN->A\tN->N\tN->both" > {o:valstats} \
+	cmd := `echo -e "orig_lab\tpred_none\tpred_a\tpred_n\tpred_both" > {o:valstats} \
 	&& cat ` + infilePtn + ` \
 	| jq -c '[.molecule.activity,.prediction.predictedLabels[0].labels[]]' \
     | tr -d "[" | tr -d "]" | tr -d '"' | \
     awk -F, '{ 
         d[$1][$2,$3]++ } 
         END { 
-            print d["A"]["",""] "\t" d["A"]["A",""] "\t" d["A"]["N",""] "\t" d["A"]["A","N"] "\t" d["N"]["",""] "\t" d["N"]["A",""] "\t" d["N"]["N",""] "\t" d["N"]["A","N"]
+            print "A" "\t" d["A"]["",""] "\t" d["A"]["A",""] "\t" d["A"]["N",""] "\t" d["A"]["A","N"]
+			print "N" "\t" d["N"]["",""] "\t" d["N"]["A",""] "\t" d["N"]["N",""] "\t" d["N"]["A","N"]
 		}' >> {o:valstats}`
 	return cmd
 }
