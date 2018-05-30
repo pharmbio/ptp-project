@@ -469,11 +469,11 @@ func main() {
 						tsvWrt.Flush()
 					}
 
-					plotCalibrationData := wf.NewProc("plot_calibration_data_"+uniqStrCost, "Rscript bin/plot_calibration.r -i {i:tsv} -o {o:png} -f png -g {p:gene}")
-					plotCalibrationData.SetPathExtend("tsv", "png", ".png")
+					plotCalibrationData := wf.NewProc("plot_calibration_data_"+uniqStrCost, "Rscript bin/plot_calibration.r -i {i:tsv} -o {o:pdf} -f pdf -g {p:gene}")
+					plotCalibrationData.SetPathExtend("tsv", "pdf", ".pdf")
 					plotCalibrationData.ParamInPort("gene").ConnectStr(geneUppercase)
 					plotCalibrationData.In("tsv").Connect(extractCalibrationData.Out("tsv"))
-					calibPlotPorts = append(calibPlotPorts, plotCalibrationData.Out("png"))
+					calibPlotPorts = append(calibPlotPorts, plotCalibrationData.Out("pdf"))
 
 					extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniqStrCost, func(ip *sp.FileIP) map[string]string {
 						newKeys := map[string]string{}
