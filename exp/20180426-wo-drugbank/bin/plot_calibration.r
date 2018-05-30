@@ -32,7 +32,7 @@ if (opt$format == 'png') {
 d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 
 plot(d$confidence, d$accuracty, xlab="Confidence", ylab="Accuracy")
-mtext(paste("Accuracy vs. Confidence, for ", opt$gene))
+mtext(paste("Accuracy vs. Confidence (", opt$gene, ")", sep=""))
 
 dev.off()
 # Avoid sending non-zero exit values on exit
