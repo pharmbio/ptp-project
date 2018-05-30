@@ -38,7 +38,7 @@ colnames(d) = c("Orig Label", "None", "A", "N", "Both")
 dplot <- as.matrix(d[,2:5]) # Don't include first col in matrix, and make into matrix
 barplot(dplot)
 #legend("topright", c("Orig A", "Orig N"), fill=c("black", "grey"))
-mtext(paste("Class membership change for (", opt$gene, ")", sep=""))
+mtext(paste("Class membership change (", opt$gene, ")", sep=""))
 dev.off()
 # Avoid sending non-zero exit values on exit
 quit(save = "no", status = 0, runLast = FALSE)

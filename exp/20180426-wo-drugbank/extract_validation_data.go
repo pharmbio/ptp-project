@@ -5,6 +5,7 @@ import (
 	spc "github.com/scipipe/scipipe/components"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 func main() {
@@ -29,10 +30,21 @@ func main() {
 	})
 	valDataPerTarget.In("valjson").Connect(validateFiles.Out())
 
-	plotValData := wf.NewProc("plot_valdata", `Rscript bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g "N/A"`)
+	extractGene := spc.NewMapToKeys(wf, "extract_gene", func(ip *sp.FileIP) map[string]string {
+		ptn, err := regexp.Compile(`\.valstats\.tsv`)
+		sp.Check(err)
+		gene := strings.ToUpper(ptn.ReplaceAllString(filepath.Base(ip.Path()), ""))
+		return map[string]string{"gene": gene}
+	})
+	extractGene.In().Connect(valDataPerTarget.Out("valstats"))
+
+	plotValData := wf.NewProc("plot_valdata", `Rscript bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g {k:valdata.gene}`)
 	plotValData.SetPathExtend("valdata", "plot", ".pdf")
-	plotValData.In("valdata").Connect(valDataPerTarget.Out("valstats"))
-	plotValData.In("valdata").Connect(valDataAll.Out("valstats"))
+	plotValData.In("valdata").Connect(extractGene.Out())
+
+	plotValDataAll := wf.NewProc("plot_valdata_all", `Rscript bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g "all targets"`)
+	plotValDataAll.SetPathExtend("valdata", "plot", ".pdf")
+	plotValDataAll.In("valdata").Connect(valDataAll.Out("valstats"))
 
 	wf.Run()
 }
