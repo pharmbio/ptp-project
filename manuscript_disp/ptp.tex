@@ -60,7 +60,7 @@
 \makeatother
 \LetLtxMacro{\oldtodo}{\todo}
 \renewcommand{\todo}[1]{{\color{magenta}\oldtodo[fancyline]{\color{white}\textsf{#1}}}}
-\newcommand{\inlinetodo}[1]{\color{magenta}\oldtodo[inline]{\color{white}\textsf{#1}}}
+\newcommand{\inlinetodo}[1]{{\color{magenta}\oldtodo[inline]{\color{white}\textsf{#1}}}}
 
 \setsecheadstyle{\LARGE}
 \setsubsecheadstyle{\large}
@@ -215,7 +215,8 @@ All the targets, with details about their respective number of active
 and non-active compounds, and whether they are included or not, are summarized
 in table \ref{tbl:targets}.
 
-\begin{table}[]
+\begin{table}
+\small
 \centering
 \caption{Targets}
 \label{tbl:targets}
@@ -271,6 +272,7 @@ in table \ref{tbl:targets}.
     SLC6A4  &       7\,228  &       382         &   Yes     &       \\
 \bottomrule
 \end{tabular}
+\inlinetodo{Extend caption and write Remarks}
 \end{table}
 
 \subsection{Hyperparameter tuning}
@@ -288,19 +290,20 @@ OF =\frac{ 1}{m} \sum\limits_{i=1}^{m} \sum\limits_{y_i \neq y }  p_i^y,
 
 where $p_i^y$ is the p-value of the $i^{th}$ test case for class $y$, and $m$ is the number of test examples.
 
-To study the effect of imbalanced datasets on efficiency, we also implemented a modified version of OF, due to the fact that OF is influenced more
-by values in the larger class in case of imbalanced datasets referred to as ``class-normalized
-observed fuzziness'' (CNOF) as
+To study the effect of imbalanced datasets on efficiency, we also implemented a
+modified version of OF, due to the fact that OF is influenced more
+by values in the larger class in case of imbalanced datasets referred to as
+``class-normalized
+observed fuzziness'' (CNOF\todo{Jonathan and Staffan will look further at this equation}) as
+
 
 \begin{equation}
 CNOF =\frac{1}{m_A} \sum\limits_{i=1}^{m_A} \sum\limits_{y_i \neq y }  p_i^y + 
       \frac{1}{m_N} \sum\limits_{i=1}^{m_N} \sum\limits_{y_i \neq y }  p_i^y
 \end{equation}
-where $p_i^y$ is the p-value of the $i^{th}$ test case for class $y$, and $m_A$ is the number of test examples for class active and $m_N$ is the number of test examples for class non-active.
-
-
-\todo{Adapt EQ2 for CNOF}
-
+where $p_i^y$ is the p-value of the $i^{th}$ test case for class $y$, and $m_A$
+is the number of test examples for class active and $m_N$ is the number of test
+examples for class non-active.
 
 %We first calculated the OF per class and divided it by the number of examples
 %(compounds) in that class, and finally took the mean value of the resulting
