@@ -2,11 +2,11 @@
 
 set +x
 
-KEYCLOAK_URL=http://keycloak-test2-modweb.130.238.55.60.nip.io/auth
+KEYCLOAK_URL=http://keycloak-modelingweb.os.pharmb.io/auth
 read -p "Username: " USERNAME
 read -p "Password: " PASSWORD
 echo "$USERNAME:$PASSWORD"
-MW_URL=http://modelingweb-test4-modweb.130.238.55.60.nip.io
+MW_URL=http://modelingweb.service.pharmb.io
 
 KC_COMMAND="curl --data grant_type=password&client_id=modelingweb&username=$USERNAME&password=$PASSWORD ${KEYCLOAK_URL}/realms/toxhq/protocol/openid-connect/token"
 echo "Executing Keycloak command: $KC_COMMAND";
