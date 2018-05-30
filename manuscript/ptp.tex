@@ -26,6 +26,8 @@
 \usepackage{todonotes}
 \newcommand{\todoil}[1]{\todo[inline]{#1}}
 
+\usepackage{booktabs}
+
 %\linenumbers
 
 
@@ -225,55 +227,57 @@ in table \ref{tbl:targets}.
 \centering
 \caption{Targets}
 \label{tbl:targets}
-\begin{tabular}{|l|r|r|l|l|}
-\hline
-    Gene ID & Actives & Non-actives (before fillup) & Included & Remarks \\ \hline
-    ACHE    &       3160    &       1152        &   Yes     &       \\
-    ADORA2A &       5275    &       593         &   Yes     &       \\
-    ADRA1A  &       1782    &       24          &   No      &       ...     \\
-    ADRA2A  &       839     &       39          &   No      &       ...     \\
-    ADRB1   &       1306    &       149         &   Yes     &       \\
-    ADRB2   &       1955    &       342282      &   Yes     &       \\
-    AR      &       2593    &       4725        &   Yes     &       \\
-    AVPR1A  &       1055    &       321406      &   Yes     &       \\
-    CACNA1C &       166     &       20          &   No      &       ...     \\
-    CCKAR   &       1249    &       132         &   Yes     &       \\
-    CHRM1   &       2776    &       417549      &   Yes     &       \\
-    CHRM2   &       1817    &       152         &   Yes     &       \\
-    CHRM3   &       1676    &       144         &   Yes     &       \\
-    CHRNA4  &       256     &       17          &   No      &       ...     \\
-    CNR1    &       5336    &       400         &   Yes     &       \\
-    CNR2    &       4583    &       402         &   Yes     &       \\
-    DRD1    &       1732    &       356201      &   Yes     &       \\
-    DRD2    &       8323    &       343206      &   Yes     &       \\
-    EDNRA   &       2129    &       124         &   Yes     &       \\
-    GABRA1  &       112     &       5           &   No      &       ...     \\
-    GRIN1   &       555     &       92          &   No      &       ...     \\
-    HRH1    &       1218    &       65          &   No      &       ...     \\
-    HRH2    &       394     &       56          &   No      &       ...     \\
-    HTR1A   &       6555    &       64578       &   Yes     &       \\
-    HTR1B   &       1262    &       86          &   No      &       ...     \\
-    HTR2A   &       4160    &       359962      &   Yes     &       \\
-    HTR2B   &       1159    &       66          &   No      &       ...     \\
-    HTR3A   &       584     &       65          &   No      &       ...     \\
-    KCNH2   &       5330    &       350773      &   Yes     &       \\
-    KCNQ1   &       37      &       303466      &   No      &       ...     \\
-    LCK     &       2662    &       283         &   Yes     &       \\
-    MAOA    &       1260    &       1083        &   Yes     &       \\
-    MINK1   &       929     &       8           &   No      &       ...     \\
-    NR3C1   &       2525    &       4382        &   Yes     &       \\
-    OPRD1   &       5350    &       826         &   Yes     &       \\
-    OPRK1   &       3672    &       303335      &   Yes     &       \\
-    OPRM1   &       5837    &       2872        &   Yes     &       \\
+\begin{tabular}{rrrcc}
+\toprule
+    Gene ID & Actives & Non-actives     & Included & Remarks \\ 
+            &         & (before fillup) &          &         \\ 
+\midrule
+    ACHE    &       3\,160  &       1\,152      &   Yes     &       \\
+    ADORA2A &       5\,275  &       593         &   Yes     &       \\
+    ADRA1A  &       1\,782  &       24          &   No      &       \ldots     \\
+    ADRA2A  &       839     &       39          &   No      &       \ldots     \\
+    ADRB1   &       1\,306  &       149         &   Yes     &       \\
+    ADRB2   &       1\,955  &       342\,282    &   Yes     &       \\
+    AR      &       2\,593  &       4\,725      &   Yes     &       \\
+    AVPR1A  &       1\,055  &       321\,406    &   Yes     &       \\
+    CACNA1C &       166     &       20          &   No      &       \ldots     \\
+    CCKAR   &       1\,249  &       132         &   Yes     &       \\
+    CHRM1   &       2\,776  &       417\,549    &   Yes     &       \\
+    CHRM2   &       1\,817  &       152         &   Yes     &       \\
+    CHRM3   &       1\,676  &       144         &   Yes     &       \\
+    CHRNA4  &       256     &       17          &   No      &       \ldots     \\
+    CNR1    &       5\,336  &       400         &   Yes     &       \\
+    CNR2    &       4\,583  &       402         &   Yes     &       \\
+    DRD1    &       1\,732  &       356\,201    &   Yes     &       \\
+    DRD2    &       8\,323  &       343\,206    &   Yes     &       \\
+    EDNRA   &       2\,129  &       124         &   Yes     &       \\
+    GABRA1  &       112     &       5           &   No      &       \ldots     \\
+    GRIN1   &       555     &       92          &   No      &       \ldots     \\
+    HRH1    &       1\,218  &       65          &   No      &       \ldots     \\
+    HRH2    &       394     &       56          &   No      &       \ldots     \\
+    HTR1A   &       6\,555  &       64\,578     &   Yes     &       \\
+    HTR1B   &       1\,262  &       86          &   No      &       \ldots     \\
+    HTR2A   &       4\,160  &       359\,962    &   Yes     &       \\
+    HTR2B   &       1\,159  &       66          &   No      &       \ldots     \\
+    HTR3A   &       584     &       65          &   No      &       \ldots     \\
+    KCNH2   &       5\,330  &       350\,773    &   Yes     &       \\
+    KCNQ1   &       37      &       303\,466    &   No      &       \ldots     \\
+    LCK     &       2\,662  &       283         &   Yes     &       \\
+    MAOA    &       1\,260  &       1\,083      &   Yes     &       \\
+    MINK1   &       929     &       8           &   No      &       \ldots     \\
+    NR3C1   &       2\,525  &       4\,382      &   Yes     &       \\
+    OPRD1   &       5\,350  &       826         &   Yes     &       \\
+    OPRK1   &       3\,672  &       303\,335    &   Yes     &       \\
+    OPRM1   &       5\,837  &       2\,872      &   Yes     &       \\
     PDE3A   &       197     &       110         &   Yes     &       \\
-    PDE4D   &       484     &       98          &   No      &       ...     \\
+    PDE4D   &       484     &       98          &   No      &       \ldots     \\
     PTGS1   &       849     &       729         &   Yes     &       \\
-    PTGS2   &       2862    &       827         &   Yes     &       \\
+    PTGS2   &       2\,862  &       827         &   Yes     &       \\
     SCN5A   &       316     &       119         &   Yes     &       \\
-    SLC6A2  &       3879    &       218         &   Yes     &       \\
-    SLC6A3  &       5017    &       106819      &   Yes     &       \\
-    SLC6A4  &       7228    &       382         &   Yes     &       \\
-\hline
+    SLC6A2  &       3\,879  &       218         &   Yes     &       \\
+    SLC6A3  &       5\,017  &       106\,819    &   Yes     &       \\
+    SLC6A4  &       7\,228  &       382         &   Yes     &       \\
+\bottomrule
 \end{tabular}
 \end{table}
 
