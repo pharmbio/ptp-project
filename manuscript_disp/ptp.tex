@@ -168,56 +168,52 @@ In this manuscript we...
 \section*{Methods}
 
 \subsection{Training data}
-The dataset used for information about binding association between ligands
-and targets, was ExcapeDB~\cite{Sun2017}. An extraction of only the columns
-for Gene name, Original entry ID (PubChem CID or CHEMBL ID), SMILES and
-Activity flag was performed early in the workflow to make subsequent data
-transformation steps more performant, given the relative large size of the
+
+A scientific workflow was constructed to automate the entire data preprocessing.
+The first step comprised extracting data on binding association between ligands and targets from the database ExcapeDB~\cite{Sun2017}, more specifically the columns Gene name, Original entry ID (PubChem CID or CHEMBL ID), SMILES and Activity flag. This was performed early in the workflow to make subsequent data transformation steps more performant, given the relative large size of the
 uncompressed ExcapeDB data file (18 GB).
+%
+From the extracted dataset, all rows for which there existed rows with a conflicting
+activity value, were completely removed.
+% (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L239-L246}{here}).
 
-From this dataset, all rows for which there existed rows with a conflicting
-activity value, were completely removed (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L239-L246}{here}).
-
-A subset of the panel of 44 binding targets as suggested in~\cite{Bowes2012}
-was selected, for which to include interaction data. Specifically, only targets
-with at least 100 associated and at least 100 non-associated compounds were
-kept. In addition some targets were excluded for which data was not found in
-ExcapeDB. This is described in detail below.
-
-Some of the gene ids used in~\cite{Bowes2012} were not found in their exact
+A subset of the panel of 44 binding targets as suggested in \cite{Bowes2012}
+was selected for inclusion in the study. The selection was based on that targets
+should have at least 100 associated and at least 100 non-associated compounds. 
+In addition some targets were excluded for which data was not found in ExcapeDB, this is described in detail below.
+%
+Some of the gene ids used in \cite{Bowes2012} were not found in their exact
 form in the ExcapeDB dataset. To resolve this, PubMed was consulted to find
-synonymous gene IDs. The following replacements of gene ids were done:
-
-i) \textit{KCNE1} was replaced with \textit{MINK1} which is present in ExcapeDB.
-
-ii) \textit{CHRNA1} (coding for the $\alpha1$ subunit of the Acetylcholine
+synonymous gene IDs with the following replacements done:
+%
+\textit{KCNE1} was replaced with \textit{MINK1} which is present in ExcapeDB.
+\textit{CHRNA1} (coding for the $\alpha1$ subunit of the Acetylcholine
 receptor) is excluded, as it is not present in the dataset (\textit{CHRNA4},
 coding for the $\alpha4$ subunit of the Acetylcholine receptor, is present in
-the dataset).
-
-iv) Both \textit{MINK1} and \textit{CHRNA4} were removed in the filtering
+the dataset). We note that both \textit{MINK1} and \textit{CHRNA4} were removed in the filtering
 step mentioned above, since the dataset did not contain more than 100 active
-and 100 non-active compounds for \textit{MINK1} nor \textit{CHRNA}.
+and 100 non-active compounds for \textit{MINK1} nor \textit{CHRNA}. 
+However, since one aim of the study is to present and publish an automated and reproducible data processing, these targets could potentially be included in subsequent runs on later versions of the database with additional data available.
 
-The resulting set consists of 31 targets, identified by the following gene
-IDs in the ExcapeDB dataset, and througout this article:
-
+The resulting set (named Dataset1) consisted of 31 targets, identified by the following gene
+IDs in the ExcapeDB dataset, and throughout this article:
+%
 PDE3A, SCN5A, CCKAR, ADRB1, PTGS1, CHRM3, CHRM2, EDNRA, MAOA, LCK, PTGS2,
 SLC6A2, ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR, SLC6A4, OPRM1, HTR1A,
 SLC6A3, OPRK1, AVPR1A, ADRB2, DRD2, KCNH2, DRD1, HTR2A, CHRM1.
-
+%
 For 21 of these targets, the dataset contained less than 100 non-active
 compounds, leading to imbalanced datasets. These 21 target genes are: PDE3A,
 SCN5A, CCKAR, ADRB1, PTGS1, CHRM3, CHRM2, EDNRA, MAOA, LCK, PTGS2, SLC6A2,
 ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR, SLC6A4 and OPRM1.
-
+%
 For these 21 targets, we filled up their respective datasets with randomly
 selected examples from the raw dataset which were not reported to be active for
-this target, thus being ``assumed non-active''. The amount of such assumed
-non-active compounds were chosen such that the total number of non-actives and
+this target, thus being 'assumed non-active'. The number of new examples was chosen such that the total number of non-actives and
 assumed non-actives would be twice the number of actives, for each target
-respectively (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L308-L328}{here} for workflow code).
-
+respectively. This dataset was named Dataset2.
+% (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L308-L328}{here} for workflow code).
+%
 All the targets, with details about their respective number of active
 and non-active compounds, and whether they are included or not, are summarized
 in table \ref{tbl:targets}.
@@ -225,7 +221,7 @@ in table \ref{tbl:targets}.
 \begin{table}
 \small
 \centering
-\caption{Targets}
+\caption{The panel of targets used in this study, identified by Gene ID. Actives and non-actives refer to the number of ligand interactions marked as active and non-active in ExcapeDB. Included indicates if the target was included in the study or excluded because it did not pass the filtering criteria.}
 \label{tbl:targets}
 \begin{tabular}{rrrcc}
 \toprule
