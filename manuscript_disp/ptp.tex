@@ -407,10 +407,20 @@ presented in a plot. The plot shows Observed Fuzziness (OF), Class Observed OF
 \end{figure}
 \subsection{Changes in class memberships}
 
+In figure \ref{fig:validation_plots} the class membership change for the
+full withheld dataset used in validation, for confidence levels 0.8 and 0.9
+respectively.
+
 \begin{figure}[h!]
-\includegraphics[width=0.8\textwidth]{figures/validation_plots/alltargets_valplot.pdf}
-    \caption{Class membership change for all targets, for the prediction data, at confidence level 0.9}
-    \label{fig:validation_plots_all}
+\includegraphics[width=0.5\textwidth]{figures/validation_plots/alltargets_0p8_valplot.pdf}
+\includegraphics[width=0.5\textwidth]{figures/validation_plots/alltargets_0p9_valplot.pdf}
+    \caption{Class membership change for all targets, for the prediction data, at confidence level 0.8 (left) and 0.9 (right), repsectively.
+    The labels on the X-axis indicate predicted labels (None, Active (A),
+    Non-active (N) or Both). Dark grey in the stacked bar plot means the
+    original label was Active (A), while light grey means the original label
+    was Non-Active (N).
+    }
+    \label{fig:validation_plots}
 \end{figure}
 
 
@@ -498,48 +508,96 @@ Supplemental 1: Calibration plots for all targets. See figure
     \label{fig:calibration_plots_all}
 \end{figure}
 
-Supplemental 2: Class membership change at 0.9 confidence level, for all
-targets. See figure \ref{fig:validation_plots_all}.
+Supplemental 2: Class membership change at 0.8 confidence level, for all
+targets. See figure \ref{fig:validation_plots_all_0.8}.
 
 \begin{figure}[h!]
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/ache_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/adora2a_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/adrb1_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/adrb2_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/alltargets_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/ar_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/avpr1a_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/cckar_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm1_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm2_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm3_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/cnr1_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/cnr2_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/drd1_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/drd2_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/ednra_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/htr1a_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/htr2a_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/kcnh2_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/lck_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/maoa_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/nr3c1_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprd1_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprk1_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprm1_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/pde3a_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/ptgs1_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/ptgs2_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/scn5a_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a2_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a3_valplot.pdf}
-\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a4_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ache_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/adora2a_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/adrb1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/adrb2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/alltargets_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ar_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/avpr1a_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/cckar_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm3_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/cnr1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/cnr2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/drd1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/drd2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ednra_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/htr1a_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/htr2a_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/kcnh2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/lck_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/maoa_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/nr3c1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprd1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprk1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprm1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/pde3a_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ptgs1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ptgs2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/scn5a_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a3_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a4_0p8_valplot.pdf}
+    \caption{Class membership change at confidence level 0.8, for all targets,
+    for the prediction dataset.
+    The labels on the X-axis indicate predicted labels (None, Active (A),
+    Non-active (N) or Both). Dark grey in the stacked bar plot means the
+    original label was Active (A), while light grey means the original label
+    was Non-Active (N).
+    }
+    \label{fig:validation_plots_all_0.8}
+\end{figure}
+
+Supplemental 3: Class membership change at 0.9 confidence level, for all
+targets. See figure \ref{fig:validation_plots_all_0.9}.
+
+\begin{figure}[h!]
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ache_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/adora2a_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/adrb1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/adrb2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/alltargets_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ar_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/avpr1a_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/cckar_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm3_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/cnr1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/cnr2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/drd1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/drd2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ednra_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/htr1a_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/htr2a_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/kcnh2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/lck_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/maoa_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/nr3c1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprd1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprk1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprm1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/pde3a_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ptgs1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ptgs2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/scn5a_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a3_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a4_0p9_valplot.pdf}
     \caption{Class membership change at confidence level 0.9, for all targets,
-    for the prediction dataset.  The labels on the X-axis indicate predicted
-    labels (None, Active (A), Non-active (N) or Both). Dark grey in the stacked
-    bar plot means the original label was Active (A), while light grey means
-    the original label was Non-Active (N).}
-    \label{fig:validation_plots_all}
+    for the prediction dataset.
+    The labels on the X-axis indicate predicted labels (None, Active (A),
+    Non-active (N) or Both). Dark grey in the stacked bar plot means the
+    original label was Active (A), while light grey means the original label
+    was Non-Active (N).
+    }
+    \label{fig:validation_plots_all_0.9}
 \end{figure}
 
 \inlinetodo{Probably refer to the withheld dataset by a dedicated name}
