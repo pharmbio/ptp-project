@@ -296,8 +296,11 @@ by values in the larger class in case of imbalanced datasets referred to as ``cl
 observed fuzziness'' (CNOF) as
 
 \begin{equation}
-CNOF =\frac{ 1}{m} \sum\limits_{i=1}^{m} \sum\limits_{y_i \neq y }  p_i^y,		
+CNOF =\frac{1}{m_A} \sum\limits_{i=1}^{m_A} \sum\limits_{y_i \neq y }  p_i^y + 
+      \frac{1}{m_N} \sum\limits_{i=1}^{m_N} \sum\limits_{y_i \neq y }  p_i^y
 \end{equation}
+where $p_i^y$ is the p-value of the $i^{th}$ test case for class $y$, and $m_A$ is the number of test examples for class active and $m_N$ is the number of test examples for class non-active.
+
 
 \todoil{Adapt EQ2 for CNOF}
 
