@@ -37,6 +37,7 @@ rownames(d) = d[,1] # Set rownames from first column
 colnames(d) = c("Orig Label", "None", "Active", "Non-active", "Both")
 dplot <- as.matrix(d[,2:5]) # Don't include first col in matrix, and make into matrix
 barplot(dplot)
+legend("topright", c("Orig Active", "Orig Non-active"), fill=c("black", "grey"))
 mtext(paste("Class membership change for (", opt$gene, ")", sep=""))
 
 dev.off()
