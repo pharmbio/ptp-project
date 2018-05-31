@@ -412,17 +412,37 @@ command, predicting values at confidence levels 0.8 and 0.9.
 
 \section*{Results}
 
+\subsection{Before and after fill up with assumed non-actives}
+
+Metrics for all models before fill up with assumed non-actives for some
+targets, is shown in \ref{fig:allmodels_nofillup}. In figure
+\ref{fig:allmodels_fillup}, the same metrics are shown, after fillup with
+assumed non-actives for the 21 targets with less than 10\,000 non-actives in
+ExcapeDB.
+
+\begin{figure}[h!]
+\includegraphics[width=\textwidth]{figures/final_models_20171106_nofillup.png}
+    \caption{All models without fill up with assumed non-actives. The targets are sorted by total number of compounds in ExcapeDB.}
+    \label{fig:allmodels_nofillup}
+\end{figure}
+
+\begin{figure}[h!]
+\includegraphics[width=\textwidth]{figures/final_models_20180223_fillup.png}
+    \caption{All models after fill up with assumed non-actives. The targets are sorted by total number of compounds in ExcapeDB. The purple line in the figure shows accuracy.}
+    \label{fig:allmodels_fillup}
+\end{figure}
+
 \subsection{Observed fuzziness}
 
-In figure \ref{fig:allmodels_fillup}, performance metrics for each model is
+In figure \ref{fig:allmodels}, performance metrics for each model is
 presented in a plot. The plot shows Observed Fuzziness (OF), Class Observed OF
 (CNOF) as described in the methods section, training time and validation.
 
 \begin{figure}[h!]
-\includegraphics[width=\textwidth]{figures/allmodels_fillup.pdf}
-    \caption{All models with the smaller ones being filled up with assumed non-actives. }
+\includegraphics[width=\textwidth]{figures/allmodels_wo_drugbank.pdf}
+    \caption{All models with the smaller ones being filled up with assumed non-actives.}
     \inlinetodo{Extend the figure caption!}
-    \label{fig:allmodels_fillup}
+    \label{fig:allmodels}
 \end{figure}
 
 \begin{figure}
