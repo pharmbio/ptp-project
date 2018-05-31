@@ -10,13 +10,13 @@ digraph train_models {
   "Create Random Bytes"[shape=box];
   "Summarize Cost Selection Results"[shape=box];
   "Summarize Final Models Stats"[shape=box];
-  "Select Cost"[shape=box];
   "Extract Target-Specific Data"[shape=box];
   "Count Target Data"[shape=box];
   "Plot Summary"[shape=box];
   "Unpack Dataset"[shape=box];
   "Clean Conflicting"[shape=box];
   "Extract Gene, SMILES and Activity"[shape=box];
+  "Select Best Cost"[shape=box];
   "CPSign Train"[shape=box];
   "Sort"[shape=box];
   "Download ExcapeDB"[shape=box];
@@ -34,7 +34,7 @@ digraph train_models {
   "Cross-Validate (cost:10)" -> "Extract CV Stats (cost:10)" ;
   "Count Target Data" -> "Summarize Final Models Stats";
   "Create Random Bytes" -> "Extract Assumed Non-Actives";
-  "Summarize Cost Selection Results" -> "Select Cost";
+  "Summarize Cost Selection Results" -> "Select Best Cost";
   "Summarize Final Models Stats" -> "Sort";
   "Extract Target-Specific Data" -> "Cross-Validate (cost:1)";
   "Extract Target-Specific Data" -> "Cross-Validate (cost:10)";
@@ -47,6 +47,7 @@ digraph train_models {
   "Clean Conflicting" -> "Extract Target-Specific Data";
   "Clean Conflicting" -> "Extract Assumed Non-Actives";
   "Extract Gene, SMILES and Activity" -> "Clean Conflicting";
+  "Select Best Cost" -> "CPSign Train" [style="dashed"];
   "CPSign Train" -> "Summarize Final Models Stats";
   "Sort" -> "Plot Summary";
   "Download ExcapeDB" -> "Unpack Dataset";
