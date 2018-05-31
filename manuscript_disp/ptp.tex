@@ -156,21 +156,26 @@ access.
 \section*{Introduction\todo{Expand the intro, prior art?}}
 
 %Introduce off target binding as a problem, and the value of predictions
+Drug-target interactions are central to the drug discovery process~\cite{Yildirim:2007vh}. It is common that drugs interact with multiple targets~\cite{hopkins2008network}, and off-target pharmacology and polypharmacology has big implications on drug efficacy and safety~\cite{Peters:2013yg,Ravikumar:2018qd}. Organizations involved in drug discovery, such as pharmaceutical companies and academic institutions, use many types of experimental techniques and assays to determine target interactions, including in vitro pharmacological profiling~\cite{Bowes2012}. However an attractive complementary method is to use computational (in silico) profiling of binding profiles for ligands~\cite{Cereto-Massague:2015px}, also opening up to predict virtual compounds. A common approach to the target prediction problem is to use a panel of structure-activity relationship (QSAR) models [REF QSAR], where chemicals in a knowledge base with known interaction values (numerical or categorial) are described numerically be descriptors and a statistical learning model is trained to predict numerical values (regression) or categorial values (classification). The recent increase in the number of available data points in interaction databases such as ChEMBL and PubChem
 
-Off-target pharmacology and polypharmacology has big implications on drug
-efficacy and safety, and prediction of target binding profiles for ligands is
-an important task that can aid early drug discovery~\cite{Bowes2012}. Drugs
-often does not interact with just one target but with multiple
-targets~\cite{hopkins2008network}. However, available methods for ligand-based
-target profiling often do not offer valid measures of confidence in
-predictions. We present an approach for ligand-based target profiling using a
+Several methods and tools are available for target prediction and for constructing and using target profiles. 
+%
+Bender et al. used a Bayesian approach to train models for 70 selected targets and use these for target profiling to classify adverse drug reactions~\cite{Bender:2007ib}.
+%
+Yao et al. describes TargetNet~\cite{Yao:2016ij}, a web service for multi-target QSAR models; an online service that uses Na\"ive Bayes 
+%
+Yu et al. used Random Forest (RF) and Support Vector Machines (SVM) to predict drug-target interactions from heterogeneous biological data~\cite{Yu:2012ol}.
+%
+TargetHunter~\cite{Wang:2013le} is anotehr online tool that uses chemical similarity to predict targets for ligands, and showed how training models on ChEMBL data enabled useful predictions on examples taken from PubChem bioassays.
+
+We note two important shortcomings among previous works. Primarily, available methods for ligand-based
+target profiling often do not offer valid measures of confidence in predictions, leaving the user uncertain about the usefulness of predictions. Secondly, the majority of the web tools lack an open and standardized API, meaning it is not straightforward (and in most cases not possible at all) to consume the services programmatically, such as with a script or inclusion in a scientific workflow system used in drug discovery like KNIME~\cite{Mazanetz:2012gy}.
+
+We present an approach for ligand-based target profiling using a
 confidence framework, delivering target profiles with confidence score for the
 predictions of whether a query compound interact with each target. The
 confidence scores are calculated using the Conformal Prediction
-methodology~\cite{Vovk2005}, with support vector machines for modeling and
-chemical structures described by the molecular signature
-descriptor~\cite{Faulon2003}. The molecular signatures have previously been
-successfully used for ligand-based target prediction~\cite{alvarsson2014ligand}
+methodology~\cite{Vovk2005}.
 
 The goal of this study was to create an automated and reproducable approach for
 generating a predicted target profile by QSAR binding models with the models
@@ -309,7 +314,7 @@ chemical. CPSign is a tool for making QSAR models with the molecular
 signatures descriptor, support vector machines and conformal prediction. The
 molecular signatures descriptor~\cite{faulon2003signature}, is based on the
 neighboring of atoms in a molecule and has been shown to work well for QSAR
-studies~\cite{lapins2018confidence}. Support vector machines is a machine learning
+studies~\cite{lapins2018confidence} and for ligand-based target prediction~\cite{alvarsson2014ligand}. Support vector machines is a machine learning
 algorithm which is commonly used in QSAR studies~\ref{norinder2003support,
 zhou2011qsar} together with molecular signatures and similar molecular
 descriptors, \textit{e.g.}, the extended connecticity fingerprints~\cite{rogers2010extended}. 
