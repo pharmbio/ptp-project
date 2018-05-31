@@ -300,12 +300,20 @@ in table~\ref{tbl:targets}.
 \inlinetodo{Extend caption}
 \end{table}
 
-\subsection{Conformal prediction}
+\subsection{Machine learning, molecular descriptors and conformal prediction\todo{add refs}}
+QSAR models are built by describing molecules by molecular descriptors and then
+train machine learning methods to, \textit{e.g.} predict target binding for a
+chemical. CPSign is a toool for making QSAR models with the molecular
+signatures descriptor, support vector machines and conformal prediction. The
+molecular signatures descriptor~\cite{some, Faulon, papers?}, is based on the
+neighboring of atoms in a molecule and has been shown to work well for QSAR
+studies~\cite{one, two}. Support vector machines is a machine learning
+algorithm which is commonly used in QSAR studies together with molecular
+signatures and similar molecular descriptors, \textit{e.g.}, the extended
+connecticity fingerprints~\cite{ecfp}. 
 
-\subsection{Machine learning and molecular descriptors}
 
 \subsection{Hyperparameter tuning}
-
 For each of the 31 targets, a parameter sweep was run to find the optimal value of the
 cost parameter of liblinear, optimizing modeling efficiency using 10-fold cross validation. The training
 approach used an Aggregated Conformal Predictor (ACP) with 10 aggregated models.
