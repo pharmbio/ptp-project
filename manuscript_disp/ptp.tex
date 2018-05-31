@@ -129,21 +129,23 @@ $^{2}$Predictive Compound ADME \& Safety, Drug Safety \& Metabolism, AstraZeneca
 
 \begin{abstract}
 \noindent
-Panels of ligand-based models are widely used in drug discovery to obtain an
-early indication of potential off-target predictions that could be linked
-to drug efficacy and safety. Another application is to combine models into
-a profile allowing to compare and search for compounds with similar
+Ligand-based models can be used in drug discovery to obtain an
+early indication of potential off-target interactions that could be linked
+to adverse effects. Another application is to combine such models into
+a panel, allowing to compare and search for compounds with similar
 profile. Most contemporary methods and implementations however lack valid
-measures of confidence in predictions, yielding only point predictions. We
+measures of confidence in predictions, presenting only point predictions. We
 here describe the use of conformal prediction for predicting off-target
-interactions based on data from the ExCAPE database about 31 binding
-targets, selected for their value in broad early hazard assessment. We used
-support vector machines, with chemical described by the signature molecular
-descriptor, to train predictive models.  Prediction results from the
-resulting models are presented as prediction intervals, as customary in
-conformal prediction. The full pre-processing and model training process is
+interactions with models trained on data from 31 targets in the ExCAPE database, 
+selected for their utility in broad early hazard assessment. 
+Chemicals were represented by the signature molecular
+descriptor and we used support vector machines as the underlying machine learning method.
+With conformal prediction, results from predictions are in the form of prediction intervals. 
+The full pre-processing and model training process is
 openly available as a scientific workflow on github, rendering it fully
-reproducible. The resulting models are published online and are available
+reproducible. 
+We illustrate the usefulness of the methodology on a set of compounds extracted from DrugBank.
+The resulting models are published online and are available
 via a graphical web interface and an OpenAPI interface for programmatic
 access.
 
