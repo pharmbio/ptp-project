@@ -377,15 +377,13 @@ calibration plots, for the smallest, median-sized, and largest target datasets,
 in figure \ref{fig:calibration_plots}.
 
 \begin{figure}[h!]
-\includegraphics[width=0.3\textwidth]{figures/calibration_plots/pde3a_calib.pdf}
-\includegraphics[width=0.3\textwidth]{figures/calibration_plots/slc6a2_calib.pdf}
-\includegraphics[width=0.3\textwidth]{figures/calibration_plots/htr2a_calib.pdf}
-    \inlinetodo{Make the axes gradation 0, 0.5, 1.0}
-    \caption{Three representative calibration plots, for models PDE3A, SLC6A2
-    and HTR2A, based on the smallest, the median, and the largest data sets in
-    terms of total number of compounds. The plots show accuracy against
-    confidence, for confidence values 0.05 to 0.95 with a step size of 0.05.}
-    \label{fig:calibration_plots}
+\includegraphics[width=\textwidth]{figures/workflow_graph_clean.pdf}
+    \caption{Simplified directed graph of processes in the the modeling workflow used
+    in the experiments in this study. Each experiment contains additions and modifications
+    to the workflow, but the workflow shown here, exemplifies the basic structure
+    that is common among most of the workflows. For more detailed workflow
+    plots, see the supplemental material.}
+    \label{fig:workflow_graph_clean}
 \end{figure}
 
 \subsection{Modeling workflow}
@@ -404,21 +402,6 @@ github (https://github.com/pharmbio/ptp-project).  An example of the modeling
 workflow is shown in figure \ref{fig:workflow_graph_clean}, which shows the workflow
 used for comparison conformal metric when filling up with assumed non-actives versus
 not filling up. More detailed workflow graphs are shown in the supplemental material.
-
-\begin{figure}[h!]
-\includegraphics[width=\textwidth]{figures/workflow_graph_clean.pdf}
-    \caption{Directed graph of processes in the the modeling workflow used to
-    generate the models for the comparison of filled up datasets versus
-    non-filled up are similar. Each node represents a workflow process (which
-    in turn can generate multiple tasks, representing concrete shell command
-    incovations). This graph is also slightly simplified by showing multiple
-    processes for multiple replicates, as a unified node (indicated by
-    \texttt{r\{1,2,3\}} in the node labels.  port names are excluded in this
-    graph for readability). Also, here the workflow is only showed for one gene
-    (PDE3A), since including all 21 genes (included in the fillup comparison),
-    it would render unreadable.}
-    \label{fig:workflow_graph_clean}
-\end{figure}
 
 \subsection{Model validation}
 
@@ -441,6 +424,27 @@ command, predicting values at confidence levels 0.8 and 0.9.
 \todo{where are these results?}
 
 \section*{Results and Discussion}
+
+\subsection{Calibration plots}
+
+As an initial sanity check, that our training procedure works as expected, we
+generated calibration plots in the cross-validation step of our workflow. Three
+example plots, for three representative targets (the smalles, the median-sized
+and the largest, in terms of compounds in ExcapeDB) can be seen in figure
+\ref{fig:calibration_plots}, while calibration plots for all targets can be
+found in the supplemental material, in figure \ref{fig:calibration_plots_all}.
+
+\begin{figure}[h!]
+\includegraphics[width=0.3\textwidth]{figures/calibration_plots/pde3a_calib.pdf}
+\includegraphics[width=0.3\textwidth]{figures/calibration_plots/slc6a2_calib.pdf}
+\includegraphics[width=0.3\textwidth]{figures/calibration_plots/htr2a_calib.pdf}
+    \inlinetodo{Make the axes gradation 0, 0.5, 1.0}
+    \caption{Three representative calibration plots, for models PDE3A, SLC6A2
+    and HTR2A, based on the smallest, the median, and the largest data sets in
+    terms of total number of compounds. The plots show accuracy against
+    confidence, for confidence values 0.05 to 0.95 with a step size of 0.05.}
+    \label{fig:calibration_plots}
+\end{figure}
 
 \subsection{Before and after fill up with assumed non-actives}
 
