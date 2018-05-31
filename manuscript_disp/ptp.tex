@@ -395,17 +395,23 @@ that is available as open source software at
 \href{http://scipipe.org}{scipipe.org} or \href{https://github.com/scipipe/scipipe}{github.com/scipipe/scipipe}.
 The cost values for each target is stored in the workflow code, available on
 github (https://github.com/pharmbio/ptp-project).  An example of the modeling
-workflow is shown in figure \ref{fig:workflow_graph_wodrugbank}.  The workflow
-used for comparison of metrics when filling up with assumed non-actives versus
-not filling up, is similar in principle, with a few differences.
+workflow is shown in figure \ref{fig:workflow_graph_clean}, which shows the workflow
+used for comparison conformal metric when filling up with assumed non-actives versus
+not filling up.
 
 \begin{figure}[h!]
-\includegraphics[width=\textwidth]{figures/workflow_graph_wodrugbank.pdf}
-    \caption{Directed graph picture of the modeling workflow used to generate
-    the models for the workflow where a set of DrugBank compounds were withheld
-    from ExcapeDB. The workflows for the comparison of filled up datasets
-    versus non-filled up are similar.}
-    \label{fig:workflow_graph_wodrugbank}
+\includegraphics[width=\textwidth]{figures/workflow_graph_clean.pdf}
+    \caption{Directed graph of processes in the the modeling workflow used to
+    generate the models for the comparison of filled up datasets versus
+    non-filled up are similar. Each node represents a workflow process (which
+    in turn can generate multiple tasks, representing concrete shell command
+    incovations). This graph is also slightly simplified by showing multiple
+    processes for multiple replicates, as a unified node (indicated by
+    \texttt{r\{1,2,3\}} in the node labels.  port names are excluded in this
+    graph for readability). Also, here the workflow is only showed for one gene
+    (PDE3A), since including all 21 genes (included in the fillup comparison),
+    it would render unreadable.}
+    \label{fig:workflow_graph_clean}
 \end{figure}
 
 \subsection{Model validation}
