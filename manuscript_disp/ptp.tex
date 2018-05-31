@@ -308,10 +308,10 @@ in table~\ref{tbl:targets}.
 
 For each of the 31 targets, a parameter sweep was run to find the optimal value of the
 cost parameter of liblinear, optimizing modeling efficiency using 10-fold cross validation. The training
-approach used an Aggregated Conformal Prediction (ACP) with 10 aggregated models.
+approach used an Aggregated Conformal Predictor (ACP) with 10 aggregated models.
 The parameter sweep evaluated three values for the cost parameter for each target; 1, 10 and 100. The
 efficiency measure used for the evaluation was the observed fuzziness (OF)
-score described in~\cite{Vovk2016} as
+score described in~\cite{Vovk2016} as:
 
 \begin{equation}
 OF =\frac{ 1}{m} \sum\limits_{i=1}^{m} \sum\limits_{y_i \neq y }  p_i^{\kern1pt y},		
@@ -327,7 +327,8 @@ OF =  \frac
 
 where $p_i^N$ is the $i^{th}$ p-value for class $N$, $p_i^A$ is the $i^{th}$
 p-value for class $A$ and $m_A$ and $m_N$ is the number of test examples in
-class $A$ and $N$ respectively.\todo{Write in words what $OF$ is?}
+class $A$ and $N$ respectively. $OF$ is basicly an average of the p-values for
+the wrong class, \textit{i.e.}, lower fuzziness means better prediction.
 
 To study the effect of imbalanced datasets on efficiency, we also implemented a
 modified version of OF, due to the fact that OF is influenced more
@@ -342,7 +343,10 @@ CNOF = \frac
         {\quad\sum\limits_{\mathclap{\substack{\scriptscriptstyle i,\ y_i=N}}}p_i^A}
         {m_N} 
 \end{equation}
-with the same variable conventions as above. \todo{Write in words what $CNOF$ is?}
+with the same variable conventions as above. Where $OF$ is only an average for
+the p-values in the test set, $CNOF$ takes the contribution from each class
+separately, meaning that for very unbalanced cases $OF$ is mainly just affected
+by the larger class and $CNOF$ is equally contributed to from both classes.
 
 %We first calculated the OF per class and divided it by the number of examples
 %(compounds) in that class, and finally took the mean value of the resulting
