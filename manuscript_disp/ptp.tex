@@ -75,6 +75,23 @@
 \captiontitlefont{\textsf\small}
 \let\thempfootnote\thefootnote
 
+\newsubfloat{figure}
+
+\newenvironment{wideMinipage}
+{ \vskip 1\baselineskip
+  \noindent   
+  \checkoddpage% 
+  \ifoddpage%
+     \hspace*{-3em}%
+  \else%
+     \hspace*{-3em}%
+  \fi%
+  \begin{minipage}{1\textwidth + 6em}
+}
+{ 
+    \end{minipage}
+    \vskip 1\baselineskip
+}
 
 \begin{document}
 
@@ -405,9 +422,17 @@ presented in a plot. The plot shows Observed Fuzziness (OF), Class Observed OF
 \end{figure}
 
 \begin{figure}
-\inlinetodo{This figure is work in progress}
-    \includegraphics[height=0.3\textheight]{figures/terbutaline2.png}
-    \includegraphics[height=0.3\textheight]{figures/terbutaline.png}
+
+\begin{wideMinipage}
+    \begin{minipage}{0.8\textwidth}
+    \subbottom[The profile as it looks on the web page. The user draws a molecule, selects a confidence and then the profile updates underneath.]{\includegraphics[height=0.41\textheight]{figures/terbutaline.png}}
+    \end{minipage}
+    \begin{minipage}{0.19\textwidth}
+    \subbottom[Coloring of which parts of the molecule contributed the most to the prediction for ADBR2.]{\fbox{\includegraphics[height=0.22\textheight]{figures/terbutaline2.png}}}
+    \end{minipage}
+    \caption{The prediction profile for Terbutaline, a known selective beta-2 adrenergic agonist  used as a broncho\-dilator and tocolytic}
+\end{wideMinipage}
+
 \end{figure}
 \subsection{Changes in class memberships}
 
