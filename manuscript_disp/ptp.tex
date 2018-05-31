@@ -494,9 +494,16 @@ full withheld dataset used in validation, for confidence levels 0.8 and 0.9
 respectively.
 
 \begin{figure}[h!]
-\includegraphics[width=0.5\textwidth]{figures/validation_plots/alltargets_0p8_valplot.pdf}
-\includegraphics[width=0.5\textwidth]{figures/validation_plots/alltargets_0p9_valplot.pdf}
-    \caption{Class membership change for all targets, for the prediction data, at confidence level 0.8 (left) and 0.9 (right), repsectively.
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \subbottom[Class membership changes for all targets at confidence level 0.8]{\includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p8_valplot.pdf}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \subbottom[Class membership changes for all targets at confidence level 0.9]{\includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p9_valplot.pdf}}
+\end{minipage}
+\hfill
+    \caption{Class membership change for all targets, for the prediction data, at confidence level 0.8 and 0.9.
     The labels on the X-axis indicate predicted labels (None, Active (A),
     Non-active (N) or Both). Dark grey in the stacked bar plot means the
     original label was Active (A), while light grey means the original label
