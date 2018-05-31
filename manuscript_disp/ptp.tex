@@ -399,33 +399,16 @@ workflow is shown in figure \ref{fig:workflow_graph_clean}, which shows the work
 used for comparison conformal metric when filling up with assumed non-actives versus
 not filling up. More detailed workflow graphs are shown in the supplemental material.
 
-\subsection{Model validation}
-
-In order to validate the predictive abilities of the trained models, data about
-1\,000 compounds were withheld from the ExcapeDB dataset. The compounds chosen to
-be withheld were the following: i) all small molecules in DrugBank (version
-5.0.11) with status ``withdrawn'', for which we could find either a pubchem ID
-or a CHEMBL ID, ii)  a randomly selected subset of the remaining compounds in
-DrugBank 5.0.11, with status ``approved'', for which we could also find PubChem or CHEMBL IDs,
-until a total number of 1\,000 compounds was reached.  No regard was paid to
-other drug statuses in DrugBank statuses such as ``investigational''.
-
-\todo{Add info about comparison of results for fillup vs non-fillup? YES! /Ola}
-
-The models built were validated by predicting the binding activity against each
-of the 31 targets for all compounds for which we had known binding
-data for a particular target. The validation was done with CPSign's validate
-command, predicting values at confidence levels 0.8 and 0.9.
-
-\todo{where are these results?}
 
 
 
 
-
+%%%%%%%%%%%%%%
+% Results and Discussion %
+%%%%%%%%%%%%%%
 \section*{Results and Discussion}
 
-\subsection{Validity}
+\subsection{Validity of models}
 To check that the conformal prediction models are valid (i.e. they predict with an error rate similar to the selected significance setting), calibration plots were generated in the cross validation step of our workflow. Three
 example plots, for three representative targets (the smalles, the median-sized
 and the largest, in terms of compounds in ExcapeDB) can be seen in figure
@@ -445,13 +428,16 @@ From the plots we conclude that all models produce valid results over all signif
     \label{fig:calibration_plots}
 \end{figure}
 
-\subsection{Before and after fill up with assumed non-actives}
 
-Metrics for all models before fill up with assumed non-actives for some
-targets, is shown in figure~\ref{fig:allmodels_nofillup}. In figure
+%\subsection{Before and after fill up with assumed non-actives}
+\subsection{Efficiency of models}
+Efficiency metrics (OF and CNOF) for all models before fill up with assumed non-actives is shown in figure~\ref{fig:allmodels_nofillup}. In figure
 \ref{fig:allmodels_fillup}, the same metrics are shown, after fillup with
 assumed non-actives for the 21 targets with less than 10\,000 non-actives in
-ExcapeDB.
+ExcapeDB. We observe that by adding assumed non-actives for small, imbalanced datasets we improve the efficiency of models trained on these datasets. This strategy was chosen for the remaining analysis workflows.
+In the next step, data from 
+
+\todo{Ola does not like the term 'fill up', can we not simply say adding assumed non-actives? Also, please ask Phil/Wes about assumed/presumed.}
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{figures/final_models_20171106_nofillup.png}
@@ -459,33 +445,46 @@ ExcapeDB.
     \label{fig:allmodels_nofillup}
 \end{figure}
 
+    \inlinetodo{Remove plot heading for fig 3 and 4, they are on top pf the plots.}
+
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{figures/final_models_20180223_fillup.png}
     \caption{All models after fill up with assumed non-actives. The targets are sorted by total number of compounds in ExcapeDB. The purple line in the figure shows accuracy.}
     \label{fig:allmodels_fillup}
 \end{figure}
 
-\subsection{Observed fuzziness}
+%\subsection{Efficiency}
+%
+%In figure \ref{fig:allmodels}, efficiency metrics Observed Fuzziness (OF), Class-Averaged OF
+%(CAOF) for each model is , training time and validation.
+%\inlinetodo{What can be seen from the figures?}
+%
+%\begin{figure}[h!]
+%\includegraphics[width=\textwidth]{figures/allmodels_wo_drugbank.pdf}
+%    \caption{All models with the smaller ones being filled up with assumed non-actives.}
+%    \inlinetodo{Extend the figure caption!}
+%    \label{fig:allmodels}
+%\end{figure}
 
-In figure \ref{fig:allmodels}, performance metrics for each model is
-presented in a plot. The plot shows Observed Fuzziness (OF), Class-Averaged OF
-(CAOF) as described in the methods section, training time and validation.
-\inlinetodo{What can be seen from the figures?}
+\subsection{External validation}
 
-\begin{figure}[h!]
-\includegraphics[width=\textwidth]{figures/allmodels_wo_drugbank.pdf}
-    \caption{All models with the smaller ones being filled up with assumed non-actives.}
-    \inlinetodo{Extend the figure caption!}
-    \label{fig:allmodels}
-\end{figure}
+In order to validate the predictive abilities of the trained models, a new dataset was created (Dataset 3) where data about
+1\,000 compounds were withheld from the ExcapeDB dataset. The compounds chosen to
+be withheld were the following: i) all small molecules in DrugBank (version
+5.0.11) with status ``withdrawn'', for which we could find either a pubchem ID
+or a CHEMBL ID, ii)  a randomly selected subset of the remaining compounds in
+DrugBank 5.0.11, with status ``approved'', for which we could also find PubChem or CHEMBL IDs,
+until a total number of 1\,000 compounds was reached.  No regard was paid to
+other drug statuses in DrugBank statuses such as ``investigational''.
 
-
-
-\subsection{Changes in class memberships}
-
-In figure \ref{fig:validation_plots} the class membership change for the
-full withheld dataset used in validation, for confidence levels 0.8 and 0.9
-respectively.
+The models built were validated by predicting the binding activity against each
+of the 31 targets for all compounds for which we had known binding
+data for a particular target. The validation was done with CPSign's validate
+command, predicting values at confidence levels 0.8 and 0.9.
+%
+In figure \ref{fig:validation_plots} the class membership change for Dataset 3, for confidence levels 0.8 and 0.9
+respectively. We observe....
+\inlinetodo{well, what do we observe in the class membership change plots? It is not obvious to me that it is correct... we should get fewer certain predictions with increasing confidence - not sure that we see that now. Maybe add the exact number for each bar?}
 
 \begin{figure}[h!]
 \hfill
@@ -504,18 +503,21 @@ respectively.
     was Non-Active (N).
     }
     \label{fig:validation_plots}
-    \inlinetodo{This figure needs a legend for the colours}
+    \inlinetodo{Increase Y-axis to 3000, now it does not look good.}
 \end{figure}
 
-\subsection*{The profile as a web page}
-The different models were published as microservices on an OpenShift cluster
+
+
+\subsection*{Target Profile-as-a-Service}
+\inlinetodo{Write about the OpenAPI}
+All models based on Dataset2 were published as microservices on an OpenShift cluster
 and a web page federating all the models were created. At the top of the web
-page (See figure~\ref{fig:web}) is and instance of the JSME editor~\cite{Bienfait2013} in which the user
-can draw a molecule. As the user draws the molecule the web page will extract
-the SMILES from the editor and send it away to the model services and make
-predictions based on the QSAR models for the drawn molecule. The user can set a
+page (See figure~\ref{fig:web}) is an instance of the JSME editor~\cite{Bienfait2013} in which the user
+can draw a molecule. As the user draws the molecule the web page extracts
+the SMILES from the editor and sends it to the model services to make
+predictions based on all available models. The user can set a
 threshold for the confidence and get visual feedback on whether the models
-predict the drawn molecule as active or non active with the chosen confidence.
+predict the drawn molecule as active or non-active with the chosen confidence.
 To the right is also a graphical profile in the form of a bar plot where
 confidence as binding is drawn in the positive direction and confidence for
 non-binding is the other direction. Hovering it will give information about
@@ -535,7 +537,7 @@ page is accessible at
 \end{figure}
 
 \FloatBarrier
-\section*{Conclusion}
+%\section*{Conclusion}
 
 
 \section*{Conflict of Interest Statement}
