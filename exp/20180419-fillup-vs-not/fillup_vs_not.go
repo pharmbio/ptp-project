@@ -16,6 +16,7 @@ import (
 )
 
 var (
+	graph    = flag.Bool("graph", false, "Only plot workflow graph and quit")
 	maxTasks = flag.Int("maxtasks", 4, "Max number of local cores to use")
 	threads  = flag.Int("threads", 1, "Number of threads that Go is allowed to start")
 	geneSet  = flag.String("geneset", "smallest1", "Gene set to use (one of smallest1, smallest3, smallest4, bowes44)")
@@ -437,7 +438,11 @@ func main() {
 	// --------------------------------
 	//wf.RunTo(procsToRun...)
 	//wf.RunToRegex("extract_assumed_n_.*")
-	wf.Run()
+	if *graph {
+		wf.PlotGraph("workflow.dot", true, true)
+	} else {
+		wf.Run()
+	}
 }
 
 // --------------------------------------------------------------------------------
