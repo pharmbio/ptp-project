@@ -443,7 +443,7 @@ command, predicting values at confidence levels 0.8 and 0.9.
 \subsection{Before and after fill up with assumed non-actives}
 
 Metrics for all models before fill up with assumed non-actives for some
-targets, is shown in \ref{fig:allmodels_nofillup}. In figure
+targets, is shown in figure~\ref{fig:allmodels_nofillup}. In figure
 \ref{fig:allmodels_fillup}, the same metrics are shown, after fillup with
 assumed non-actives for the 21 targets with less than 10\,000 non-actives in
 ExcapeDB.
@@ -483,7 +483,7 @@ presented in a plot. The plot shows Observed Fuzziness (OF), Class-Averaged OF
     \begin{minipage}{0.19\textwidth}
     \subbottom[Coloring of which parts of the molecule contributed the most to the prediction for ADBR2.]{\fbox{\includegraphics[height=0.22\textheight]{figures/terbutaline2.png}}}
     \end{minipage}
-    \caption{The prediction profile for Terbutaline, a known selective beta-2 adrenergic agonist  used as a broncho\-dilator and tocolytic}
+    \caption{The prediction profile for Terbutaline, a known selective beta-2 adrenergic agonist  used as a broncho\-dilator and tocolytic \label{fig:web}}
 \end{wideMinipage}
 
 \end{figure}
@@ -512,6 +512,22 @@ respectively.
     \label{fig:validation_plots}
     \inlinetodo{This figure needs a legend}
 \end{figure}
+
+\subsection*{The profile as a web page}
+The different models were published as microservices on an OpenShift cluster
+and a web page federating all the models were created. At the top of the web
+page (See figure~\ref{fig:web}) is and instance of the JSME editor~\cite{Bienfait2013} in which the user
+can draw a molecule. As the user draws the molecule the web page will extract
+the SMILES from the editor and send it away to the model services and make
+predictions based on the QSAR models for the drawn molecule. The user can set a
+threshold for the confidence and get visual feedback on whether the models
+predict the drawn molecule as active or non active with the chosen confidence.
+To the right is also a graphical profile in the form of a bar plot where
+confidence as binding is drawn in the positive direction and confidence for
+non-binding is the other direction. Hovering it will give information about
+exactly which model a certain peak in the bar charts corresponds to. The web
+page is accessible at
+\url{http://modelingweb.service.pharmb.io/predict/profile/ptp-wo-drugbank}.
 
 \FloatBarrier
 \section*{Conclusion}
