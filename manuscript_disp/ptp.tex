@@ -239,14 +239,15 @@ and non-active compounds, and whether they are included or not, are summarized
 in table \ref{tbl:targets}.
 
 \begin{table}
+\begin{wideMinipage}
 \small
 \centering
 \caption{The panel of targets used in this study, identified by Gene ID. Actives and non-actives refer to the number of ligand interactions marked as active and non-active in ExcapeDB. Included indicates if the target was included in the study or excluded because it did not pass the filtering criteria.}
 \label{tbl:targets}
 \begin{tabular}{rrrrccl}
 \toprule
-    Gene ID & Actives & Non-actives     & Non-actives    & Included & Filled-up & Remarks \\
-            &         & (before fillup) & (after fillup) &          &           & \\
+             &         & Non-actives     & Non-actives    &           &            &         \\
+     Gene ID & Actives & (before fillup) & (after fillup) &  Included & Filled-up  & Remarks \\
 \midrule
     ACHE    &       3\,160  &       1\,152      &   5\,824   &   Yes     &       &       \\
     ADORA2A &       5\,275  &       593         &   10\,092  &   Yes     &       &       \\
@@ -296,6 +297,7 @@ in table \ref{tbl:targets}.
     SLC6A4  &       7\,228  &       382         &   13\,660  &   Yes     &       &       \\
 \bottomrule
 \end{tabular}
+\end{wideMinipage}
 \inlinetodo{Extend caption}
 \end{table}
 
