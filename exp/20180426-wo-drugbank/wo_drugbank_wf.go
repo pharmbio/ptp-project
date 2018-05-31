@@ -648,7 +648,7 @@ func main() {
 	// Run the pipeline!
 	// --------------------------------
 	if *graph {
-		wf.WriteDotFile("wo_drugbank_wf.dot", false, true)
+		wf.PlotGraph("wo_drugbank_wf.dot", true, true)
 	} else {
 		wf.RunToRegex(*procsRegex)
 	}
