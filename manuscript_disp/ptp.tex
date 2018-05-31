@@ -153,7 +153,7 @@ access.
  %\keyFont{ \section{Keywords:} drug discovery, predictive modelling, conformal prediction, machine learning, off-target, adverse effects} %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
 \end{abstract}
 
-\section*{Introduction\todo{Expand the intro, prior art?}}
+\section*{Introduction}
 
 %Introduce off target binding as a problem, and the value of predictions
 Drug-target interactions are central to the drug discovery process~\cite{Yildirim:2007vh}. It is common that drugs interact with multiple targets~\cite{hopkins2008network}, and off-target pharmacology and polypharmacology has big implications on drug efficacy and safety~\cite{Peters:2013yg,Ravikumar:2018qd}. Organizations involved in drug discovery, such as pharmaceutical companies and academic institutions, use many types of experimental techniques and assays to determine target interactions, including in vitro pharmacological profiling~\cite{Bowes2012}. However an attractive complementary method is to use computational (in silico) profiling of binding profiles for ligands~\cite{Cereto-Massague:2015px}, also opening up to predict virtual compounds. A common approach to the target prediction problem is to use a panel of structure-activity relationship (QSAR) models [REF QSAR], where chemicals in a knowledge base with known interaction values (numerical or categorial) are described numerically be descriptors and a statistical learning model is trained to predict numerical values (regression) or categorial values (classification). The recent increase in the number of available data points in interaction databases such as ChEMBL and PubChem
@@ -171,14 +171,14 @@ TargetHunter~\cite{Wang:2013le} is anotehr online tool that uses chemical simila
 We note two important shortcomings among previous works. Primarily, available methods for ligand-based
 target profiling often do not offer valid measures of confidence in predictions, leaving the user uncertain about the usefulness of predictions. Secondly, the majority of the web tools lack an open and standardized API, meaning it is not straightforward (and in most cases not possible at all) to consume the services programmatically, such as with a script or inclusion in a scientific workflow system used in drug discovery like KNIME~\cite{Mazanetz:2012gy}.
 
-We present an approach for ligand-based target profiling using a
+We here present an approach for ligand-based target profiling using a
 confidence framework, delivering target profiles with confidence score for the
 predictions of whether a query compound interact with each target. The
 confidence scores are calculated using the Conformal Prediction
 methodology~\cite{Vovk2005}.
-
-The goal of this study was to create an automated and reproducable approach for
-generating a predicted target profile by QSAR binding models with the models
+%
+The goal of this study was to create an automated and reproducible approach for
+generating a predicted target profile by QSAR binding models, with the models
 making up the profile published online as micro services and the profile
 accessible from a web page. Although the models give a confidence measure we
 also set out to evaluate them on test sets to see how well they perform on some
@@ -304,20 +304,17 @@ in table~\ref{tbl:targets}.
 \bottomrule
 \end{tabular}
 \end{wideMinipage}
-\inlinetodo{Extend caption}
 \end{table}
 
-\subsection{Machine learning, molecular descriptors and conformal prediction\todo{add refs}}
-QSAR models are built by describing molecules by molecular descriptors and then
-train machine learning methods to, \textit{e.g.} predict target binding for a
-chemical. CPSign is a tool for making QSAR models with the molecular
-signatures descriptor, support vector machines and conformal prediction. The
-molecular signatures descriptor~\cite{faulon2003signature}, is based on the
-neighboring of atoms in a molecule and has been shown to work well for QSAR
-studies~\cite{lapins2018confidence} and for ligand-based target prediction~\cite{alvarsson2014ligand}. Support vector machines is a machine learning
-algorithm which is commonly used in QSAR studies~\ref{norinder2003support,
-zhou2011qsar} together with molecular signatures and similar molecular
-descriptors, \textit{e.g.}, the extended connecticity fingerprints~\cite{rogers2010extended}. 
+\subsection{Conformal prediction}
+Conformal Prediction (CP)~\cite{Vovk2005} provides a layer on top of an existing machine learning method and yields valid prediction regions for test examples. This contrasts to standard machine learning that delivers point estimates, and in conformal prediction a prediction region contains the true value with probability equal to a selected significance level $\epsilon$. Such a prediction region can be obtained under the assumption that the observed data is exchangeable. An important impact is that the size of this region directly relate to the 'strangeness' of the test example, and is an alternative to the concept of a model's 'applicability domain'~\cite{norinder2014introducing}. For the classification case, a prediction comes as a set of p-values (one for each class), and in a Mondrian setting then the classes are handled independently which has attractive properties when dealing with imbalanced datasets~\cite{Norinder:2017qc,Sun:2017qm}. 
+
+In this study we used the Mondrian conformal prediction implementation in the software CPSign~\cite{CPSignDocs}, leveraging the liblinear~\cite{fan2008liblinear} SVM implementation together with the signatures molecular descriptor~\cite{faulon2003signature}. 
+This descriptor is based on the
+neighbouring of atoms in a molecule and has been shown to work well for QSAR
+studies~\cite{lapins2018confidence,Alvarsson:2016pw} and for ligand-based target prediction~\cite{alvarsson2014ligand}. Support vector machines is a machine learning
+algorithm which is commonly used in QSAR studies~\cite{norinder2003support,zhou2011qsar} together with molecular signatures and similar molecular
+descriptors, \textit{e.g.}, the extended connectivity fingerprints~\cite{rogers2010extended}.
 
 
 \subsection{Hyperparameter tuning}
@@ -375,14 +372,6 @@ by the larger class and $CAOF$ is equally contributed to from both classes.
 CAOF was not used for cost selection, but is provided for information in the results from the workflow.
 
 
-\subsection{Calibration plots}
-From the crossvalidation, calibration plots\todo{Write a bit about what a
-calibration plot is somewhere?} were generated by predicting values for
-confidence values at 0.05 up to 0.95, with a step size of 0.05. These plots are
-available in the supplementary material. Additionally, three representative
-calibration plots, for the smallest, median-sized, and largest target datasets,
-in figure \ref{fig:calibration_plots}.
-
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{figures/workflow_graph_clean.pdf}
     \caption{Simplified directed graph of processes in the the modeling workflow used
@@ -430,16 +419,19 @@ command, predicting values at confidence levels 0.8 and 0.9.
 
 \todo{where are these results?}
 
+
+
+
+
 \section*{Results and Discussion}
 
-\subsection{Calibration plots}
-
-As an initial sanity check, that our training procedure works as expected, we
-generated calibration plots in the cross-validation step of our workflow. Three
+\subsection{Validity}
+To check that the conformal prediction models are valid (i.e. they predict with an error rate similar to the selected significance setting), calibration plots were generated in the cross validation step of our workflow. Three
 example plots, for three representative targets (the smalles, the median-sized
 and the largest, in terms of compounds in ExcapeDB) can be seen in figure
 \ref{fig:calibration_plots}, while calibration plots for all targets can be
-found in the supplemental material, in figure \ref{fig:calibration_plots_all}.
+found in the supplemental material (figure~\ref{fig:calibration_plots_all}).
+From the plots we conclude that all models produce valid results over all significance levels.
 
 \begin{figure}[h!]
 \includegraphics[width=0.3\textwidth]{figures/calibration_plots/pde3a_calib.pdf}
