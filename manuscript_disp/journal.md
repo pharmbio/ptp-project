@@ -14,6 +14,7 @@
       - [x] One per target (Unless too few predicted compounds per target)
 - [x] Check if terbutalin is in the training dataset (Update: It's not, it's
   among the withheld ones)
+- [x] Create workflow picture
 - [ ] Add 0, 0.5 and 1 as ticks in calibration plots
 - [ ] Beef up introduction (Jonalv? Saml?)
 - [ ] Write up some text in the results

@@ -17,6 +17,7 @@ import (
 )
 
 var (
+	graph      = flag.Bool("graph", false, "If this flag is specified, the workflow will just print out the workflow as a graph in dot and pdf format, and nothing else")
 	maxTasks   = flag.Int("maxtasks", 4, "Max number of local cores to use")
 	threads    = flag.Int("threads", 1, "Number of threads that Go is allowed to start")
 	geneSet    = flag.String("geneset", "smallest1", "Gene set to use (one of smallest1, smallest3, smallest4, bowes44)")
@@ -646,7 +647,11 @@ func main() {
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
-	wf.RunToRegex(*procsRegex)
+	if *graph {
+		wf.WriteDotFile("wo_drugbank_wf.dot", false, true)
+	} else {
+		wf.RunToRegex(*procsRegex)
+	}
 }
 
 // --------------------------------------------------------------------------------
