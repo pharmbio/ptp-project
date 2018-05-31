@@ -148,7 +148,7 @@ access.
  %\keyFont{ \section{Keywords:} drug discovery, predictive modelling, conformal prediction, machine learning, off-target, adverse effects} %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
 \end{abstract}
 
-\section*{Introduction}
+\section*{Introduction\todo{Expand the intro, prior art?}}
 
 %Introduce off target binding as a problem, and the value of predictions
 
@@ -166,18 +166,15 @@ methodology~\cite{Vovk2005}, with support vector machines for modeling and
 chemical structures described by the molecular signature
 descriptor~\cite{Faulon2003}. The molecular signatures have previously been
 sucessfully used for ligand-based target prediction~\cite{alvarsson2014ligand}
-We study profiles for different sets of targets, including a subset of the
-minimal panel of 44 targets for broad early hazard assessment suggested
-by~\cite{Bowes2012}, but also the applicability of larger as well as focused
-target sets.
 
-\todo{Expand the intro above which is just taken from the abstract}
-
-%Prior art - what has been done before?
-Earlier studies...
-
-%What is the motivation for the study, and what will we describe in this manuscript
-In this manuscript we...
+The goal of this study was to create an automated and reproducable approach for
+generating a predicted target profile by QSAR binding models with the models
+making up the prifile published online as micor services and the profile
+accesible from a web page. Although the models give a confidence measure we
+also set out to evaluate them on test sets to see how well they perform on some
+representatable data. We examplified the process by creating a profile on the
+targets for broad early hazard assessment presented by Bowes \textit{et
+al.}~\cite{Bowes2012}.
 
 %%%%%%%%%%%%%%%%%%
 %Methods
@@ -242,7 +239,7 @@ in table \ref{tbl:targets}.
 \begin{wideMinipage}
 \small
 \centering
-\vspace*{-35pt} % This is cheating, but this table is HUGE!
+\vspace*{-35pt} % This is cheating, top margin should be holy, but this table is HUGE!
 \caption{The panel of targets used in this study, identified by Gene ID. Actives and non-actives refer to the number of ligand interactions marked as active and non-active in ExcapeDB. Included indicates if the target was included in the study or excluded because it did not pass the filtering criteria.}
 \label{tbl:targets}
 \begin{tabular}{rrrrccl}
