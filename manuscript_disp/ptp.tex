@@ -13,6 +13,7 @@
 \usepackage{amssymb}
 \usepackage{tikz}
 \usepackage{enumitem}
+\usepackage{multirow}
 \usepackage{rotating}
 \renewcommand{\thefootnote}{\color{red}\arabic{footnote}}
 \usepackage{placeins}
@@ -239,60 +240,65 @@ in table \ref{tbl:targets}.
 \begin{wideMinipage}
 \small
 \centering
-\vspace*{-35pt} % This is cheating, top margin should be holy, but this table is HUGE!
+\vspace*{-45pt} % This is cheating, top margin should be holy, but this table is HUGE!
 \caption{The panel of targets used in this study, identified by Gene ID. Actives and non-actives refer to the number of ligand interactions marked as active and non-active in ExcapeDB. Included indicates if the target was included in the study or excluded because it did not pass the filtering criteria.}
 \label{tbl:targets}
-\begin{tabular}{rrrrccl}
+\begin{tabular}{crrrrcl}
 \toprule
-             &         & Non-actives     & Non-actives    &           &            &         \\
-     Gene ID & Actives & (before fillup) & (after fillup) &  Included & Filled-up  & Remarks \\
+&             &         & Non-actives       & Non-actives      &              &       \\
+&             &         & (before fillup \& & (after fillup \& &              &       \\
+&     Gene ID & Actives & deduplikation)    & deduplikation)   & Filled-up  & Remarks \\
 \midrule
-    ACHE    &       3\,160  &       1\,152      &   5\,824   &   Yes     &       &       \\
-    ADORA2A &       5\,275  &       593         &   10\,092  &   Yes     &       &       \\
-    ADRA1A  &       1\,782  &       24          &            &           &       &       \\
-    ADRA2A  &       839     &       39          &            &           &       &       \\
-    ADRB1   &       1\,306  &       149         &   2\,544   &   Yes     &       &       \\
-    ADRB2   &       1\,955  &       342\,282    &   341\,925 &   Yes     &       &       \\
-    AR      &       2\,593  &       4\,725      &   4\,866   &   Yes     &       &       \\
-    AVPR1A  &       1\,055  &       321\,406    &   321\,098 &   Yes     &       &       \\
-    CACNA1C &       166     &       20          &            &           &       &       \\
-    CCKAR   &       1\,249  &       132         &   2\,458   &   Yes     &       &       \\
-    CHRM1   &       2\,776  &       417\,549    &   358\,330 &   Yes     &       &       \\
-    CHRM2   &       1\,817  &       152         &   3\,440   &   Yes     &       &       \\
-    CHRM3   &       1\,676  &       144         &   3\,234   &   Yes     &       &       \\
-    CHRNA1  &       -       &       -           &            &           &       & Not in ExcapeDB \\
-    CHRNA4  &       256     &       17          &            &           &       &       \\
-    CNR1    &       5\,336  &       400         &   10\,220  &   Yes     &       &       \\
-    CNR2    &       4\,583  &       402         &   8\,676   &   Yes     &       &       \\
-    DRD1    &       1\,732  &       356\,201    &   355\,909 &   Yes     &       &       \\
-    DRD2    &       8\,323  &       343\,206    &   342\,958 &   Yes     &       &       \\
-    EDNRA   &       2\,129  &       124         &   4\,050   &   Yes     &       &       \\
-    GABRA1  &       112     &       5           &            &           &       &       \\
-    GRIN1   &       555     &       92          &            &           &       &       \\
-    HRH1    &       1\,218  &       65          &            &           &       &       \\
-    HRH2    &       394     &       56          &            &           &       &       \\
-    HTR1A   &       6\,555  &       64\,578     &   64\,468  &   Yes     &       &       \\
-    HTR1B   &       1\,262  &       86          &            &           &       &       \\
-    HTR2A   &       4\,160  &       359\,962    &   359\,663 &   Yes     &       &       \\
-    HTR2B   &       1\,159  &       66          &            &           &       &       \\
-    HTR3A   &       584     &       65          &            &           &       &       \\
-    KCNH2   &       5\,330  &       350\,773    &   350\,452 &   Yes     &       &       \\
-    KCNQ1   &       37      &       303\,466    &            &           &       &       \\
-    LCK     &       2\,662  &       283         &   5\,246   &   Yes     &       &       \\
-    MAOA    &       1\,260  &       1\,083      &   2\,452   &   Yes     &       &       \\
-    MINK1   &       929     &       8           &            &           &       & Synonym to KCNE1 \\
-    NR3C1   &       2\,525  &       4\,382      &   4\,804   &   Yes     &       &       \\
-    OPRD1   &       5\,350  &       826         &   9\,580   &   Yes     &       &       \\
-    OPRK1   &       3\,672  &       303\,335    &   303\,111 &   Yes     &       &       \\
-    OPRM1   &       5\,837  &       2\,872      &   11\,252  &   Yes     &       &       \\
-    PDE3A   &       197     &       110         &   392      &   Yes     &       &       \\
-    PDE4D   &       484     &       98          &            &           &       &       \\
-    PTGS1   &       849     &       729         &   1\,634   &   Yes     &       &       \\
-    PTGS2   &       2\,862  &       827         &   5\,162   &   Yes     &       &       \\
-    SCN5A   &       316     &       119         &   624      &   Yes     &       &       \\
-    SLC6A2  &       3\,879  &       218         &   7\,498   &   Yes     &       &       \\
-    SLC6A3  &       5\,017  &       106\,819    &   106\,594 &   Yes     &       &       \\
-    SLC6A4  &       7\,228  &       382         &   13\,660  &   Yes     &       &       \\
+\multirow{31}{*}{\begin{turn}{90}\textsc{Included}\end{turn}} 
+&    ACHE    &       3\,160  &       1\,152      &   5\,824   & \checkmark      &       \\
+&    ADORA2A &       5\,275  &       593         &   10\,092  & \checkmark      &       \\
+&    ADRB1   &       1\,306  &       149         &   2\,544   & \checkmark      &       \\
+&    ADRB2   &       1\,955  &       342\,282    &   341\,925 &       &       \\
+&    AR      &       2\,593  &       4\,725      &   4\,866   & \checkmark      &       \\
+&    AVPR1A  &       1\,055  &       321\,406    &   321\,098 &       &       \\
+&    CCKAR   &       1\,249  &       132         &   2\,458   & \checkmark      &       \\
+&    CHRM1   &       2\,776  &       417\,549    &   358\,330 &       &       \\
+&    CHRM2   &       1\,817  &       152         &   3\,440   & \checkmark      &       \\
+&    CHRM3   &       1\,676  &       144         &   3\,234   & \checkmark      &       \\
+&    CNR1    &       5\,336  &       400         &   10\,220  & \checkmark      &       \\
+&    CNR2    &       4\,583  &       402         &   8\,676   & \checkmark      &       \\
+&    DRD1    &       1\,732  &       356\,201    &   355\,909 &       &       \\
+&    DRD2    &       8\,323  &       343\,206    &   342\,958 &       &       \\
+&    EDNRA   &       2\,129  &       124         &   4\,050   & \checkmark      &       \\
+&    HTR1A   &       6\,555  &       64\,578     &   64\,468  &       &       \\
+&    HTR2A   &       4\,160  &       359\,962    &   359\,663 &       &       \\
+&    KCNH2   &       5\,330  &       350\,773    &   350\,452 &       &       \\
+&    LCK     &       2\,662  &       283         &   5\,246   & \checkmark      &       \\
+&    MAOA    &       1\,260  &       1\,083      &   2\,452   & \checkmark      &       \\
+&    NR3C1   &       2\,525  &       4\,382      &   4\,804   & \checkmark      &       \\
+&    OPRD1   &       5\,350  &       826         &   9\,580   & \checkmark      &       \\
+&    OPRK1   &       3\,672  &       303\,335    &   303\,111 &       &       \\
+&    OPRM1   &       5\,837  &       2\,872      &   11\,252  & \checkmark      &       \\
+&    PDE3A   &       197     &       110         &   392      & \checkmark      &       \\
+&    PTGS1   &       849     &       729         &   1\,634   & \checkmark      &       \\
+&    PTGS2   &       2\,862  &       827         &   5\,162   & \checkmark      &       \\
+&    SCN5A   &       316     &       119         &   624      & \checkmark      &       \\
+&    SLC6A2  &       3\,879  &       218         &   7\,498   & \checkmark      &       \\
+&    SLC6A3  &       5\,017  &       106\,819    &   106\,594 &       &       \\
+&    SLC6A4  &       7\,228  &       382         &   13\,660  & \checkmark      &       \\
+\midrule
+\multirow{15}{*}{\begin{turn}{90}\textsc{Not Included}\end{turn}} 
+&    ADRA1A  &       1\,782  &       24          &            &       &       \\
+&    ADRA2A  &       839     &       39          &            &       &       \\
+&    CACNA1C &       166     &       20          &            &       &       \\
+&    CHRNA1  &       -       &       -           &            &       & Not in ExcapeDB \\
+&    CHRNA4  &       256     &       17          &            &       &       \\
+&    GABRA1  &       112     &       5           &            &       &       \\
+&    GRIN1   &       555     &       92          &            &       &       \\
+&    HRH1    &       1\,218  &       65          &            &       &       \\
+&    HRH2    &       394     &       56          &            &       &       \\
+&    HTR1B   &       1\,262  &       86          &            &       &       \\
+&    HTR2B   &       1\,159  &       66          &            &       &       \\
+&    HTR3A   &       584     &       65          &            &       &       \\
+&    KCNQ1   &       37      &       303\,466    &            &       &       \\
+&    MINK1   &       929     &       8           &            &       & Synonym to KCNE1 \\
+&    PDE4D   &       484     &       98          &            &       &       \\
+
 \bottomrule
 \end{tabular}
 \end{wideMinipage}
