@@ -77,6 +77,8 @@
 \let\thempfootnote\thefootnote
 
 \newsubfloat{figure}
+\mergepagefloatstyle{floatcomp}{plain}{empty}
+\pagestyle{floatcomp}
 
 \newenvironment{wideMinipage}
 { \vskip 1\baselineskip
@@ -236,7 +238,7 @@ All the targets, with details about their respective number of active
 and non-active compounds, and whether they are included or not, are summarized
 in table \ref{tbl:targets}.
 
-\begin{table}
+\begin{table}[p]
 \begin{wideMinipage}
 \small
 \centering
