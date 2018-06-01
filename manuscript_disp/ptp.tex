@@ -138,16 +138,15 @@ confidence in predictions, presenting only point predictions. We here
 describe the use of conformal prediction for predicting off-target
 interactions with models trained on data from 31 targets in the ExCAPE
 database, selected for their utility in broad early hazard assessment.
-Chemicals were represented by the signature molecular descriptor and we
-used support vector machines as the underlying machine learning method.
-With conformal prediction, {\color{magenta} results from predictions are in the
-form of prediction\todo{aren't we doing classification? Can the p-values really
-be called prediction intervals?} intervals}.  The full pre-processing and model
-training process is openly available as a scientific workflow on github,
-rendering it fully reproducible.  We illustrate the usefulness of the
-methodology on a set of compounds extracted from DrugBank.  The resulting
-models are published online and are available via a graphical web interface and
-an OpenAPI interface for programmatic access.
+Chemicals were represented by the signature molecular descriptor and we used
+support vector machines as the underlying machine learning method. With
+conformal prediction, results from predictions are in the form of confidence
+p-values for the different classes.  The full pre-processing and model training
+process is openly available as a scientific workflow on github, rendering it
+fully reproducible.  We illustrate the usefulness of the methodology on a set
+of compounds extracted from DrugBank.  The resulting models are published
+online and are available via a graphical web interface and an OpenAPI interface
+for programmatic access.
 
 %\tiny
  %\keyFont{ \section{Keywords:} drug discovery, predictive modelling, conformal prediction, machine learning, off-target, adverse effects} %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
@@ -167,13 +166,14 @@ including in vitro pharmacological profiling~\cite{Bowes2012}. However an
 attractive complementary method is to use computational (in silico) profiling
 of binding profiles for ligands~\cite{Cereto-Massague:2015px}, also opening up
 to predict virtual compounds. A common approach to the target prediction
-problem is to use a panel of structure-activity relationship (QSAR) models
-{\color{magenta}[REF\todo{missing ref} QSAR]}, where chemicals in a knowledge
-base with known interaction values (numerical or categorial) are described
-numerically be descriptors and a statistical learning model is trained to
-predict numerical values (regression) or categorial values (classification).
-The recent increase in the number of available data points in interaction
-databases such as ChEMBL and PubChem{\color{magenta}\todo{unfinished sentense}\ldots}
+problem is to use a panel of structure-activity relationship (QSAR) models%
+%{\color{magenta}[REF\todo{missing ref} QSAR]}
+, where chemicals in a knowledge base with known interaction values (numerical
+or categorial) are described numerically be descriptors and a statistical
+learning model is trained to predict numerical values (regression) or
+categorial values (classification). %The recent increase in the number of
+%available data points in interaction databases such as ChEMBL and
+%PubChem{\color{magenta}\todo{unfinished sentense}\ldots}
 
 Several methods and tools are available for target prediction and for
 constructing and using target profiles. 
@@ -436,6 +436,7 @@ results from the workflow.
 
 
 \begin{figure}[h!]
+\vspace{2\baselineskip}
 \includegraphics[width=\textwidth]{figures/workflow_graph_clean.pdf}
     \caption{Simplified directed graph of processes in the the modeling workflow used
     in the experiments in this study. Each experiment contains additions and modifications
@@ -486,7 +487,7 @@ significance levels.
 \includegraphics[width=0.3\textwidth]{figures/calibration_plots/pde3a_calib.pdf}
 \includegraphics[width=0.3\textwidth]{figures/calibration_plots/slc6a2_calib.pdf}
 \includegraphics[width=0.3\textwidth]{figures/calibration_plots/htr2a_calib.pdf}
-    \inlinetodo{Make the axes gradation 0, 0.5, 1.0}
+    %\inlinetodo{Make the axes gradation 0, 0.5, 1.0}
     \caption{Three representative calibration plots, for models PDE3A, SLC6A2
     and HTR2A, based on the smallest, the median, and the largest data sets in
     terms of total number of compounds. The plots show accuracy against
@@ -497,7 +498,7 @@ significance levels.
 
 %\subsection{Before and after fill up with assumed non-actives}
 \subsection{Efficiency of models}
-Efficiency metrics (OF and CAOF) for all models built on Dataset1 (without
+The efficiency metric CAOF for all models built on Dataset1 (without
 adding assumed non-actives) are shown in figure~\ref{fig:allmodels_nofillup}.
 In figure \ref{fig:allmodels_fillup}, the same metrics are shown for when target
 datasets in Dataset2 have been filled up with assumed non-actives, to compensate
@@ -522,7 +523,7 @@ analysis workflows.
     \label{fig:allmodels_nofillup}
 \end{figure}
 
-    \inlinetodo{Remove plot heading for fig 3 and 4, they are on top pf the plots.}
+%    \inlinetodo{Remove plot heading for fig 3 and 4, they are on top pf the plots.}
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{figures/final_models_20180223_fillup.png}
@@ -599,7 +600,7 @@ to larger prediction sets.
     was Non-Active (N).
     }
     \label{fig:validation_plots}
-    \inlinetodo{Increase Y-axis to 3000, now it does not look good.}
+    %\inlinetodo{Increase Y-axis to 3000, now it does not look good.}
 \end{figure}
 
 \subsection*{Target Profile-as-a-Service}
@@ -624,6 +625,7 @@ direction. Hovering it will give information about exactly which model a
 certain peak in the bar charts corresponds to. The web page is accessible at
 \url{http://modelingweb.service.pharmb.io/predict/profile/ptp-wo-drugbank}.
 \begin{figure}
+\vspace*{-60pt} % Yea here we go again, call me a cheater if you want to...
 \begin{wideMinipage}
     \begin{minipage}{0.8\textwidth}
     \subbottom[The profile as it looks on the web page. The user draws a molecule, selects a confidence and then the profile updates underneath.]{\includegraphics[height=0.41\textheight]{figures/terbutaline.png}}
