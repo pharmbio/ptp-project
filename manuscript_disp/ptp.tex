@@ -566,7 +566,13 @@ In figure \ref{fig:validation_plots} the class membership change for Dataset 3,
 for confidence levels 0.8 and 0.9 respectively is shown. We see how the number
 of prediction of ``both'' labels increases when the confidence level increases
 from 0.8 to 0.9. This is as expected, as this means that fewer compounds could
-be predicted to a specific label with the higher confidence level.
+be predicted to only one specific label with the higher confidence level. The number of
+``None'' predictions decreases at a higher confidence, which is expected as the 
+predictor must accepts less probable (in the Conformal Prediction ranking sense) 
+predictions to be considered part of the prediction region at a higher confidence.
+This behaviour might seem backwards, but at a higher confidence the predictor
+has to include less likely predictions for it not to miss any true labels, leading 
+to larger prediction sets.
 
 \inlinetodo{well, what do we observe in the class membership change plots? It
 is not obvious to me that it is correct... we should get fewer certain
