@@ -606,20 +606,25 @@ I have added one explanation now ... but I have a harder time explaining the
 
 
 \subsection*{Target Profile-as-a-Service}
-\inlinetodo{Write about the OpenAPI and what we can do with it, why it is good.}
-All models based on Dataset2 were published as microservices on an OpenShift
-cluster and a web page federating all the models were created. At the top of
-the web page (See figure~\ref{fig:web}) is an instance of the JSME
-editor~\cite{Bienfait2013} in which the user can draw a molecule. As the user
-draws the molecule the web page extracts the SMILES from the editor and sends
-it to the model services to make predictions based on all available models. The
-user can set a threshold for the confidence and get visual feedback on whether
-the models predict the drawn molecule as active or non-active with the chosen
-confidence.  To the right is also a graphical profile in the form of a bar plot
-where confidence as binding is drawn in the positive direction and confidence
-for non-binding is the other direction. Hovering it will give information about
-exactly which model a certain peak in the bar charts corresponds to. The web
-page is accessible at
+All models based on Dataset2 were published as microservices with REST APIs
+publicly made available using the OpenAPI specification on an OpenShift cluster
+and a web page federating all the models were created. The OpenAPI
+specification is a standardisation for how REST APIs are described, it means
+that there is a common way for looking up how to use the REST API of a web
+service and that greatly simplifies the process of tying multiple different web
+services together. It simplifies calling the services from scripts as well as
+from other web pages, such as our web page that makes a profile image out of
+the multiple QSAR models. At the top of the web page (See figure~\ref{fig:web})
+is an instance of the JSME editor~\cite{Bienfait2013} in which the user can
+draw a molecule. As the user draws the molecule the web page extracts the
+SMILES from the editor and sends it to the model services to make predictions
+based on all available models. The user can set a threshold for the confidence
+and get visual feedback on whether the models predict the drawn molecule as
+active or non-active with the chosen confidence.  To the right is also a
+graphical profile in the form of a bar plot where confidence as binding is
+drawn in the positive direction and confidence for non-binding is the other
+direction. Hovering it will give information about exactly which model a
+certain peak in the bar charts corresponds to. The web page is accessible at
 \url{http://modelingweb.service.pharmb.io/predict/profile/ptp-wo-drugbank}.
 \begin{figure}
 \begin{wideMinipage}
