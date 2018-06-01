@@ -497,20 +497,25 @@ significance levels.
 \subsection{Efficiency of models}
 Efficiency metrics (OF and CAOF) for all models built on Dataset1 (without
 adding assumed non-actives) are shown in figure~\ref{fig:allmodels_nofillup}.
-In figure \ref{fig:allmodels_fillup}, the same metrics are shown for models
-built on Dataset2 (with added assumed non-actives).
+In figure \ref{fig:allmodels_fillup}, the same metrics are shown for when target
+datasets in Dataset2 have been filled up with assumed non-actives, to compensate
+these target datasets' imbalanced nature.
 %, after fillup with assumed non-actives for the 21 targets with less than
 %10\,000 non-actives in ExcapeDB. 
 We observe that by adding assumed non-actives for small, imbalanced datasets we
-improve the efficiency of models trained on these datasets. This strategy was
-chosen for the remaining analysis workflows.
+improve the efficiency of models trained on these datasets (OF, and CAOF, shown
+by the green and blue lines respectively, improve). Thus, this strategy of
+filling up the small target datasets in Dataset2 was chosen for the subsequent
+analysis workflows.
 
 \todo{Ola does not like the term 'fill up', can we not simply say adding
 assumed non-actives? Also, please ask Phil/Wes about assumed/presumed.}
+\todo{Samuel thinks we can fix this for the final version, but won't really
+have time right now.}
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{figures/final_models_20171106_nofillup.png}
-    \caption{All models without fill up with assumed non-actives. The targets
+    \caption{All models without fill up of assumed non-actives. The targets
     are sorted by total number of compounds in ExcapeDB.}
     \label{fig:allmodels_nofillup}
 \end{figure}
