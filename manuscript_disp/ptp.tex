@@ -231,7 +231,7 @@ subsequent data transformation steps less time-consuming, given the relative lar
 size of the uncompressed ExcapeDB data file (18 GB).
 %
 From the extracted dataset, all rows for which there existed rows with a conflicting
-activity value for the same target (Gene ID) and SMILES, were completely removed.
+activity value for the same target (gene symbol) and SMILES were completely removed.
 % (See \footnote{\url{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo\_drugbank\_wf.go\#L239-L246}}).
 
 A subset of the panel of 44 binding targets as suggested in \cite{Bowes2012}
@@ -240,9 +240,9 @@ targets should have at least 100 associated and at least 100 non-associated
 compounds.  In addition some targets were excluded for which data was not found
 in ExcapeDB, this is described in detail below.
 %
-Some of the gene ids used in \cite{Bowes2012} were not found in their exact
+Some of the gene symbols used in \cite{Bowes2012} were not found in their exact
 form in the ExcapeDB dataset. To resolve this, PubMed was consulted to find
-synonymous gene IDs with the following replacements done:
+synonymous gene symbols with the following replacements done:
 %
 \textit{KCNE1} was replaced with \textit{MINK1} which is present in ExcapeDB.
 \textit{CHRNA1} (coding for the $\alpha1$ subunit of the Acetylcholine
@@ -280,7 +280,7 @@ table~\ref{tbl:targets}.
 \small
 \centering
 \vspace*{-45pt} % This is cheating, top margin should be holy, but this table is HUGE!
-\caption{The panel of targets used in this study, identified by Gene ID.
+\caption{The panel of targets used in this study, identified by gene symbol.
     Actives and non-actives refer to the number of ligand interactions marked
     as active and non-active in ExcapeDB. Included indicates if the target was
     included in the study or excluded because it did not pass the filtering
@@ -290,7 +290,7 @@ table~\ref{tbl:targets}.
 \toprule
 &             &         & Non-actives       & Non-actives      &              &       \\
 &             &         & (before fillup \& & (after fillup \& &              &       \\
-&     Gene ID & Actives & deduplication)    & deduplication)   & Filled-up  & Remarks \\
+& Gene symbol & Actives & deduplication)    & deduplication)   & Filled-up  & Remarks \\
 \midrule
 \multirow{31}{*}{\begin{turn}{90}\textsc{Included}\end{turn}} 
 &    ACHE    &       3\,160  &       1\,152      &   5\,824   & \checkmark      &       \\
