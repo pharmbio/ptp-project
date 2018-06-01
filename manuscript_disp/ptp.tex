@@ -224,7 +224,7 @@ al.}~\cite{Bowes2012}.
 
 A scientific workflow was constructed to automate the entire data
 preprocessing.  The first step comprised extracting data on binding association
-between ligands and targets from the database ExcapeDB~\cite{Sun2017}, more
+between ligands and targets from the ExcapeDB dataset~\cite{Sun2017}, more
 specifically the columns Gene name, Original entry ID (PubChem CID or CHEMBL
 ID), SMILES and Activity flag. This was performed early in the workflow to make
 subsequent data transformation steps less time-consuming, given the relative large
@@ -235,7 +235,7 @@ activity value for the same target (gene symbol) and SMILES were completely remo
 % (See \footnote{\url{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo\_drugbank\_wf.go\#L239-L246}}).
 
 A subset of the panel of 44 binding targets as suggested in \cite{Bowes2012}
-was selected for inclusion in the study. The selection was based on that
+was selected for inclusion in the study. The selection was based on the criteria that
 targets should have at least 100 associated and at least 100 non-associated
 compounds.  In addition some targets were excluded for which data was not found
 in ExcapeDB, this is described in detail below.
