@@ -132,7 +132,7 @@ $^{2}$Predictive Compound ADME \& Safety, Drug Safety \& Metabolism, AstraZeneca
 Ligand-based models can be used in drug discovery to obtain an early indication
 of potential off-target interactions that could be linked to adverse
 effects. Another application is to combine such models into a panel,
-allowing to compare and search for compounds with similar profile. Most
+allowing for comparing and searching for compounds with similar profile. Most
 contemporary methods and implementations however lack valid measures of
 confidence in predictions, presenting only point predictions. We here
 describe the use of conformal prediction for predicting off-target
@@ -140,13 +140,14 @@ interactions with models trained on data from 31 targets in the ExCAPE
 database, selected for their utility in broad early hazard assessment.
 Chemicals were represented by the signature molecular descriptor and we
 used support vector machines as the underlying machine learning method.
-With conformal prediction, results from predictions are in the form of
-prediction intervals.  The full pre-processing and model training process
-is openly available as a scientific workflow on github, rendering it fully
-reproducible.  We illustrate the usefulness of the methodology on a set of
-compounds extracted from DrugBank.  The resulting models are published
-online and are available via a graphical web interface and an OpenAPI
-interface for programmatic access.
+With conformal prediction, {\color{magenta} results from predictions are in the
+form of prediction\todo{aren't we doing classification? Can the p-values really
+be called prediction intervals?} intervals}.  The full pre-processing and model
+training process is openly available as a scientific workflow on github,
+rendering it fully reproducible.  We illustrate the usefulness of the
+methodology on a set of compounds extracted from DrugBank.  The resulting
+models are published online and are available via a graphical web interface and
+an OpenAPI interface for programmatic access.
 
 %\tiny
  %\keyFont{ \section{Keywords:} drug discovery, predictive modelling, conformal prediction, machine learning, off-target, adverse effects} %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
@@ -166,27 +167,28 @@ including in vitro pharmacological profiling~\cite{Bowes2012}. However an
 attractive complementary method is to use computational (in silico) profiling
 of binding profiles for ligands~\cite{Cereto-Massague:2015px}, also opening up
 to predict virtual compounds. A common approach to the target prediction
-problem is to use a panel of structure-activity relationship (QSAR) models [REF
-QSAR], where chemicals in a knowledge base with known interaction values
-(numerical or categorial) are described numerically be descriptors and a
-statistical learning model is trained to predict numerical values (regression)
-or categorial values (classification). The recent increase in the number of
-available data points in interaction databases such as ChEMBL and PubChem
+problem is to use a panel of structure-activity relationship (QSAR) models
+{\color{magenta}[REF\todo{missing ref} QSAR]}, where chemicals in a knowledge
+base with known interaction values (numerical or categorial) are described
+numerically be descriptors and a statistical learning model is trained to
+predict numerical values (regression) or categorial values (classification).
+The recent increase in the number of available data points in interaction
+databases such as ChEMBL and PubChem{\color{magenta}\todo{unfinished sentense}\ldots}
 
 Several methods and tools are available for target prediction and for
 constructing and using target profiles. 
 %
-Bender et al. used a Bayesian approach to train models for 70 selected targets
+Bender \textit{et al}. used a Bayesian approach to train models for 70 selected targets
 and use these for target profiling to classify adverse drug
 reactions~\cite{Bender:2007ib}.
 %
-Yao et al. describes TargetNet~\cite{Yao:2016ij}, a web service for
-multi-target QSAR models; an online service that uses Na\"ive Bayes 
+Yao \textit{et al}. describes TargetNet~\cite{Yao:2016ij}, a web service for
+multi-target QSAR models; an online service that uses Na\"ive Bayes.  
 %
-Yu et al. used Random Forest (RF) and Support Vector Machines (SVM) to predict
+Yu \textit{et al}. used Random Forest (RF) and Support Vector Machines (SVM) to predict
 drug-target interactions from heterogeneous biological data~\cite{Yu:2012ol}.
 %
-TargetHunter~\cite{Wang:2013le} is anotehr online tool that uses chemical
+TargetHunter~\cite{Wang:2013le} is another online tool that uses chemical
 similarity to predict targets for ligands, and showed how training models on
 ChEMBL data enabled useful predictions on examples taken from PubChem
 bioassays.
@@ -263,7 +265,7 @@ a \checkmark\ in the `Filled-up' column of Table~\ref{tbl:targets}).
 %
 For these 21 targets, we ``filled up'' their respective datasets with randomly
 selected examples from the raw dataset which were not reported to be active for
-this target, thus being 'assumed non-active', and being marked as such, when
+this target, thus being `assumed non-active', and being marked as such, when
 they were added. The number of new examples was chosen such that the total
 number of non-actives and assumed non-actives added up to twice the number of
 actives, for each target respectively. This dataset consisting of 21 targets
@@ -353,11 +355,11 @@ Conformal Prediction (CP)~\cite{Vovk2005} provides a layer on top of an
 existing machine learning method and yields valid prediction regions for test
 examples. This contrasts to standard machine learning that delivers point
 estimates, and in conformal prediction a prediction region contains the true
-value with probability equal to a selected significance level $\epsilon$. Such
+value with probability equal to a selected significance level $\varepsilon$. Such
 a prediction region can be obtained under the assumption that the observed data
 is exchangeable. An important impact is that the size of this region directly
-relate to the 'strangeness' of the test example, and is an alternative to the
-concept of a model's 'applicability domain'~\cite{norinder2014introducing}. For
+relate to the `strangeness' of the test example, and is an alternative to the
+concept of a model's `applicability domain'~\cite{norinder2014introducing}. For
 the classification case, a prediction comes as a set of p-values (one for each
 class), and in a Mondrian setting then the classes are handled independently
 which has attractive properties when dealing with imbalanced
