@@ -383,9 +383,9 @@ CAOF was not used for cost selection, but is provided for information in the res
 \end{figure}
 
 \subsection{Modeling workflow}
-Before the training, the CPSign precompute command was run, in order to
+Before the training, the CPSign \texttt{precompute} command was run, in order to
 generate a sparse representation of each target's dataset.
-ACPs consisting of 10 models were then trained for each target using the CPSign software using the 'train' command.
+ACPs consisting of 10 models were then trained for each target using the CPSign software using the \texttt{train} command.
 The cost value used was the one obtained from the hyperparameter tuning. 
 % (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L69-L101}{here}).
 The computational workflows for orchestrating the extraction of data, model building, 
@@ -410,7 +410,7 @@ not filling up. More detailed workflow graphs are shown in the supplemental mate
 
 \subsection{Validity of models}
 To check that the conformal prediction models are valid (i.e. they predict with an error rate similar to the selected significance setting), calibration plots were generated in the cross validation step of our workflow. Three
-example plots, for three representative targets (the smalles, the median-sized
+example plots, for three representative targets (the smallest, the median-sized
 and the largest, in terms of compounds in ExcapeDB) can be seen in figure
 \ref{fig:calibration_plots}, while calibration plots for all targets can be
 found in the supplemental material (figure~\ref{fig:calibration_plots_all}).
@@ -478,7 +478,7 @@ other drug statuses in DrugBank statuses such as ``investigational''.
 
 The models built were validated by predicting the binding activity against each
 of the 31 targets for all compounds for which we had known binding
-data for a particular target. The validation was done with CPSign's validate
+data for a particular target. The validation was done with CPSign's \texttt{validate}
 command, predicting values at confidence levels 0.8 and 0.9.
 %
 In figure \ref{fig:validation_plots} the class membership change for Dataset 3, for confidence levels 0.8 and 0.9
