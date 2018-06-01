@@ -568,10 +568,10 @@ of prediction of ``both'' labels increases when the confidence level increases
 from 0.8 to 0.9. This is as expected, as this means that fewer compounds could
 be predicted to only one specific label with the higher confidence level. The number of
 ``None'' predictions decreases at a higher confidence, which is expected as the 
-predictor must accepts less probable (in the Conformal Prediction ranking sense) 
+predictor must accept less probable (in the Conformal Prediction ranking sense) 
 predictions to be considered part of the prediction region at a higher confidence.
 This behaviour might seem backwards, but at a higher confidence the predictor
-has to include less likely predictions for it not to miss any true labels, leading 
+has to include less likely predictions for it not to miss fewer of the true labels, leading 
 to larger prediction sets.
 
 \inlinetodo{well, what do we observe in the class membership change plots? It
