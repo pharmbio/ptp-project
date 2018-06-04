@@ -295,7 +295,7 @@ al.}~\cite{Bowes2012}.
 %%%%%%%%%%%%%%%%%%
 \section*{Methods}
 
-\subsection{Training data}
+\subsection*{Training data}
 
 A scientific workflow was constructed to automate the entire data
 preprocessing.  The first step comprised extracting data on binding association
@@ -425,7 +425,7 @@ table~\ref{tbl:targets}.
 %\end{wideMinipage}
 \end{table}
 
-\subsection{Conformal prediction}
+\subsection*{Conformal prediction}
 Conformal Prediction (CP)~\cite{Vovk2005} provides a layer on top of an
 existing machine learning method and yields valid prediction regions for test
 examples. This contrasts to standard machine learning that delivers point
@@ -453,7 +453,7 @@ signatures and similar molecular descriptors, \textit{e.g.}, the extended
 connectivity fingerprints~\cite{rogers2010extended}.
 
 
-\subsection{Hyperparameter tuning}
+\subsection*{Hyperparameter tuning}
 For each of the 31 targets, a parameter sweep was run to find the optimal value
 of the cost parameter of liblinear, optimizing modeling efficiency using
 10-fold cross validation. The training approach used an Aggregated Conformal
@@ -521,7 +521,7 @@ results from the workflow.
     \label{fig:workflow_graph_clean}
 \end{figure}
 
-\subsection{Modeling workflow}
+\subsection*{Modeling workflow}
 Before the training, the CPSign \texttt{precompute} command was run, in order to
 generate a sparse representation of each target's dataset.
 ACPs consisting of 10 models were then trained for each target using the CPSign software using the \texttt{train} command.
@@ -547,7 +547,7 @@ not filling up. More detailed workflow graphs are shown in the supplemental mate
 %%%%%%%%%%%%%%
 \section*{Results and Discussion}
 
-\subsection{Validity of models}
+\subsection*{Validity of models}
 To check that the conformal prediction models are valid (i.e. they predict with
 an error rate similar to the selected significance setting), calibration plots
 were generated in the cross validation step of our workflow. Three example
@@ -571,8 +571,8 @@ significance levels.
 \end{figure}
 
 
-%\subsection{Before and after fill up with assumed non-actives}
-\subsection{Efficiency of models}
+%\subsection*{Before and after fill up with assumed non-actives}
+\subsection*{Efficiency of models}
 The efficiency metric CAOF for all models built on Dataset1 (without
 adding assumed non-actives) are shown in figure~\ref{fig:allmodels_nofillup}.
 In figure \ref{fig:allmodels_fillup}, the same metrics are shown for when target
@@ -608,7 +608,7 @@ analysis workflows.
     \label{fig:allmodels_fillup}
 \end{figure}
 
-%\subsection{Efficiency}
+%\subsection*{Efficiency}
 %
 %In figure \ref{fig:allmodels}, efficiency metrics Observed Fuzziness (OF), Class-Averaged OF
 %(CAOF) for each model is , training time and validation.
@@ -621,7 +621,7 @@ analysis workflows.
 %    \label{fig:allmodels}
 %\end{figure}
 
-\subsection{External validation}
+\subsection*{External validation}
 
 In order to validate the predictive abilities of the trained models, a new
 dataset was created (Dataset 3) where data about 1\,000 compounds were withheld
