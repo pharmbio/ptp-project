@@ -614,7 +614,8 @@ Attending: Ola, Jonathan, Arvid, Samuel
 ## Notes and Todo's
 
 - We'll make the ptp-project github repo open
-- Timeplan: Wrap up this week
+- Jonathan will move back content from the `manuscript_disp` version, to the
+  frontiers template, before we finalize stuff for submission.
 - Not many changes after AstraZeneca review.
 - Include Observed Fuzziness in plots (not only Class-Averaged OF)
 - Describe Original CP effiency (but with other name) (Like "Single value
@@ -626,3 +627,4 @@ Attending: Ola, Jonathan, Arvid, Samuel
 - Models on Zenodo (as a backup)?
 - Shape up prediction web UI
 - Re-compute final models (including the Drugbank compounds)
+- Timeplan: Wrap up this week
