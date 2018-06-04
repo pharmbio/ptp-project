@@ -23,15 +23,89 @@
 %\setcitestyle{square} % for Physics and Applied Mathematics and Statistics articles
 \usepackage{url,hyperref,lineno,microtype,subcaption}
 \usepackage[onehalfspacing]{setspace}
-\usepackage{todonotes}
-\newcommand{\todoil}[1]{\todo[inline]{#1}}
+%\usepackage{todonotes}
+%\newcommand{\todoil}[1]{\todo[inline]{#1}}
+
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{letltxmacro}
+\usepackage[lining]{ebgaramond}
+\usepackage[cmintegrals,cmbraces]{newtxmath}
+\usepackage{ebgaramond-maths}
 
 \usepackage{booktabs}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{tikz}
+%\usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{rotating}
+\renewcommand{\thefootnote}{\color{red}\arabic{footnote}}
+\usepackage{placeins}
+\usepackage[textsize=small, linecolor=magenta, bordercolor=magenta,
+            backgroundcolor=magenta, textwidth=3cm]{todonotes}
 
 %\linenumbers
 
+% TODO: @jonalv, check:
+%\urlstyle{sf}
+%\makeatletter
+%    \let\UrlSpecialsOld\UrlSpecials
+%    \def\UrlSpecials{\UrlSpecialsOld\do\/{\Url@slash}\do\_{\Url@underscore}}%
+%    \def\Url@slash{\@ifnextchar/{\kern-.11em\mathchar47\kern-.2em}%
+%        {\kern-.0em\mathchar47\kern-.08em\penalty\UrlBigBreakPenalty}}
+%        \def\Url@underscore{\nfss@text{\leavevmode \kern.06em\vbox{\hrule\@width.3em}}}
+%\makeatother
+%\captionnamefont{\small\bfseries}
+%\captiontitlefont{\small}
+
+\makeatletter
+    \renewcommand{\@todonotes@drawMarginNoteWithLine}{%
+    \begin{tikzpicture}[remember picture, overlay, baseline=-0.75ex]%
+        \node [coordinate] (inText) {};%
+    \end{tikzpicture}%
+    \marginpar[{% Draw note in left margin
+        \@todonotes@drawMarginNote{r}%
+        \@todonotes@drawLineToLeftMargin%
+    }]{% Draw note in right margin
+        \@todonotes@drawMarginNote{l}%
+        \@todonotes@drawLineToRightMargin%
+    }%
+    }
+    \renewcommand{\@todonotes@drawMarginNote}[1]{
+        \makebox[\marginparwidth][#1]{\begin{tikzpicture}[remember picture,baseline=(X.base)]%
+            \node(X){\vphantom{X}};%
+            \draw node[notestyle,font=\@todonotes@sizecommand,anchor=north] (inNote) at (X.north)%
+                {\@todonotes@text};%
+            \if@todonotes@authorgiven%
+                \draw node[notestyle,font=\@todonotes@sizecommand,anchor=north] (inNote) at (X.north)%
+                    {\@todonotes@sizecommand\@todonotes@author};%
+                \node(Y)[below=of X]{};%
+                \draw node[notestyle,font=\@todonotes@sizecommand,anchor=north] (inNote) at (X.south)%
+                    {\@todonotes@text};%
+            \else%
+                \draw node[notestyle,font=\@todonotes@sizecommand,anchor=north] (inNote) at (X.north)%
+                    {\@todonotes@text};%
+            \fi%
+        \end{tikzpicture}%
+    }}
+\makeatother
+\LetLtxMacro{\oldtodo}{\todo}
+\renewcommand{\todo}[1]{{\color{magenta}\oldtodo[fancyline]{\color{white}\textsf{#1}}}}
+\newcommand{\inlinetodo}[1]{{\color{magenta}\oldtodo[inline]{\color{white}\textsf{#1}}}}
 
 % Leave a blank line between paragraphs instead of using \\
+
+%\setsecheadstyle{\LARGE}
+%\setsubsecheadstyle{\large}
+%\setsubsubsecheadstyle{\itshape}
+%\setparaheadstyle{\normalsize\scshape\liningnums}
+%\counterwithout{figure}{chapter}
+%\counterwithout{table}{chapter}
+%\captionnamefont{\textsf\small}
+%\captiontitlefont{\textsf\small}
+%\let\thempfootnote\thefootnote
 
 
 \def\keyFont{\fontsize{8}{11}\helveticabold }
@@ -54,16 +128,30 @@ $^{2}$Predictive Compound ADME \& Safety, Drug Safety \& Metabolism, AstraZeneca
 \def\corrEmail{samuel.lampa@farmbio.uu.se}
 
 
-
+\newenvironment{wideMinipage}
+{ \vskip 1\baselineskip
+  \noindent
+  \checkoddpage%
+  \ifoddpage%
+     \hspace*{-3em}%
+  \else%
+     \hspace*{-3em}%
+  \fi%
+  \begin{minipage}{1\textwidth + 6em}
+}
+{
+    \end{minipage}
+    \vskip 1\baselineskip
+}
 
 \begin{document}
 
 \onecolumn
 \firstpage{1}
 
-\title[Predicting off-target binding profiles with confidence using conformal
-prediction]{Predicting off-target binding profiles with confidence using conformal
-prediction}
+\title[Predicting off-target binding profiles with confidence using Conformal
+Prediction]{Predicting off-target binding profiles with confidence using Conformal
+Prediction}
 
 \author[\firstAuthorLast ]{\Authors} %This field will be automatically populated
 \address{} %This field will be automatically populated
@@ -114,385 +202,576 @@ prediction}
 %an API, and we also make the complete workflow for reproducing the study
 %together with all models publicly available.
 
-Panels of ligand-based models are widely used in drug discovery to obtain an
-early indication of potential off-target predictions that could be linked
-to drug efficacy and safety. Another application is to combine models into
-a profile allowing to compare and search for compounds with similar
-profile. Most contemporary methods and implementations however lack valid
-measures of confidence in predictions, yielding only point predictions. We
-here describe the use of conformal prediction for predicting off-target
-interactions based on data from the ExCAPE database about 31 binding
-targets, selected for their value in broad early hazard assessment. We used
-support vector machines, with chemical described by the signature molecular
-descriptor, to train predictive models.  Prediction results from the
-resulting models are presented as prediction intervals, as customary in
-conformal prediction. The full pre-processing and model training process is
-openly available as a scientific workflow on github, rendering it fully
-reproducible. The resulting models are published online and are available
-via a graphical web interface and an OpenAPI interface for programmatic
-access.
+Ligand-based models can be used in drug discovery to obtain an early indication
+of potential off-target interactions that could be linked to adverse
+effects. Another application is to combine such models into a panel,
+allowing for comparing and searching for compounds with similar profile. Most
+contemporary methods and implementations however lack valid measures of
+confidence in predictions, presenting only point predictions. We here
+describe the use of conformal prediction for predicting off-target
+interactions with models trained on data from 31 targets in the ExCAPE
+database, selected for their utility in broad early hazard assessment.
+Chemicals were represented by the signature molecular descriptor and we used
+support vector machines as the underlying machine learning method. With
+conformal prediction, results from predictions are in the form of confidence
+p-values for the different classes.  The full pre-processing and model training
+process is openly available as a scientific workflow on github, rendering it
+fully reproducible.  We illustrate the usefulness of the methodology on a set
+of compounds extracted from DrugBank.  The resulting models are published
+online and are available via a graphical web interface and an OpenAPI interface
+for programmatic access.
 
 \tiny
  \keyFont{ \section{Keywords:} drug discovery, predictive modelling, conformal prediction, machine learning, off-target, adverse effects} %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
 \end{abstract}
 
-\section{Introduction}
+\section*{Introduction}
 
 %Introduce off target binding as a problem, and the value of predictions
+Drug-target interactions are central to the drug discovery
+process~\cite{Yildirim:2007vh}. It is common that drugs interact with multiple
+targets~\cite{hopkins2008network}, and off-target pharmacology and
+polypharmacology has big implications on drug efficacy and
+safety~\cite{Peters:2013yg,Ravikumar:2018qd}. Organizations involved in drug
+discovery, such as pharmaceutical companies and academic institutions, use many
+types of experimental techniques and assays to determine target interactions,
+including in vitro pharmacological profiling~\cite{Bowes2012}. However an
+attractive complementary method is to use computational (in silico) profiling
+of binding profiles for ligands~\cite{Cereto-Massague:2015px}, also opening up
+to predict virtual compounds. A common approach to the target prediction
+problem is to use a panel of structure-activity relationship (QSAR) models%
+%{\color{magenta}[REF\todo{missing ref} QSAR]}
+, where chemicals in a knowledge base with known interaction values (numerical
+or categorial) are described numerically by descriptors and a statistical
+learning model is trained to predict numerical values (regression) or
+categorial values (classification). %The recent increase in the number of
+%available data points in interaction databases such as ChEMBL and
+%PubChem{\color{magenta}\todo{unfinished sentense}\ldots}
 
-Off-target pharmacology and polypharmacology has big implications on drug
-efficacy and safety, and prediction of target binding profiles for ligands is
-an important task that can aid early drug discovery \cite{Bowes2012}.
-However, available methods for ligand-based target profiling do not offer
-valid measures of confidence in predictions or well-calibrated probabilities.
-We present an approach for ligand-based target profiling using probabilistic
-predictions, delivering target profiles with valid predictions of the
-probability for the query compound to interact with each target. The
-probabilities are calculated using the Conformal Prediction methodology
-\cite{Vovk2005}, with support vector machines for modeling and chemical structures
-described by the signature descriptor \cite{Faulon2003}. We study profiles
-for different sets of targets, including a subset of the minimal panel of 44
-targets for broad early hazard assessment suggested by \cite{Bowes2012}, but
-also the applicability of larger as well as focused target sets.
+Several methods and tools are available for target prediction and for
+constructing and using target profiles.
+%
+Bender \textit{et al}. used a Bayesian approach to train models for 70 selected targets
+and use these for target profiling to classify adverse drug
+reactions~\cite{Bender:2007ib}.
+%
+Yao \textit{et al}. describes TargetNet~\cite{Yao:2016ij}, a web service for
+multi-target QSAR models; an online service that uses Na\"ive Bayes.
+%
+Yu \textit{et al}. used Random Forest (RF) and Support Vector Machines (SVM) to predict
+drug-target interactions from heterogeneous biological data~\cite{Yu:2012ol}.
+%
+TargetHunter~\cite{Wang:2013le} is another online tool that uses chemical
+similarity to predict targets for ligands, and showed how training models on
+ChEMBL data enabled useful predictions on examples taken from PubChem
+bioassays.
 
-\todoil{Expand the intro above which is just taken from the abstract}
+We note two important shortcomings among previous works. Primarily, available
+methods for ligand-based target profiling often do not offer valid measures of
+confidence in predictions, leaving the user uncertain about the usefulness of
+predictions. Secondly, the majority of the web tools lack an open and
+standardized API, meaning it is not straightforward (and in most cases not
+possible at all) to consume the services programmatically, such as with a
+script or inclusion in a scientific workflow system used in drug discovery like
+KNIME~\cite{Mazanetz:2012gy}.
 
-%Prior art - what has been done before?
-Earlier studies...
-
-%What is the motivation for the study, and what will we describe in this manuscript
-In this manuscript we...
+We here present an approach for ligand-based target profiling using a
+confidence framework, delivering target profiles with confidence score for the
+predictions of whether a query compound interact with each target. The
+confidence scores are calculated using the Conformal Prediction
+methodology~\cite{Vovk2005}.
+%
+The goal of this study was to create an automated and reproducible approach for
+generating a predicted target profile by QSAR binding models, with the models
+making up the profile published online as micro services and the profile
+accessible from a web page. Although the models give a confidence measure we
+also set out to evaluate them on test sets to see how well they perform on some
+representable data. We exemplified the process by creating a profile on the
+targets for broad early hazard assessment presented by Bowes \textit{et
+al.}~\cite{Bowes2012}.
 
 %%%%%%%%%%%%%%%%%%
 %Methods
 %%%%%%%%%%%%%%%%%%
-\section{Methods}
+\section*{Methods}
 
 \subsection{Training data}
-A scientific workflow was constructed to automate the entire data preprocessing.
-The first step comprised extracting data on binding association between ligands and targets from the database ExcapeDB~\cite{Sun2017}, more specifically the columns Gene name, Original entry ID (PubChem CID or CHEMBL ID), SMILES and Activity flag. This was performed early in the workflow to make subsequent data transformation steps more performant, given the relative large size of the
-uncompressed ExcapeDB data file (18 GB).
+
+A scientific workflow was constructed to automate the entire data
+preprocessing.  The first step comprised extracting data on binding association
+between ligands and targets from the ExcapeDB dataset~\cite{Sun2017}, more
+specifically the columns Gene name, Original entry ID (PubChem CID or CHEMBL
+ID), SMILES and Activity flag. This was performed early in the workflow to make
+subsequent data transformation steps less time-consuming, given the relative large
+size of the uncompressed ExcapeDB data file (18 GB).
 %
 From the extracted dataset, all rows for which there existed rows with a conflicting
-activity value, were completely removed.
-% (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L239-L246}{here}).
+activity value for the same target (gene symbol) and SMILES were completely removed.
+% (See \footnote{\url{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo\_drugbank\_wf.go\#L239-L246}}).
 
 A subset of the panel of 44 binding targets as suggested in \cite{Bowes2012}
-was selected for inclusion in the study. The selection was based on that targets
-should have at least 100 associated and at least 100 non-associated compounds. 
-In addition some targets were excluded for which data was not found in ExcapeDB, this is described in detail below.
+was selected for inclusion in the study. The selection was based on the
+criteria that targets should have at least 100 active and at least 100
+non-active compounds.  In addition some targets were excluded for which data
+was not found in ExcapeDB, this is described in detail below.
 %
-Some of the gene ids used in \cite{Bowes2012} were not found in their exact
+Some of the gene symbols used in \cite{Bowes2012} were not found in their exact
 form in the ExcapeDB dataset. To resolve this, PubMed was consulted to find
-synonymous gene IDs with the following replacements done:
+synonymous gene symbols with the following replacements done:
 %
 \textit{KCNE1} was replaced with \textit{MINK1} which is present in ExcapeDB.
 \textit{CHRNA1} (coding for the $\alpha1$ subunit of the Acetylcholine
 receptor) is excluded, as it is not present in the dataset (\textit{CHRNA4},
 coding for the $\alpha4$ subunit of the Acetylcholine receptor, is present in
-the dataset). We note that both \textit{MINK1} and \textit{CHRNA4} were removed in the filtering
-step mentioned above, since the dataset did not contain more than 100 active
-and 100 non-active compounds for \textit{MINK1} nor \textit{CHRNA}. 
-However, since one aim of the study is to present and publish an automated and reproducible data processing, these targets could potentially be included in subsequent runs on later versions of the database with additional data available.
+the dataset). We note that both \textit{MINK1} and \textit{CHRNA4} were removed
+in the filtering step mentioned above, since the dataset did not contain more
+than 100 active and 100 non-active compounds for \textit{MINK1} nor
+\textit{CHRNA}.  However, since one aim of the study is to present and publish
+an automated and reproducible data processing workflow, these targets could
+potentially be included in subsequent runs on later versions of the database
+with additional data available.
 
-The resulting set (named Dataset1) consisted of 31 targets, identified by the following gene
-IDs in the ExcapeDB dataset, and throughout this article:
+The resulting set (named Dataset1) consisted of 31 targets (the upper half of
+Table~\ref{tbl:targets}).  For 21 of these targets, the dataset contained less
+than 10\,000 non-active compounds, leading to imbalanced datasets (marked with
+a \checkmark\ in the `Filled-up' column of Table~\ref{tbl:targets}).
 %
-PDE3A, SCN5A, CCKAR, ADRB1, PTGS1, CHRM3, CHRM2, EDNRA, MAOA, LCK, PTGS2,
-SLC6A2, ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR, SLC6A4, OPRM1, HTR1A,
-SLC6A3, OPRK1, AVPR1A, ADRB2, DRD2, KCNH2, DRD1, HTR2A, CHRM1.
-%
-For 21 of these targets, the dataset contained less than 100 non-active
-compounds, leading to imbalanced datasets. These 21 target genes are: PDE3A,
-SCN5A, CCKAR, ADRB1, PTGS1, CHRM3, CHRM2, EDNRA, MAOA, LCK, PTGS2, SLC6A2,
-ACHE, CNR2, CNR1, ADORA2A, OPRD1, NR3C1, AR, SLC6A4 and OPRM1.
-%
-For these 21 targets, we filled up their respective datasets with randomly
+For these 21 targets, we ``filled up'' their respective datasets with randomly
 selected examples from the raw dataset which were not reported to be active for
-this target, thus being 'assumed non-active'. The number of new examples was chosen such that the total number of non-actives and
-assumed non-actives would be twice the number of actives, for each target
-respectively. This dataset was named Dataset2.
-% (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L308-L328}{here} for workflow code).
+this target, thus being `assumed non-active', and being marked as such, when
+they were added. The number of new examples was chosen such that the total
+number of non-actives and assumed non-actives added up to twice the number of
+actives, for each target respectively. This dataset consisting of 21 targets
+with ``filled-up'' datasets, was named Dataset2.
+% (See
+% \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L308-L328}{here}
+% for workflow code).
 %
-All the targets, with details about their respective number of active
-and non-active compounds, and whether they are included or not, are summarized
-in table \ref{tbl:targets}.
+All the targets, with details about their respective number of active and
+non-active compounds, and whether they are included or not, are summarized in
+table~\ref{tbl:targets}.
 
-\begin{table}[h]
+\begin{table}[p]
+% TODO: @jonalv, check:
+%\begin{wideMinipage}
+\small
 \centering
-\caption{The panel of targets used in this study, identified by Gene ID. Actives and non-actives refer to the number of ligand interactions marked as active and non-active in ExcapeDB. Included indicates if the target was included in the study or excluded because it did not pass the filtering criteria.\\}
+\vspace*{-45pt} % This is cheating, top margin should be holy, but this table is HUGE!
+\caption{The panel of targets used in this study, identified by gene symbol.
+    Actives and non-actives refer to the number of ligand interactions marked
+    as active and non-active in ExcapeDB. Included indicates if the target was
+    included in the study or excluded because it did not pass the filtering
+    criteria.}
 \label{tbl:targets}
-\begin{tabular}{rrrcc}
+\begin{tabular}{crrrrcl}
 \toprule
-    Gene ID & Actives & Non-actives     & Included & Remarks \\ 
-            &         & (before fillup) &          &         \\ 
+&             &         & Non-actives       & Non-actives      &              &       \\
+&             &         & (before fillup \& & (after fillup \& &              &       \\
+& Gene symbol & Actives & deduplication)    & deduplication)   & Filled-up  & Remarks \\
 \midrule
-    ACHE    &       3\,160  &       1\,152      &   Yes     &       \\
-    ADORA2A &       5\,275  &       593         &   Yes     &       \\
-    ADRA1A  &       1\,782  &       24          &   No      &       \ldots     \\
-    ADRA2A  &       839     &       39          &   No      &       \ldots     \\
-    ADRB1   &       1\,306  &       149         &   Yes     &       \\
-    ADRB2   &       1\,955  &       342\,282    &   Yes     &       \\
-    AR      &       2\,593  &       4\,725      &   Yes     &       \\
-    AVPR1A  &       1\,055  &       321\,406    &   Yes     &       \\
-    CACNA1C &       166     &       20          &   No      &       \ldots     \\
-    CCKAR   &       1\,249  &       132         &   Yes     &       \\
-    CHRM1   &       2\,776  &       417\,549    &   Yes     &       \\
-    CHRM2   &       1\,817  &       152         &   Yes     &       \\
-    CHRM3   &       1\,676  &       144         &   Yes     &       \\
-    CHRNA4  &       256     &       17          &   No      &       \ldots     \\
-    CNR1    &       5\,336  &       400         &   Yes     &       \\
-    CNR2    &       4\,583  &       402         &   Yes     &       \\
-    DRD1    &       1\,732  &       356\,201    &   Yes     &       \\
-    DRD2    &       8\,323  &       343\,206    &   Yes     &       \\
-    EDNRA   &       2\,129  &       124         &   Yes     &       \\
-    GABRA1  &       112     &       5           &   No      &       \ldots     \\
-    GRIN1   &       555     &       92          &   No      &       \ldots     \\
-    HRH1    &       1\,218  &       65          &   No      &       \ldots     \\
-    HRH2    &       394     &       56          &   No      &       \ldots     \\
-    HTR1A   &       6\,555  &       64\,578     &   Yes     &       \\
-    HTR1B   &       1\,262  &       86          &   No      &       \ldots     \\
-    HTR2A   &       4\,160  &       359\,962    &   Yes     &       \\
-    HTR2B   &       1\,159  &       66          &   No      &       \ldots     \\
-    HTR3A   &       584     &       65          &   No      &       \ldots     \\
-    KCNH2   &       5\,330  &       350\,773    &   Yes     &       \\
-    KCNQ1   &       37      &       303\,466    &   No      &       \ldots     \\
-    LCK     &       2\,662  &       283         &   Yes     &       \\
-    MAOA    &       1\,260  &       1\,083      &   Yes     &       \\
-    MINK1   &       929     &       8           &   No      &       \ldots     \\
-    NR3C1   &       2\,525  &       4\,382      &   Yes     &       \\
-    OPRD1   &       5\,350  &       826         &   Yes     &       \\
-    OPRK1   &       3\,672  &       303\,335    &   Yes     &       \\
-    OPRM1   &       5\,837  &       2\,872      &   Yes     &       \\
-    PDE3A   &       197     &       110         &   Yes     &       \\
-    PDE4D   &       484     &       98          &   No      &       \ldots     \\
-    PTGS1   &       849     &       729         &   Yes     &       \\
-    PTGS2   &       2\,862  &       827         &   Yes     &       \\
-    SCN5A   &       316     &       119         &   Yes     &       \\
-    SLC6A2  &       3\,879  &       218         &   Yes     &       \\
-    SLC6A3  &       5\,017  &       106\,819    &   Yes     &       \\
-    SLC6A4  &       7\,228  &       382         &   Yes     &       \\
+\multirow{31}{*}{\begin{turn}{90}\textsc{Included}\end{turn}}
+&    ACHE    &       3\,160  &       1\,152      &   5\,824   & \checkmark      &       \\
+&    ADORA2A &       5\,275  &       593         &   10\,092  & \checkmark      &       \\
+&    ADRB1   &       1\,306  &       149         &   2\,544   & \checkmark      &       \\
+&    ADRB2   &       1\,955  &       342\,282    &   341\,925 &       &       \\
+&    AR      &       2\,593  &       4\,725      &   4\,866   & \checkmark      &       \\
+&    AVPR1A  &       1\,055  &       321\,406    &   321\,098 &       &       \\
+&    CCKAR   &       1\,249  &       132         &   2\,458   & \checkmark      &       \\
+&    CHRM1   &       2\,776  &       417\,549    &   358\,330 &       &       \\
+&    CHRM2   &       1\,817  &       152         &   3\,440   & \checkmark      &       \\
+&    CHRM3   &       1\,676  &       144         &   3\,234   & \checkmark      &       \\
+&    CNR1    &       5\,336  &       400         &   10\,220  & \checkmark      &       \\
+&    CNR2    &       4\,583  &       402         &   8\,676   & \checkmark      &       \\
+&    DRD1    &       1\,732  &       356\,201    &   355\,909 &       &       \\
+&    DRD2    &       8\,323  &       343\,206    &   342\,958 &       &       \\
+&    EDNRA   &       2\,129  &       124         &   4\,050   & \checkmark      &       \\
+&    HTR1A   &       6\,555  &       64\,578     &   64\,468  &       &       \\
+&    HTR2A   &       4\,160  &       359\,962    &   359\,663 &       &       \\
+&    KCNH2   &       5\,330  &       350\,773    &   350\,452 &       &       \\
+&    LCK     &       2\,662  &       283         &   5\,246   & \checkmark      &       \\
+&    MAOA    &       1\,260  &       1\,083      &   2\,452   & \checkmark      &       \\
+&    NR3C1   &       2\,525  &       4\,382      &   4\,804   & \checkmark      &       \\
+&    OPRD1   &       5\,350  &       826         &   9\,580   & \checkmark      &       \\
+&    OPRK1   &       3\,672  &       303\,335    &   303\,111 &       &       \\
+&    OPRM1   &       5\,837  &       2\,872      &   11\,252  & \checkmark      &       \\
+&    PDE3A   &       197     &       110         &   392      & \checkmark      &       \\
+&    PTGS1   &       849     &       729         &   1\,634   & \checkmark      &       \\
+&    PTGS2   &       2\,862  &       827         &   5\,162   & \checkmark      &       \\
+&    SCN5A   &       316     &       119         &   624      & \checkmark      &       \\
+&    SLC6A2  &       3\,879  &       218         &   7\,498   & \checkmark      &       \\
+&    SLC6A3  &       5\,017  &       106\,819    &   106\,594 &       &       \\
+&    SLC6A4  &       7\,228  &       382         &   13\,660  & \checkmark      &       \\
+\midrule
+\multirow{15}{*}{\begin{turn}{90}\textsc{Not Included}\end{turn}}
+&    ADRA1A  &       1\,782  &       24          &            &       &       \\
+&    ADRA2A  &       839     &       39          &            &       &       \\
+&    CACNA1C &       166     &       20          &            &       &       \\
+&    CHRNA1  &       -       &       -           &            &       & Not in ExcapeDB \\
+&    CHRNA4  &       256     &       17          &            &       &       \\
+&    GABRA1  &       112     &       5           &            &       &       \\
+&    GRIN1   &       555     &       92          &            &       &       \\
+&    HRH1    &       1\,218  &       65          &            &       &       \\
+&    HRH2    &       394     &       56          &            &       &       \\
+&    HTR1B   &       1\,262  &       86          &            &       &       \\
+&    HTR2B   &       1\,159  &       66          &            &       &       \\
+&    HTR3A   &       584     &       65          &            &       &       \\
+&    KCNQ1   &       37      &       303\,466    &            &       &       \\
+&    MINK1   &       929     &       8           &            &       & Synonym to KCNE1 \\
+&    PDE4D   &       484     &       98          &            &       &       \\
+
 \bottomrule
 \end{tabular}
+% TODO: @jonalv, check:
+%\end{wideMinipage}
 \end{table}
 
+\subsection{Conformal prediction}
+Conformal Prediction (CP)~\cite{Vovk2005} provides a layer on top of an
+existing machine learning method and yields valid prediction regions for test
+examples. This contrasts to standard machine learning that delivers point
+estimates, and in conformal prediction a prediction region contains the true
+value with probability equal to a selected significance level $\varepsilon$. Such
+a prediction region can be obtained under the assumption that the observed data
+is exchangeable. An important impact is that the size of this region directly
+relate to the `strangeness' of the test example, and is an alternative to the
+concept of a model's `applicability domain'~\cite{norinder2014introducing}. For
+the classification case, a prediction comes as a set of p-values (one for each
+class), and in a Mondrian setting then the classes are handled independently
+which has attractive properties when dealing with imbalanced
+datasets~\cite{Norinder:2017qc,Sun:2017qm}.
+
+In this study we used the Mondrian conformal prediction implementation in the
+software CPSign~\cite{CPSignDocs}, leveraging the
+liblinear~\cite{fan2008liblinear} SVM implementation together with the
+signatures molecular descriptor~\cite{faulon2003signature}.  This descriptor is
+based on the neighbouring of atoms in a molecule and has been shown to work
+well for QSAR studies~\cite{lapins2018confidence,Alvarsson:2016pw} and for
+ligand-based target prediction~\cite{alvarsson2014ligand}. Support vector
+machines is a machine learning algorithm which is commonly used in QSAR
+studies~\cite{norinder2003support,zhou2011qsar} together with molecular
+signatures and similar molecular descriptors, \textit{e.g.}, the extended
+connectivity fingerprints~\cite{rogers2010extended}.
+
+
 \subsection{Hyperparameter tuning}
-
-For each of the 31 targets, a parameter sweep was run to find the optimal value of the
-cost parameter of liblinear, optimizing modeling efficiency using 10-fold cross validation. The training
-approach used an Aggregated Conformal Prediction (ACP) with 10 aggregated models.
-The parameter sweep evaluated three values for the cost parameter for each target; 1, 10 and 100. The
-efficiency measure used for the evaluation was the observed fuzziness (OF)
-score described in \cite{Vovk2016} as
-
-\begin{equation}
-OF =\frac{ 1}{m} \sum\limits_{i=1}^{m} \sum\limits_{y_i \neq y }  p_i^y,		
-\end{equation}
-
-where $p_i^y$ is the p-value of the $i^{th}$ test case for class $y$, and $m$ is the number of test examples.
-
-To study the effect of imbalanced datasets on efficiency, we also implemented a modified version of OF, due to the fact that OF is influenced more
-by values in the larger class in case of imbalanced datasets referred to as ``class-normalized
-observed fuzziness'' (CNOF) as
+For each of the 31 targets, a parameter sweep was run to find the optimal value
+of the cost parameter of liblinear, optimizing modeling efficiency using
+10-fold cross validation. The training approach used an Aggregated Conformal
+Predictor (ACP) with 10 aggregated models.  The parameter sweep evaluated three
+values for the cost parameter for each target; 1, 10 and 100. The efficiency
+measure used for the evaluation was the observed fuzziness (OF) score described
+in~\cite{Vovk2016} as:
 
 \begin{equation}
-CNOF =\frac{1}{m_A} \sum\limits_{i=1}^{m_A} \sum\limits_{y_i \neq y }  p_i^y + 
-      \frac{1}{m_N} \sum\limits_{i=1}^{m_N} \sum\limits_{y_i \neq y }  p_i^y
+OF =\frac{ 1}{m} \sum\limits_{i=1}^{m} \sum\limits_{y_i \neq y }  p_i^{\kern1pt y},		
 \end{equation}
-where $p_i^y$ is the p-value of the $i^{th}$ test case for class $y$, and $m_A$ is the number of test examples for class active and $m_N$ is the number of test examples for class non-active.
 
+where $p_i^{\kern1pt y}$ is the p-value of the $i^{th}$ test case for class $y$, and $m$ is the number of test examples, or in our case with only two classes:
 
-\todoil{Adapt EQ2 for CNOF}
+\begin{equation}
+OF =  \frac
+        {\quad\sum\limits_{\mathclap{\substack{\scriptscriptstyle i,\ y_i=A}}}p_i^N \, + \;\sum\limits_{\mathclap{\substack{\scriptscriptstyle i,\ y_i=N}}}p_i^A}
+        {m_A + m_N}
+\end{equation}
 
+where $p_i^N$ is the $i^{th}$ p-value for class $N$, $p_i^A$ is the $i^{th}$
+p-value for class $A$ and $m_A$ and $m_N$ is the number of test examples in
+class $A$ and $N$ respectively. $OF$ is basicly an average of the p-values for
+the wrong class, \textit{i.e.}, lower fuzziness means better prediction.
+
+To study the effect of imbalanced datasets on efficiency, we also implemented a
+modified version of OF, due to the fact that OF is influenced more
+by values in the larger class in case of imbalanced datasets referred to as
+``class-averaged
+observed fuzziness'' (CAOF) as:
+\begin{equation}
+CAOF = \frac
+        {\quad\sum\limits_{\mathclap{\substack{\scriptscriptstyle i,\ y_i=A}}}p_i^N}
+        {m_A}
+       + \frac
+        {\quad\sum\limits_{\mathclap{\substack{\scriptscriptstyle i,\ y_i=N}}}p_i^A}
+        {m_N}
+\end{equation}
+with the same variable conventions as above. Where $OF$ is only an average for
+the p-values in the test set, $CAOF$ takes the contribution from each class
+separately, meaning that for very unbalanced cases $OF$ is mainly just affected
+by the larger class and $CAOF$ is equally contributed to from both classes.
 
 %We first calculated the OF per class and divided it by the number of examples
 %(compounds) in that class, and finally took the mean value of the resulting
 %normalized OF values for each class.
 
 %For evaluation of the OF score mentioned above, we ran cross-validation
-%through CPSign's built-in crossvalidate function, with 10 folds. 
+%through CPSign's built-in crossvalidate function, with 10 folds.
 %(specified to cpsign's crossvalidate and train commands using the
 %\texttt{--nr-models} flag).
 
-CNOF was not used for cost selection, but is provided for information in the results from the workflow.
+CAOF was not used for cost selection, but is provided for information in the
+results from the workflow.
 
-From the crossvalidation, calibration plots were generated by predicting values
-for confidence values at 0.05 up to 0.05, with a step size of 0.05. These plots
-are available as supplementary material.
-
-\todoil{Present a few (1-3) calibration plots in the main manuscript and refer to them here as 'illustrative'. They constitute hard results.}
-
-
-
-\subsection{Modeling workflow}
-Before the training, the CPSign precompute command was run, in order to
-generate a sparse representation of each target's dataset.
-ACPs consisting of 10 models were then trained for each target using the CPSign software using the 'train' command.
-The cost value used was the one obtained from the hyperparameter tuning. 
-% (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L69-L101}{here}).
-The computational workflows for orchestrating the extraction of data, model building, 
-and the collection of results for summarization and plotting were
-implemented in the Go programming language using the SciPipe workflow library 
-that is available as open source software at
-\href{http://scipipe.org}{scipipe.org} or \href{https://github.com/scipipe/scipipe}{github.com/scipipe/scipipe}.
-The cost values for each target is stored in the workflow code, available on github (https://github.com/pharmbio/ptp-project).
-
-\todoil{We need an illustration of the workflow, either generated by software or a manually drawn figure}
-
-
-
-\subsection{Model validation}
-
-In order to validate the predictive abilities of the trained models, data about
-1000 compounds were withheld from the ExcapeDB dataset. The compounds chosen to
-be withheld were the following: i) all small molecules in DrugBank (version
-5.0.11) with status ``withdrawn'', for which we could find either a pubchem ID
-or a CHEMBL ID, ii)  a randomly selected subset of the remaining compounds in
-DrugBank 5.0.11, with status ``approved'', for which we could also find PubChem or CHEMBL IDs,
-until a total number of 1000 compounds was reached.  No regard was paid to
-other drug statuses in DrugBank statuses such as ``investigational''.
-
-\todoil{Add info about comparison of results for fillup vs non-fillup? YES! /Ola}
-
-The models built were validated by predicting the binding activity against each
-of the 31 targets for all compounds for which we had known binding
-data for a particular target. The validation was done with CPSign's validate
-command, predicting values at confidence levels 0.8 and 0.9.
-
-\todoil{where are these results?}
-
-
-\section{Results}
-
-\subsection{Calibration plots}
 
 \begin{figure}[h!]
-\includegraphics[width=\textwidth]{figures/calibration_plots/pde3a_calib.png}
-\includegraphics[width=\textwidth]{figures/calibration_plots/adrb2_calib.png}
-\includegraphics[width=\textwidth]{figures/calibration_plots/htr1a_calib.png}
-    \caption{All models with the smaller ones being filled up with assumed non-actives. EXTEND FIG CAPTION! }
+\vspace{2\baselineskip}
+\includegraphics[width=\textwidth]{figures/workflow_graph_clean.pdf}
+    \caption{Simplified directed graph of processes in the the modeling workflow used
+    in the experiments in this study. Each experiment contains additions and modifications
+    to the workflow, but the workflow shown here, exemplifies the basic structure
+    that is common among most of the workflows. For more detailed workflow
+    plots, see the supplemental material.}
+    \label{fig:workflow_graph_clean}
+\end{figure}
+
+\subsection{Modeling workflow}
+Before the training, the CPSign \texttt{precompute} command was run, in order to
+generate a sparse representation of each target's dataset.
+ACPs consisting of 10 models were then trained for each target using the CPSign software using the \texttt{train} command.
+The cost value used was the one obtained from the hyperparameter tuning.
+% (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L69-L101}{here}).
+The computational workflows for orchestrating the extraction of data, model building,
+and the collection of results for summarization and plotting were
+implemented in the Go programming language using the SciPipe workflow library
+that is available as open source software at
+\href{http://scipipe.org}{scipipe.org} or \href{https://github.com/scipipe/scipipe}{github.com/scipipe/scipipe}.
+The cost values for each target is stored in the workflow code, available on
+github (https://github.com/pharmbio/ptp-project).  An example of the modeling
+workflow is shown in figure \ref{fig:workflow_graph_clean}, which shows the workflow
+used for comparison conformal metric when filling up with assumed non-actives versus
+not filling up. More detailed workflow graphs are shown in the supplemental material.
+
+
+
+
+
+%%%%%%%%%%%%%%
+% Results and Discussion %
+%%%%%%%%%%%%%%
+\section*{Results and Discussion}
+
+\subsection{Validity of models}
+To check that the conformal prediction models are valid (i.e. they predict with
+an error rate similar to the selected significance setting), calibration plots
+were generated in the cross validation step of our workflow. Three example
+plots, for three representative targets (the smallest, the median-sized and the
+largest, in terms of compounds in ExcapeDB) can be seen in figure
+\ref{fig:calibration_plots}, while calibration plots for all targets can be
+found in the supplemental material (figure~\ref{fig:calibration_plots_all}).
+From the plots we conclude that all models produce valid results over all
+significance levels.
+
+\begin{figure}[h!]
+\includegraphics[width=0.3\textwidth]{figures/calibration_plots/pde3a_calib.pdf}
+\includegraphics[width=0.3\textwidth]{figures/calibration_plots/slc6a2_calib.pdf}
+\includegraphics[width=0.3\textwidth]{figures/calibration_plots/htr2a_calib.pdf}
+    %\inlinetodo{Make the axes gradation 0, 0.5, 1.0}
+    \caption{Three representative calibration plots, for models PDE3A, SLC6A2
+    and HTR2A, based on the smallest, the median, and the largest data sets in
+    terms of total number of compounds. The plots show accuracy against
+    confidence, for confidence values 0.05 to 0.95 with a step size of 0.05.}
     \label{fig:calibration_plots}
 \end{figure}
 
-\subsection{Observed fuzziness}
 
-In figure \ref{fig:allmodels_fillup}, performance metrics for each model is
-presented in a plot. The plot shows Observed Fuzziness (OF), Class Observed OF
-(CNOF) as described in the methods section, training time and validation.
+%\subsection{Before and after fill up with assumed non-actives}
+\subsection{Efficiency of models}
+The efficiency metric CAOF for all models built on Dataset1 (without
+adding assumed non-actives) are shown in figure~\ref{fig:allmodels_nofillup}.
+In figure \ref{fig:allmodels_fillup}, the same metrics are shown for when target
+datasets in Dataset2 have been filled up with assumed non-actives, to compensate
+these target datasets' imbalanced nature.
+%, after fillup with assumed non-actives for the 21 targets with less than
+%10\,000 non-actives in ExcapeDB.
+We observe that by adding assumed non-actives for small, imbalanced datasets we
+improve the efficiency of models trained on these datasets (OF, and CAOF, shown
+by the green and blue lines respectively, improve). Thus, this strategy of
+filling up the small target datasets in Dataset2 was chosen for the subsequent
+analysis workflows.
+
+%\todo{Ola does not like the term 'fill up', can we not simply say adding
+%assumed non-actives? Also, please ask Phil/Wes about assumed/presumed.}
+%\todo{Samuel thinks we can fix this for the final version, but won't really
+%have time right now.}
 
 \begin{figure}[h!]
-\includegraphics[width=\textwidth]{figures/allmodels_fillup.pdf}
-    \caption{All models with the smaller ones being filled up with assumed non-actives. EXTEND FIG CAPTION! }
+\includegraphics[width=\textwidth]{figures/final_models_20171106_nofillup.png}
+    \caption{All models without fill up of assumed non-actives. The targets
+    are sorted by total number of compounds in ExcapeDB.}
+    \label{fig:allmodels_nofillup}
+\end{figure}
+
+%    \inlinetodo{Remove plot heading for fig 3 and 4, they are on top pf the plots.}
+
+\begin{figure}[h!]
+\includegraphics[width=\textwidth]{figures/final_models_20180223_fillup.png}
+    \caption{All models after fill up with assumed non-actives. The targets are
+    sorted by total number of compounds in ExcapeDB. The purple line in the
+    figure shows accuracy.}
     \label{fig:allmodels_fillup}
 \end{figure}
 
-\todoil{Also include plots with non-filled presumed negatives }
+%\subsection{Efficiency}
+%
+%In figure \ref{fig:allmodels}, efficiency metrics Observed Fuzziness (OF), Class-Averaged OF
+%(CAOF) for each model is , training time and validation.
+%\inlinetodo{What can be seen from the figures?}
+%
+%\begin{figure}[h!]
+%\includegraphics[width=\textwidth]{figures/allmodels_wo_drugbank.pdf}
+%    \caption{All models with the smaller ones being filled up with assumed non-actives.}
+%    \inlinetodo{Extend the figure caption!}
+%    \label{fig:allmodels}
+%\end{figure}
 
+\subsection{External validation}
 
+In order to validate the predictive abilities of the trained models, a new
+dataset was created (Dataset 3) where data about 1\,000 compounds were withheld
+from the ExcapeDB dataset. The compounds chosen to be withheld were the
+following: i) all small molecules in DrugBank (version 5.0.11) with status
+``withdrawn'', for which we could find either a pubchem ID or a CHEMBL ID, ii)
+a randomly selected subset of the remaining compounds in DrugBank 5.0.11, with
+status ``approved'', for which we could also find PubChem or CHEMBL IDs, until
+a total number of 1\,000 compounds was reached.  No regard was paid to other
+drug statuses in DrugBank such as ``investigational''.
 
-\subsection{Changes in class memberships}
+The models built were validated by predicting the binding activity against each
+of the 31 targets for all compounds for which we had known binding data for a
+particular target. The validation was done with CPSign's \texttt{validate}
+command, predicting values at confidence levels 0.8 and 0.9.
+%
+In figure \ref{fig:validation_plots} the class membership change for Dataset 3,
+for confidence levels 0.8 and 0.9 respectively is shown. We see how the number
+of prediction of ``both'' labels increases when the confidence level increases
+from 0.8 to 0.9. This is as expected, as this means that fewer compounds could
+be predicted to only one specific label with the higher confidence level. The number of
+``None'' predictions decreases at a higher confidence, which is expected as the
+predictor must accept less probable (in the Conformal Prediction ranking sense)
+predictions to be considered part of the prediction region at a higher confidence.
+This behaviour might seem backwards, but at a higher confidence the predictor
+has to include less likely predictions for it not to miss fewer of the true labels, leading
+to larger prediction sets.
 
-\todoil{Make a similar plot as Figure 3 in \cite{Norinder2014}}
+%\inlinetodo{well, what do we observe in the class membership change plots? It
+%is not obvious to me that it is correct... we should get fewer certain
+%predictions with increasing confidence - not sure that we see that now. Maybe
+%add the exact number for each bar? \\
+%I have added one explanation now ... but I have a harder time explaining the
+%``None'' prediction ... gotta check Norinder's paper /SL
+%(... and, Staffan promisedto add something about the change in "None"/"null")/SL}
 
-%For \textbf{Original Research} Articles \citep{conference}, Clinical Trial Articles
-%\citep{article}, and Technology Reports \citep{patent}, the introduction should
-%be succinct, with no subheadings \citep{book}. For Case Reports the
-%Introduction should include symptoms at presentation \citep{chapter}, physical
-%exams and lab results \citep{dataset}.
+\begin{figure}[h!]
+\hfill
+% TODO: @jonalv, check:
+%\begin{minipage}{0.45\textwidth}
+%    \subbottom[Class membership changes for all targets at confidence level 0.8]{\includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p8_valplot.pdf}}
+%\end{minipage}
+\hfill
+% TODO: @jonalv, check:
+%\begin{minipage}{0.45\textwidth}
+%    \subbottom[Class membership changes for all targets at confidence level 0.9]{\includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p9_valplot.pdf}}
+%\end{minipage}
+\hfill
+    \caption{Class membership change for all targets, for the prediction data, at confidence level 0.8 and 0.9.
+    The labels on the X-axis indicate predicted labels (None, Active (A),
+    Non-active (N) or Both). Dark grey in the stacked bar plot means the
+    original label was Active (A), while light grey means the original label
+    was Non-Active (N).
+    }
+    \label{fig:validation_plots}
+    %\inlinetodo{Increase Y-axis to 3000, now it does not look good.}
+\end{figure}
 
-%\section{Article types}
-%
-%For requirements for a specific article type please refer to the Article Types
-%on any Frontiers journal page. Please also refer to
-%\href{http://home.frontiersin.org/about/author-guidelines#Sections}{Author
-%Guidelines} for further information on how to organize your manuscript in the
-%required sections or their equivalents for your field
+\subsection*{Target Profile-as-a-Service}
+All models based on Dataset2 were published as microservices with REST APIs
+publicly made available using the OpenAPI specification on an OpenShift cluster
+and a web page federating all the models were created. The OpenAPI
+specification is a standardisation for how REST APIs are described, it means
+that there is a common way for looking up how to use the REST API of a web
+service and that greatly simplifies the process of tying multiple different web
+services together. It simplifies calling the services from scripts as well as
+from other web pages, such as our web page that makes a profile image out of
+the multiple QSAR models. At the top of the web page (See figure~\ref{fig:web})
+is an instance of the JSME editor~\cite{Bienfait2013} in which the user can
+draw a molecule. As the user draws the molecule the web page extracts the
+SMILES from the editor and sends it to the model services to make predictions
+based on all available models. The user can set a threshold for the confidence
+and get visual feedback on whether the models predict the drawn molecule as
+active or non-active with the chosen confidence.  To the right is also a
+graphical profile in the form of a bar plot where confidence as binding is
+drawn in the positive direction and confidence for non-binding is the other
+direction. Hovering it will give information about exactly which model a
+certain peak in the bar charts corresponds to. The web page is accessible at
+\url{http://modelingweb.service.pharmb.io/predict/profile/ptp-wo-drugbank}.
+\begin{figure}
+\vspace*{-60pt} % Yea here we go again, call me a cheater if you want to...
+% TODO: @jonalv, check:
+%\begin{wideMinipage}
+%    \begin{minipage}{0.8\textwidth}
+%    \subbottom[The profile as it looks on the web page. The user draws a molecule, selects a confidence and then the profile updates underneath.]{\includegraphics[height=0.41\textheight]{figures/terbutaline.png}}
+%    \end{minipage}
+%    \begin{minipage}{0.19\textwidth}
+%    \subbottom[Coloring of which parts of the molecule contributed the most to the prediction for ADBR2.]{\fbox{\includegraphics[height=0.22\textheight]{figures/terbutaline2.png}}}
+%    \end{minipage}
+%    \caption{The prediction profile for Terbutaline, a known selective beta-2 adrenergic agonist  used as a broncho\-dilator and tocolytic \label{fig:web}}
+%\end{wideMinipage}
+\end{figure}
+Using the models from the external validation dataset (Dataset 3) profiles were
+created for three molecules from the test set (figure~\ref{fig:threeprofiles},
+\textit{i.e.}, the profiles were made for drugs that the models have not seen
+before.
 
-% For Original Research articles, please note that the Material and Methods
-% section can be placed in any of the following ways: before Results, before
-% Discussion or after Discussion.
+\begin{figure}
+\hfill
+% TODO: @jonalv, check:
+%\begin{minipage}[t]{0.3\textwidth}
+%    \subbottom[The profile for Tacrine, a centrally acting anticholinesterase, with a distinct peak for the ACHE gene.]{\includegraphics[width=\linewidth]{figures/chembl95.png}}
+%\end{minipage}
+\hfill
+% TODO: @jonalv, check:
+%\begin{minipage}[t]{0.3\textwidth}
+%    \subbottom[The profile for Pilocarpine, a muscarinic acetylcholine receptor M$_1$ agonist, with two higher peaks, CHRM1 and LCK, only CHRM1 has a really low p-value for non-active though (0.001).]{\includegraphics[width=\linewidth]{figures/chembl550.png}}
+%\end{minipage}
+\hfill
+% TODO: @jonalv, check:
+%\begin{minipage}[t]{0.3\textwidth}
+%    \subbottom[The profile for Pergolide, a DRD1, DRD2, HTR1A, and HTR2A agonist. This can be seen in the profile as these four genes have the four highest p-values for active.]{\includegraphics[width=\linewidth]{figures/chembl531.png}}
+%\end{minipage}
+\hfill
+\caption{Profiles for a few of the removed drugs using the validation models, \textit{e.g.}, these molecules are not in the training sets for the models.\label{fig:threeprofiles}}
+\end{figure}
 
-%\section{Manuscript Formatting}
-%
-%\subsection{Heading Levels}
-%
-%%There are 5 heading levels
-%
-%\subsection{Level 2}
-%\subsubsection{Level 3}
-%\paragraph{Level 4}
-%\subparagraph{Level 5}
-%
-%\subsection{Equations}
-%Equations should be inserted in editable format from the equation editor.
-%
-%\begin{equation}
-%\sum x+ y =Z\label{eq:01}
-%\end{equation}
-%
-%\subsection{Figures}
-%Frontiers requires figures to be submitted individually, in the same order as
-%they are referred to in the manuscript. Figures will then be automatically
-%embedded at the bottom of the submitted manuscript. Kindly ensure that each
-%table and figure is mentioned in the text and in numerical order. Figures must
-%be of sufficient resolution for publication
-%\href{http://home.frontiersin.org/about/author-guidelines#ResolutionRequirements}{see
-%here for examples and minimum requirements}. Figures which are not according to
-%the guidelines will cause substantial delay during the production process.
-%Please see
-%\href{http://home.frontiersin.org/about/author-guidelines#GeneralStyleGuidelinesforFigures}{here}
-%for full figure guidelines. Cite figures with subfigures as figure
-%\ref{fig:2}B.
-%
-%
-%\subsubsection{Permission to reuse and Copyright}
-%Permission must be obtained for use of copyrighted material from other sources
-%(including the web). Please note that it is compulsory to follow figure
-%instructions.
-%
-%\subsection{Tables}
-%Tables should be inserted at the end of the manuscript. Please build your table
-%directly in LaTeX.Tables provided as jpeg/tiff files will not be accepted.
-%Please note that very large tables (covering several pages) cannot be included
-%in the final PDF for reasons of space. These tables will be published as
-%\href{http://home.frontiersin.org/about/author-guidelines#SupplementaryMaterial}{Supplementary
-%Material} on the online article page at the time of acceptance. The author will
-%be notified during the typesetting of the final article if this is the case.
-%
-%\section{Nomenclature}
-%
-%\subsection{Resource Identification Initiative}
-%To take part in the Resource Identification Initiative, please use the
-%corresponding catalog number and RRID in your current manuscript. For more
-%information about the project and for steps on how to search for an RRID,
-%please click
-%\href{http://www.frontiersin.org/files/pdf/letter_to_author.pdf}{here}.
-%
-%\subsection{Life Science Identifiers}
-%Life Science Identifiers (LSIDs) for ZOOBANK registered names or nomenclatural
-%acts should be listed in the manuscript before the keywords. For more
-%information on LSIDs please see
-%\href{http://www.frontiersin.org/about/AuthorGuidelines#InclusionofZoologicalNomenclature}{Inclusion
-%of Zoological Nomenclature} section of the guidelines.
-%
-%
-%\section{Additional Requirements}
-%
-%For additional requirements for specific article types and further information
-%please refer to
-%\href{http://www.frontiersin.org/about/AuthorGuidelines#AdditionalRequirements}{Author
-%Guidelines}.
+\FloatBarrier
+%\section*{Conclusion}
+
+\section*{Abbreviations}
+
+\begin{itemize}
+    \item A: Active
+    \item ACP: Aggregated Conformal Predictor
+    \item CAOF: Class-Averaged Observed Fuzziness
+    \item CP: Conformal Prediction
+    \item N: Non-active
+    \item OF: Observed Fuzziness
+    \item QSAR: Quantitative Structure-Activity Relationship
+    \item RF: Random Forest
+    \item SMILES: Simplified molecular-input line-entry system (A text-based representation of chemical structures)
+    \item SVM: Support Vector Machines
+\end{itemize}
 
 \section*{Conflict of Interest Statement}
 %All financial, commercial or other relationships that might be perceived by
 %the academic community as representing a potential conflict of interest must
 %be disclosed. If no such relationship exists, authors will be asked to confirm
 %the following statement:
-OS, JA, AB, and SA declare involvement in Genetta Soft AB, a Swedish based company developing the CPSign software.
+OS, JA, AB, and SA are involved in Genetta Soft AB, a Swedish based company
+developing the CPSign software.
 
 
 \section*{Author Contributions}
-OS conceived the study. OS, JA, SA and SL designed the study, interpreted results, and wrote the manuscript. SL implemented the workflow and carried out the analysis. SA extended CPSign with new features. JA, SA and AB contributed with model deployment and APIs. EA contributed with expertise in target profiles and cheminformatics. All authors read and approved the manuscript.
+OS conceived the study. OS, JA, SA and SL designed the study, interpreted
+results, and wrote the manuscript. SL implemented the workflow and carried out
+the analysis. SA extended CPSign with new features. JA, SA and AB contributed
+with model deployment and APIs. EA contributed with expertise in target
+profiles and cheminformatics. All authors read and approved the manuscript.
 
 
 %The Author Contributions section is mandatory for all articles, including
@@ -508,15 +787,20 @@ OS conceived the study. OS, JA, SA and SL designed the study, interpreted result
 %Details of all funding sources should be provided, including grant numbers if
 %applicable. Please ensure to add all necessary funding information, as after
 %publication this is no longer possible.
-This study was supported by OpenRiskNet (Grant Agreement 731075), a project funded by the European Commission under the Horizon 2020 Programme.
+This study was supported by OpenRiskNet (Grant Agreement 731075), a project
+funded by the European Commission under the Horizon 2020 Programme.
 
 \section*{Acknowledgments}
+The computations were performed on resources provided by SNIC through Uppsala
+Multidisciplinary Center for Advanced Computational Science (UPPMAX) under
+Project SNIC 2017/7-89.
 %This is a short text to acknowledge the contributions of specific colleagues,
 %institutions, or agencies that aided the efforts of the authors.
 
-The computations were performed on resources provided by SNIC through Uppsala Multidisciplinary Center for Advanced Computational Science (UPPMAX) under Project SNIC XXXX/Y-ZZZ.
-
-
+\bibliographystyle{unsrt}
+\bibliography{ptp}
+\newpage
+\appendix
 \section*{Supplemental Data}
 %\href{http://home.frontiersin.org/about/author-guidelines#SupplementaryMaterial}{Supplementary
 %Material} should be uploaded separately on submission, if there are
@@ -526,47 +810,159 @@ The computations were performed on resources provided by SNIC through Uppsala Mu
 %
 %
 
-Calibration plots? More?
+Supplemental 1: Calibration plots for all targets. See figure
+\ref{fig:calibration_plots_all}.
 
-\bibliographystyle{frontiersinSCNS_ENG_HUMS} % for Science, Engineering and Humanities and Social Sciences articles, for Humanities and Social Sciences articles please include page numbers in the in-text citations
-%\bibliographystyle{frontiersinHLTH&FPHY} % for Health, Physics and Mathematics articles
-\bibliography{ptp}
+\begin{figure}[h!]
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/ache_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/adora2a_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/adrb1_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/adrb2_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/ar_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/avpr1a_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/cckar_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/chrm1_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/chrm2_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/chrm3_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/cnr1_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/cnr2_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/drd1_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/drd2_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/ednra_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/htr1a_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/htr2a_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/kcnh2_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/lck_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/maoa_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/nr3c1_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/oprd1_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/oprk1_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/oprm1_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/pde3a_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/ptgs1_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/ptgs2_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/scn5a_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/slc6a2_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/slc6a3_calib.pdf}
+\includegraphics[width=0.19\textwidth]{figures/calibration_plots/slc6a4_calib.pdf}
 
-% Make sure to upload the bib file along with the tex file and PDF Please see
-% the test.bib file for some examples of references
+    \caption{Calibration plots for all targets. The plots show accuracy against
+        confidence, for confidence values 0.05 to 0.95 with a step size of 0.05.}
+    \label{fig:calibration_plots_all}
+\end{figure}
 
-\section*{Figure captions}
+Supplemental 2: Class membership change at 0.8 confidence level, for all
+targets. See figure \ref{fig:validation_plots_all_0.8}.
 
-% Please be aware that for original research articles we only permit a combined
-% number of 15 figures and tables, one figure with multiple subfigures will
-% count as only one figure.  Use this if adding the figures directly in the
-% mansucript, if so, please remember to also upload the files when submitting
-% your article There is no need for adding the file termination, as long as you
-% indicate where the file is saved. In the examples below the files (logo1.jpg
-% and logos.jpg) are in the Frontiers LaTeX folder If using *.tif files convert
-% them to .jpg or .png NB logo1.jpg is required in the path in order to
-% correctly compile front page header %%%
+\begin{figure}[h!]
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ache_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/adora2a_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/adrb1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/adrb2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/alltargets_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ar_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/avpr1a_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/cckar_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm3_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/cnr1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/cnr2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/drd1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/drd2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ednra_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/htr1a_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/htr2a_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/kcnh2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/lck_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/maoa_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/nr3c1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprd1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprk1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprm1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/pde3a_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ptgs1_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ptgs2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/scn5a_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a2_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a3_0p8_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a4_0p8_valplot.pdf}
+    \caption{Class membership change at confidence level 0.8, for all targets,
+    for the prediction dataset.
+    The labels on the X-axis indicate predicted labels (None, Active (A),
+    Non-active (N) or Both). Dark grey in the stacked bar plot means the
+    original label was Active (A), while light grey means the original label
+    was Non-Active (N).
+    }
+    \label{fig:validation_plots_all_0.8}
+\end{figure}
 
-%\begin{figure}[h!]
-%\begin{center}
-%\includegraphics[width=10cm]{logo1}% This is a *.jpg file
-%\end{center}
-%\caption{ Enter the caption for your figure here.  Repeat as  necessary for each of your figures}\label{fig:1}
-%\end{figure}
-%
-%
-%\begin{figure}[h!]
-%\begin{center}
-%\includegraphics[width=15cm]{logos}
-%\end{center}
-%\caption{This is a figure with sub figures, (A) is one logo, (B) is a different logo.}\label{fig:2}
-%\end{figure}
+Supplemental 3: Class membership change at 0.9 confidence level, for all
+targets. See figure \ref{fig:validation_plots_all_0.9}.
 
-% If you are submitting a figure with subfigures please combine these into one
-% image file with part labels integrated.  If you don't add the figures in the
-% LaTeX files, please upload them when submitting the article.  Frontiers will
-% add the figures at the end of the provisional pdf automatically The use of
-% LaTeX coding to draw Diagrams/Figures/Structures should be avoided. They
-% should be external callouts including graphics.
+\begin{figure}[h!]
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ache_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/adora2a_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/adrb1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/adrb2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/alltargets_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ar_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/avpr1a_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/cckar_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/chrm3_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/cnr1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/cnr2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/drd1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/drd2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ednra_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/htr1a_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/htr2a_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/kcnh2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/lck_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/maoa_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/nr3c1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprd1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprk1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/oprm1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/pde3a_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ptgs1_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/ptgs2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/scn5a_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a2_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a3_0p9_valplot.pdf}
+\includegraphics[width=0.19\textwidth]{figures/validation_plots/slc6a4_0p9_valplot.pdf}
+    \caption{Class membership change at confidence level 0.9, for all targets,
+    for the prediction dataset.
+    The labels on the X-axis indicate predicted labels (None, Active (A),
+    Non-active (N) or Both). Dark grey in the stacked bar plot means the
+    original label was Active (A), while light grey means the original label
+    was Non-Active (N).
+    }
+    \label{fig:validation_plots_all_0.9}
+\end{figure}
+
+Supplemental 4: Detailed workflow graphs.
+
+Detailed workflow graph for the fillup-vs-not experiment can be seen in figure
+\ref{fig:workflow_detailed_fillup_vs_not}.
+
+Detailed workflow graph for the workflow where drugbank compounds were removed,
+can be seen in figure \ref{fig:workflow_detailed_wo_drugbank}.
+
+\begin{figure}[h!]
+\includegraphics[width=\textwidth]{figures/workflow_graph_fillup_vs_not.pdf}
+    \caption{Detailed workflow graph for the fillup-vs-not experiment.}
+    \label{fig:workflow_detailed_fillup_vs_not}
+\end{figure}
+
+\begin{figure}[h!]
+\includegraphics[width=\textwidth]{figures/workflow_graph_wo_drugbank.pdf}
+    \caption{Detailed workflow graph for the workflow where drugbank compounds
+    were removed. Note the additional components in the top of the figure, for
+    preparing and extracting data from the drugbank dataset.}
+    \label{fig:workflow_detailed_wo_drugbank}
+\end{figure}
 
 \end{document}
