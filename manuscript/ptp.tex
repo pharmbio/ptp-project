@@ -659,18 +659,13 @@ to larger prediction sets.
 %(... and, Staffan promisedto add something about the change in "None"/"null")/SL}
 
 \begin{figure}[h!]
-\hfill
-% TODO: @jonalv, check:
-%\begin{minipage}{0.45\textwidth}
-%    \subbottom[Class membership changes for all targets at confidence level 0.8]{\includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p8_valplot.pdf}}
-%\end{minipage}
-\hfill
-% TODO: @jonalv, check:
-%\begin{minipage}{0.45\textwidth}
-%    \subbottom[Class membership changes for all targets at confidence level 0.9]{\includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p9_valplot.pdf}}
-%\end{minipage}
-\hfill
-    \caption{Class membership change for all targets, for the prediction data, at confidence level 0.8 and 0.9.
+\begin{minipage}{0.45\textwidth}
+    \subcaption[Class membership changes for all targets at confidence level 0.8]{\includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p8_valplot.pdf}}\label{fig:validation_plots:a}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+    \subcaption[Class membership changes for all targets at confidence level 0.9]{\includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p9_valplot.pdf}}\label{fig:validation_plots:b}
+\end{minipage}
+    \caption{Class membership change for all targets, for the prediction data, at confidence level 0.8 (\ref{fig:validation_plots:a}) and 0.9 (\ref{fig:validation_plots:b}).
     The labels on the X-axis indicate predicted labels (None, Active (A),
     Non-active (N) or Both). Dark grey in the stacked bar plot means the
     original label was Active (A), while light grey means the original label
@@ -702,16 +697,17 @@ direction. Hovering it will give information about exactly which model a
 certain peak in the bar charts corresponds to. The web page is accessible at
 \url{http://modelingweb.service.pharmb.io/predict/profile/ptp-wo-drugbank}.
 \begin{figure}
-\vspace*{-60pt} % Yea here we go again, call me a cheater if you want to...
+%\vspace*{-60pt} % Yea here we go again, call me a cheater if you want to...
 % TODO: @jonalv, check:
 %\begin{wideMinipage}
-%    \begin{minipage}{0.8\textwidth}
-%    \subbottom[The profile as it looks on the web page. The user draws a molecule, selects a confidence and then the profile updates underneath.]{\includegraphics[height=0.41\textheight]{figures/terbutaline.png}}
-%    \end{minipage}
-%    \begin{minipage}{0.19\textwidth}
-%    \subbottom[Coloring of which parts of the molecule contributed the most to the prediction for ADBR2.]{\fbox{\includegraphics[height=0.22\textheight]{figures/terbutaline2.png}}}
-%    \end{minipage}
-%    \caption{The prediction profile for Terbutaline, a known selective beta-2 adrenergic agonist  used as a broncho\-dilator and tocolytic \label{fig:web}}
+    \begin{minipage}{0.8\textwidth}
+    \subcaption[The profile as it looks on the web page. The user draws a molecule, selects a confidence and then the profile updates underneath.]{\includegraphics[height=0.41\textheight]{figures/terbutaline.png}}
+    \end{minipage}
+    \begin{minipage}{0.19\textwidth}
+    \subcaption[Coloring of which parts of the molecule contributed the most to the prediction for ADBR2.]{\fbox{\includegraphics[height=0.22\textheight]{figures/terbutaline2.png}}}
+    \end{minipage}
+    \caption{The prediction profile for Terbutaline, a known selective beta-2 adrenergic agonist  used as a broncho\-dilator and tocolytic \label{fig:web}}
+% TODO: @jonalv, check:
 %\end{wideMinipage}
 \end{figure}
 Using the models from the external validation dataset (Dataset 3) profiles were
@@ -721,20 +717,17 @@ before.
 
 \begin{figure}
 \hfill
-% TODO: @jonalv, check:
-%\begin{minipage}[t]{0.3\textwidth}
-%    \subbottom[The profile for Tacrine, a centrally acting anticholinesterase, with a distinct peak for the ACHE gene.]{\includegraphics[width=\linewidth]{figures/chembl95.png}}
-%\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+    \subcaption[The profile for Tacrine, a centrally acting anticholinesterase, with a distinct peak for the ACHE gene.]{\includegraphics[width=\linewidth]{figures/chembl95.png}}
+\end{minipage}
 \hfill
-% TODO: @jonalv, check:
-%\begin{minipage}[t]{0.3\textwidth}
-%    \subbottom[The profile for Pilocarpine, a muscarinic acetylcholine receptor M$_1$ agonist, with two higher peaks, CHRM1 and LCK, only CHRM1 has a really low p-value for non-active though (0.001).]{\includegraphics[width=\linewidth]{figures/chembl550.png}}
-%\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+    \subcaption[The profile for Pilocarpine, a muscarinic acetylcholine receptor M$_1$ agonist, with two higher peaks, CHRM1 and LCK, only CHRM1 has a really low p-value for non-active though (0.001).]{\includegraphics[width=\linewidth]{figures/chembl550.png}}
+\end{minipage}
 \hfill
-% TODO: @jonalv, check:
-%\begin{minipage}[t]{0.3\textwidth}
-%    \subbottom[The profile for Pergolide, a DRD1, DRD2, HTR1A, and HTR2A agonist. This can be seen in the profile as these four genes have the four highest p-values for active.]{\includegraphics[width=\linewidth]{figures/chembl531.png}}
-%\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+    \subcaption[The profile for Pergolide, a DRD1, DRD2, HTR1A, and HTR2A agonist. This can be seen in the profile as these four genes have the four highest p-values for active.]{\includegraphics[width=\linewidth]{figures/chembl531.png}}
+\end{minipage}
 \hfill
 \caption{Profiles for a few of the removed drugs using the validation models, \textit{e.g.}, these molecules are not in the training sets for the models.\label{fig:threeprofiles}}
 \end{figure}
