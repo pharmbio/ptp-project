@@ -613,6 +613,7 @@ Attending: Ola, Jonathan, Arvid, Samuel
 
 ## Notes and Todo's
 
+- We'll make the ptp-project github repo open
 - Timeplan: Wrap up this week
 - Not many changes after AstraZeneca review.
 - Include Observed Fuzziness in plots (not only Class-Averaged OF)
