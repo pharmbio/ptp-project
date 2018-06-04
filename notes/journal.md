@@ -606,3 +606,22 @@ Another note is that the deadline for Samuel's "Disputationsanmälan" is June
 1st, and all the manuscripts need to be in "publication ready status" by then.
 We'll try to have the manuscript in good shape for that date ("minor"
 modifications can be done after that).
+
+# Project meeting 2018-06-04
+
+Attending: Ola, Jonathan, Arvid, Samuel
+
+## Notes and Todo's
+
+- Timeplan: Wrap up this week
+- Not many changes after AstraZeneca review.
+- Include Observed Fuzziness in plots (not only Class-Averaged OF)
+- Describe Original CP effiency (but with other name) (Like "Single value
+  efficiency")
+- Remake the plot (so axles don't cut the bars)
+- Accuracy: 1 - error rate
+- Validity: Integrerad skillnad mellan error rate från diagonalen, på
+  kalibrerplottarna
+- Models on Zenodo (as a backup)?
+- Shape up prediction web UI
+- Re-compute final models (including the Drugbank compounds)
