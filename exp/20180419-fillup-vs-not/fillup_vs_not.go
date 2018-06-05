@@ -421,7 +421,7 @@ func main() {
 	for _, imgType := range []string{"png", "pdf"} {
 		for _, runSet := range runSets {
 			plotSummary := wf.NewProc("plot_summary_"+runSet+"_"+imgType, "Rscript bin/plot_summary.r -r {p:runset} -i {i:summary} -o {o:plot} -f {p:imgtype} # {i:gene_smiles_activity}")
-			plotSummary.SetPathExtend("summary", "plot", "."+runSet+".png")
+			plotSummary.SetPathExtend("summary", "plot", "."+runSet+"."+imgType)
 			plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
 			plotSummary.In("gene_smiles_activity").Connect(removeConflicting.Out("gene_smiles_activity"))
 			plotSummary.ParamInPort("runset").ConnectStr(runSet)
