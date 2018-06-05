@@ -116,7 +116,7 @@ func main() {
 
 	// extractGSA extracts a file with only Gene symbol, SMILES and the
 	// Activity flag, into a .tsv file, for easier subsequent parsing
-	extractGSA := wf.NewProc("extract_gene_smiles_activity", `awk -F "\t" '{ print $9 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {os:gene_smiles_activity}`) // os = output (streaming) ... stream output via a fifo file
+	extractGSA := wf.NewProc("extract_gene_smiles_activity", `awk -F "\t" '{ print $9 "\t" $12 "\t" $4 }' {i:excapedb} | sort -uV > {o:gene_smiles_activity}`) // os = output (streaming) ... stream output via a fifo file
 	extractGSA.SetPathReplace("excapedb", "gene_smiles_activity", ".tsv", ".ext_gene_smiles_activity.tsv")
 	extractGSA.In("excapedb").Connect(unPackDB.Out("unxzed"))
 
