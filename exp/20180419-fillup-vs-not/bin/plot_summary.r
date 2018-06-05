@@ -72,7 +72,8 @@ mtext("Compounds",
       line=3.6);
 legend("bottomright",
        c("Active", "Nonactive"),
-       fill=c("white", "#dddddd"));
+       fill=c("white", "#dddddd"),
+       bg = "white")
 
 # Ugly hack to get the sorting right: Get a list of total counts, that is sorted
 # by alphabetic sort of gene names. This will work well to get sorting by total
