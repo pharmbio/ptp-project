@@ -573,18 +573,18 @@ significance levels.
 
 %\subsection*{Before and after fill up with assumed non-actives}
 \subsection*{Efficiency of models}
-The efficiency metric CAOF for all models built on Dataset1 (without
-adding assumed non-actives) are shown in figure~\ref{fig:allmodels_nofillup}.
-In figure \ref{fig:allmodels_fillup}, the same metrics are shown for when target
-datasets in Dataset2 have been filled up with assumed non-actives, to compensate
-these target datasets' imbalanced nature.
+The efficiency metric CAOF for Dataset2 (without adding assumed non-actives)
+are shown in figure~\ref{fig:21small_orig}. In figure \ref{fig:21small_fill},
+the same metrics are shown for when all target datasets (still in Dataset2)
+have been filled up with assumed non-actives, to compensate these target
+datasets' imbalanced nature.
 %, after fillup with assumed non-actives for the 21 targets with less than
 %10\,000 non-actives in ExcapeDB.
 We observe that by adding assumed non-actives for small, imbalanced datasets we
 improve the efficiency of models trained on these datasets (OF, and CAOF, shown
 by the green and blue lines respectively, improve). Thus, this strategy of
-filling up the small target datasets in Dataset2 was chosen for the subsequent
-analysis workflows.
+filling up the ``small'' target datasets in Dataset2 was chosen for the
+subsequent analysis workflows.
 
 %\todo{Ola does not like the term 'fill up', can we not simply say adding
 %assumed non-actives? Also, please ask Phil/Wes about assumed/presumed.}
@@ -592,20 +592,19 @@ analysis workflows.
 %have time right now.}
 
 \begin{figure}[h!]
-\includegraphics[width=\textwidth]{figures/final_models_20171106_nofillup.png}
-    \caption{All models without fill up of assumed non-actives. The targets
+\includegraphics[width=\textwidth]{figures/21small_orig.pdf}
+    \caption{Dataset2 without fill up of assumed non-actives. The targets
     are sorted by total number of compounds in ExcapeDB.}
-    \label{fig:allmodels_nofillup}
+    \label{fig:21small_orig}
 \end{figure}
 
 %    \inlinetodo{Remove plot heading for fig 3 and 4, they are on top pf the plots.}
 
 \begin{figure}[h!]
-\includegraphics[width=\textwidth]{figures/final_models_20180223_fillup.png}
-    \caption{All models after fill up with assumed non-actives. The targets are
-    sorted by total number of compounds in ExcapeDB. The purple line in the
-    figure shows accuracy.}
-    \label{fig:allmodels_fillup}
+\includegraphics[width=\textwidth]{figures/21small_fill.pdf}
+    \caption{Dataset2 after fill up with assumed non-actives. The targets are
+    sorted by total number of compounds in ExcapeDB.}
+    \label{fig:21small_fill}
 \end{figure}
 
 %\subsection*{Efficiency}
