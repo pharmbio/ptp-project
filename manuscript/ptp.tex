@@ -546,8 +546,8 @@ by the green and blue lines respectively, improve). Thus, this strategy of
 filling up the ``small'' target datasets in Dataset2 was chosen for the
 subsequent analysis workflows.
 
-\inlinetodo{Ola does not like the term 'fill up', can we not simply say adding
-assumed non-actives? Also, please ask Phil/Wes about assumed/presumed.}
+\inlinetodo{Ola does not like the term 'fill up', it sounds non-scientific. Can we not simply say adding
+assumed non-actives?}
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{figures/21small_orig.pdf}
@@ -657,54 +657,85 @@ short nice URL with pharmb.io and UU logo}.
     \begin{minipage}{0.70\textwidth}
         \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
         \includegraphics[height=0.37\textheight]{figures/terbutaline.png}
-        \subcaption{The profile as it looks on the web page. The user draws a molecule, selects a confidence and then the profile updates underneath.}
+        \subcaption{The profile as it looks on the web page. The user draws a
+        molecule, selects a confidence and then the profile updates
+        underneath.}
         \label{fig:terbutaline:a}
     \end{minipage}
     \quad
     \begin{minipage}{0.25\textwidth}
         \fbox{\includegraphics[height=0.23\textheight]{figures/terbutaline2.png}}
-        \subcaption{Coloring of which parts of the molecule contributed the most to the prediction for ADBR2.}
+        \subcaption{Coloring of which parts of the molecule contributed the
+        most to the prediction for ADBR2.}
         \label{fig:terbutaline:b}
     \end{minipage}
-    \caption{The prediction profile for Terbutaline, a known selective beta-2 adrenergic agonist  used as a broncho\-dilator and tocolytic \label{fig:web}}
+    \caption{The prediction profile for Terbutaline, a known selective beta-2
+    adrenergic agonist  used as a broncho\-dilator and tocolytic
+    \label{fig:web}}
 \end{figure}
-Using the models from the external validation dataset (Dataset 3) profiles were
-created for three molecules from the test set (figure~\ref{fig:terbutaline},
-\textit{i.e.}, the profiles were made for drugs that the models have not seen
-before.
+
+\subsection{Example predictions}
+Using the models from the external validation dataset (Dataset 3), target
+profiles were predicted for three molecules from the test set
+(figure~\ref{fig:threeprofiles}), \textit{i.e.}, the profiles were made for
+drugs that the models have not seen before. Figure~\ref{fig:threeprofiles:a}
+shows the target profile for Tacrine, a centrally acting anticholinesterase,
+with a distinct peak for the ACHE gene, es expected. Further, we note that most
+other targets are predicted as negative with high p-values (green color) or
+predicted as active with relatively low p-values (purple color).
+Figure~\ref{fig:threeprofiles:b} shows the target profile for Pilocarpine, a
+muscarinic acetylcholine receptor M$_1$ agonist, with a target profile
+consisting of mostly negative predictions, and only mildly two active targets
+(CHRM1 and LCK). Here we note that LCK has a similar p-value for active and
+non-active, and for a conformal prediction the lowest p-value is sometimes
+referred to as credibility - meaning that even if a prediction has a high
+p-value, its credibility and hence usefulness in a decision setting might be
+low. Figure~\ref{fig:threeprofiles:c} shows the target profile for Pergolide,
+an agonist for DRD1, DRD2, HTR1A, and HTR2A which shows up as the four highest
+positive predictions in the profile.
 
 \begin{figure}
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
     \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
     \includegraphics[width=\linewidth]{figures/chembl95.png}
-    \subcaption{The profile for Tacrine, a centrally acting anticholinesterase, with a distinct peak for the ACHE gene.}
+    \subcaption{The profile for Tacrine, a centrally acting anticholinesterase,
+    with a distinct peak for the ACHE gene.}
     \label{fig:threeprofiles:a}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
     \includegraphics[width=\linewidth]{figures/chembl550.png}
     \subcaption{The profile for Pilocarpine, a muscarinic acetylcholine
-    receptor M$_1$ agonist, with two higher peaks, CHRM1 and LCK, only CHRM1
-    has a really low p-value for non-active though (0.001).}
+    receptor M$_1$ agonist, with only two moderately higher peaks for positive
+    prediction, CHRM1 and LCK.}
     \label{fig:threeprofiles:b}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
     \includegraphics[width=\linewidth]{figures/chembl531.png}
     \subcaption{The profile for Pergolide, a DRD1, DRD2, HTR1A, and HTR2A
-    agonist. This can be seen in the profile as these four genes have the four
-    highest p-values for active.}
+    agonist, which is reflected by the four highest p-values for a positive
+    prediction.}
     \label{fig:threeprofiles:c}
 \end{minipage}
 \hfill
-\caption{Profiles for a few of the removed drugs using the validation models, \textit{e.g.}, these molecules are not in the training sets for the models.
+\caption{Profiles for a few of the removed drugs using the validation models,
+    \textit{e.g.}, these molecules are not in the training sets for the models.
     \label{fig:threeprofiles}}
 \end{figure}
+
+
+
 
 \FloatBarrier
 \section*{Conclusion}
 \inlinetodo{This versions needs a conclusion though}
+
+
+
+
+
 
 \section*{Abbreviations}
 
@@ -950,3 +981,5 @@ can be seen in figure \ref{fig:workflow_detailed_wo_drugbank}.
 \end{figure}
 
 \end{document}
+
+
