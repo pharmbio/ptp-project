@@ -439,9 +439,9 @@ func main() {
 	//wf.RunTo(procsToRun...)
 	//wf.RunToRegex("extract_assumed_n_.*")
 	if *graph {
-		wf.PlotGraph("workflow.dot", true, true)
+		//wf.PlotGraph("workflow.dot", true, true)
 	} else {
-		wf.Run()
+		wf.RunToRegex("plot_summary_.*")
 	}
 }
 

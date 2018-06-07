@@ -84,9 +84,10 @@ sort_vector <- aggregate(drunset$ActiveCnt, by=list(Gene = drunset$Gene), FUN=su
 # --------------------------------------------------------------------------------
 # Set up colors
 # --------------------------------------------------------------------------------
-col_eff <- "#993366"
-col_of <- "#336633"
-col_caof <- "#336699"
+col_eff <- "#368645" # "#F36E48" # "#993366"
+col_of <- "#167391" # "#1985A8" # "#336633"
+col_caof <- "#673BA8" # "#1EA0CB" # "#336699"
+line_width <- 2;
 
 # --------------------------------------------------------------------------------
 # Plot Efficiency
@@ -100,7 +101,7 @@ plot(bplt, 1-drepl$r3$Efficiency, type="p", axes=FALSE, col=col_eff, col.axis=co
 eff_median <- aggregate(drunset$Efficiency, by=list(Gene = drunset$Gene), FUN=median)
 eff_median <- eff_median[order(sort_vector$x),]
 par(new=TRUE);
-plot(bplt, 1-eff_median$x, type="l", axes=FALSE, col=col_eff, col.axis=col_eff, las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+plot(bplt, 1-eff_median$x, type="l", axes=FALSE, col=col_eff, col.axis=col_eff, las=2, ylab=NA, xlab=NA, ylim=c(0,1), lwd=line_width);
 axis(4, las=2, col="black", col.axis="black", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
 mtext("Efficiency (prediction set size)", side=4, line=3.6, col=col_eff)
 # --------------------------------------------------------------------------------
@@ -117,7 +118,7 @@ plot(bplt, 1-drepl$r3$ObsFuzzOverall, type="p", axes=FALSE, col=col_of, col.axis
 ofca_median <- aggregate(drunset$ObsFuzzOverall, by=list(Gene = drunset$Gene), FUN=median)
 ofca_median <- ofca_median[order(sort_vector$x),]
 par(new=TRUE);
-plot(bplt, 1-ofca_median$x, type="l", axes=FALSE, col=col_of, col.axis=col_of, las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+plot(bplt, 1-ofca_median$x, type="l", axes=FALSE, col=col_of, col.axis=col_of, las=2, ylab=NA, xlab=NA, ylim=c(0,1), lwd=line_width);
 #axis(4, las=2, col=col_of, col.axis=col_of, at=c(0,0.5,1), labels=c("1", "0.5", "0"));
 mtext("Observed Fuzziness (OF)", side=4, line=4.8, col=col_of)
 # --------------------------------------------------------------------------------
@@ -134,7 +135,7 @@ plot(bplt, 1-drepl$r3$ObsFuzzClassAvg, type="p", axes=FALSE, col=col_caof, col.a
 ofca_median <- aggregate(drunset$ObsFuzzClassAvg, by=list(Gene = drunset$Gene), FUN=median)
 ofca_median <- ofca_median[order(sort_vector$x),]
 par(new=TRUE);
-plot(bplt, 1-ofca_median$x, type="l", axes=FALSE, col=col_caof, col.axis=col_caof, yaxt='n', las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+plot(bplt, 1-ofca_median$x, type="l", axes=FALSE, col=col_caof, col.axis=col_caof, yaxt='n', las=2, ylab=NA, xlab=NA, ylim=c(0,1), lwd=line_width);
 #axis(4, las=2, col=col_caof, col.axis=col_caof, at=c(0,0.5,1), labels=c("1", "0.5", "0"));
 mtext("Class-averaged Observed Fuzziness (CAOF)", side=4, line=6.0, col=col_caof)
 # --------------------------------------------------------------------------------
