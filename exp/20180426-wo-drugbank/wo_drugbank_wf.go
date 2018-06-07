@@ -637,8 +637,8 @@ func main() {
 	sortSummaryOnDataSize.In("summary").Connect(finalModelsSummary.OutSummary())
 
 	for _, runSet := range runSets {
-		plotSummary := wf.NewProc("plot_summary_"+runSet, "Rscript bin/plot_summary.r -i {i:summary} -o {o:plot} -f png # gene:{i:gene_smiles_activity} runset:{p:runset}")
-		plotSummary.SetPathExtend("summary", "plot", "."+runSet+".png")
+		plotSummary := wf.NewProc("plot_summary_"+runSet, "Rscript bin/plot_summary.r -i {i:summary} -o {o:plot} -f pdf # gene:{i:gene_smiles_activity} runset:{p:runset}")
+		plotSummary.SetPathExtend("summary", "plot", "."+runSet+".pdf")
 		plotSummary.In("summary").Connect(sortSummaryOnDataSize.Out("sorted"))
 		plotSummary.In("gene_smiles_activity").Connect(remDrugBankComps.Out("gisa_wo_drugbank"))
 		plotSummary.ParamInPort("runset").ConnectStr(runSet)

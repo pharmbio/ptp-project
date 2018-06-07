@@ -59,7 +59,6 @@ bplt <- barplot(counts,
         main = "Compound counts, training time and observed fuzziness per target",
         las=2,
         cex.names=0.8,
-        ylim=c(0,10000),
         legend = FALSE,
         xlab=NA,
         ylab=NA,
@@ -81,12 +80,12 @@ sort_vector_totcounts <- aggregate(d$TotalCnt, by=list(Gene = d$Gene), FUN=media
 # --------------------------------------------------------------------------------
 # Plot observed fuzziness (Class-Averaged)
 # --------------------------------------------------------------------------------
-par(new=TRUE)
-plot(bplt, 1-drepl$r1$ObsFuzzClassAvg, type="p", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-par(new=TRUE);
-plot(bplt, 1-drepl$r2$ObsFuzzClassAvg, type="p", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-par(new=TRUE);
-plot(bplt, 1-drepl$r3$ObsFuzzClassAvg, type="p", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+#par(new=TRUE)
+#plot(bplt, 1-drepl$r1$ObsFuzzClassAvg, type="p", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+#par(new=TRUE);
+#plot(bplt, 1-drepl$r2$ObsFuzzClassAvg, type="p", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+#par(new=TRUE);
+#plot(bplt, 1-drepl$r3$ObsFuzzClassAvg, type="p", axes=FALSE, col="blue", col.axis="blue", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 ofca_median <- aggregate(d$ObsFuzzClassAvg, by=list(Gene = d$Gene), FUN=median)
 ofca_median <- ofca_median[order(sort_vector_totcounts$x),]
 par(new=TRUE);
@@ -98,12 +97,12 @@ mtext("Class-averaged Observed Fuzziness", side=4, line=4.8, col="blue")
 # --------------------------------------------------------------------------------
 # Plot observed fuzziness (Overall)
 # --------------------------------------------------------------------------------
-par(new=TRUE)
-plot(bplt, 1-drepl$r1$ObsFuzzOverall, type="p", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-par(new=TRUE);
-plot(bplt, 1-drepl$r2$ObsFuzzOverall, type="p", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-par(new=TRUE);
-plot(bplt, 1-drepl$r3$ObsFuzzOverall, type="p", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+#par(new=TRUE)
+#plot(bplt, 1-drepl$r1$ObsFuzzOverall, type="p", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+#par(new=TRUE);
+#plot(bplt, 1-drepl$r2$ObsFuzzOverall, type="p", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+#par(new=TRUE);
+#plot(bplt, 1-drepl$r3$ObsFuzzOverall, type="p", axes=FALSE, col="#0099FF", col.axis="#0099FF", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 ofca_median <- aggregate(d$ObsFuzzOverall, by=list(Gene = d$Gene), FUN=median)
 ofca_median <- ofca_median[order(sort_vector_totcounts$x),]
 par(new=TRUE);
@@ -116,12 +115,12 @@ mtext("Observed Fuzziness (Overall)", side=4, line=3.6, col="#0099FF")
 # --------------------------------------------------------------------------------
 # Plot Efficiency
 # --------------------------------------------------------------------------------
-par(new=TRUE)
-plot(bplt, 1-drepl$r1$Efficiency, type="p", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-par(new=TRUE);
-plot(bplt, 1-drepl$r2$Efficiency, type="p", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
-par(new=TRUE);
-plot(bplt, 1-drepl$r3$Efficiency, type="p", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+#par(new=TRUE)
+#plot(bplt, 1-drepl$r1$Efficiency, type="p", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+#par(new=TRUE);
+#plot(bplt, 1-drepl$r2$Efficiency, type="p", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
+#par(new=TRUE);
+#plot(bplt, 1-drepl$r3$Efficiency, type="p", axes=FALSE, col="#007700", col.axis="#007700", las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 eff_median <- aggregate(d$Efficiency, by=list(Gene = d$Gene), FUN=median)
 eff_median <- eff_median[order(sort_vector_totcounts$x),]
 par(new=TRUE);
@@ -134,34 +133,34 @@ mtext("Original CP Efficiency measure", side=4, line=6.0, col="#007700")
 # --------------------------------------------------------------------------------
 # Plot training time (minutes)
 # --------------------------------------------------------------------------------
-par(new=TRUE);
-plot(bplt, drepl$r1$ExecTimeMS/(1000*60), type="p", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
-par(new=TRUE);
-plot(bplt, drepl$r2$ExecTimeMS/(1000*60), type="p", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
-par(new=TRUE);
-plot(bplt, drepl$r3$ExecTimeMS/(1000*60), type="p", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
-exectime_median <- aggregate(d$ExecTimeMS, by=list(Gene = d$Gene), FUN=median)
-exectime_median <- exectime_median[order(sort_vector_totcounts$x),]
-par(new=TRUE);
-plot(bplt, exectime_median$x/(1000*60), type="l", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
-axis(4, las=2, col="white", col.axis="red", col.ticks="red", at=c(1,30,60), labels=c("1 min", "30 min", "1 h"));
-mtext("Training time (min)", side=4, line=2.4, col="red")
+#par(new=TRUE);
+#plot(bplt, drepl$r1$ExecTimeMS/(1000*60), type="p", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
+#par(new=TRUE);
+#plot(bplt, drepl$r2$ExecTimeMS/(1000*60), type="p", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
+#par(new=TRUE);
+#plot(bplt, drepl$r3$ExecTimeMS/(1000*60), type="p", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
+#exectime_median <- aggregate(d$ExecTimeMS, by=list(Gene = d$Gene), FUN=median)
+#exectime_median <- exectime_median[order(sort_vector_totcounts$x),]
+#par(new=TRUE);
+#plot(bplt, exectime_median$x/(1000*60), type="l", col="red", axes=FALSE, log="y", ylab=NA, xlab=NA);
+#axis(4, las=2, col="white", col.axis="red", col.ticks="red", at=c(1,30,60), labels=c("1 min", "30 min", "1 h"));
+#mtext("Training time (min)", side=4, line=2.4, col="red")
 # --------------------------------------------------------------------------------
 
 
 # --------------------------------------------------------------------------------
 # Plot accuracy
 # --------------------------------------------------------------------------------
-par(new=TRUE);
-plot(bplt, drepl$r1$Accuracy, type="p", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
-par(new=TRUE);
-plot(bplt, drepl$r2$Accuracy, type="p", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
-par(new=TRUE);
-plot(bplt, drepl$r3$Accuracy, type="p", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
-accuracy_median <- aggregate(d$Accuracy, by=list(Gene = d$Gene), FUN=median)
-accuracy_median <- accuracy_median[order(sort_vector_totcounts$x),]
-par(new=TRUE);
-plot(bplt, accuracy_median$x, type="l", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
+#par(new=TRUE);
+#plot(bplt, drepl$r1$Accuracy, type="p", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
+#par(new=TRUE);
+#plot(bplt, drepl$r2$Accuracy, type="p", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
+#par(new=TRUE);
+#plot(bplt, drepl$r3$Accuracy, type="p", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
+#accuracy_median <- aggregate(d$Accuracy, by=list(Gene = d$Gene), FUN=median)
+#accuracy_median <- accuracy_median[order(sort_vector_totcounts$x),]
+#par(new=TRUE);
+#plot(bplt, accuracy_median$x, type="l", col="purple2", axes=FALSE, ylab=NA, xlab=NA, ylim=c(0,1));
 # --------------------------------------------------------------------------------
 
 
