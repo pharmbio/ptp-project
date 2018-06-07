@@ -30,9 +30,7 @@
 \usepackage{hyperref}
 \usepackage{microtype}
 \usepackage{letltxmacro}
-\usepackage[lining]{ebgaramond}
 \usepackage[cmintegrals,cmbraces]{newtxmath}
-\usepackage{ebgaramond-maths}
 
 \usepackage{booktabs}
 \usepackage{mathtools}
@@ -41,24 +39,11 @@
 %\usepackage{enumitem}
 \usepackage{multirow}
 \usepackage{rotating}
-\renewcommand{\thefootnote}{\color{red}\arabic{footnote}}
 \usepackage{placeins}
-\usepackage[textsize=small, linecolor=magenta, bordercolor=magenta,
-            backgroundcolor=magenta, textwidth=3cm]{todonotes}
+\usepackage[textsize=tiny, linecolor=magenta, bordercolor=magenta,
+            backgroundcolor=magenta, textwidth=1.5cm]{todonotes}
 
 %\linenumbers
-
-% TODO: @jonalv, check:
-%\urlstyle{sf}
-%\makeatletter
-%    \let\UrlSpecialsOld\UrlSpecials
-%    \def\UrlSpecials{\UrlSpecialsOld\do\/{\Url@slash}\do\_{\Url@underscore}}%
-%    \def\Url@slash{\@ifnextchar/{\kern-.11em\mathchar47\kern-.2em}%
-%        {\kern-.0em\mathchar47\kern-.08em\penalty\UrlBigBreakPenalty}}
-%        \def\Url@underscore{\nfss@text{\leavevmode \kern.06em\vbox{\hrule\@width.3em}}}
-%\makeatother
-%\captionnamefont{\small\bfseries}
-%\captiontitlefont{\small}
 
 \makeatletter
     \renewcommand{\@todonotes@drawMarginNoteWithLine}{%
@@ -92,21 +77,8 @@
     }}
 \makeatother
 \LetLtxMacro{\oldtodo}{\todo}
-\renewcommand{\todo}[1]{{\color{magenta}\oldtodo[fancyline]{\color{white}\textsf{#1}}}}
+\renewcommand{\todo}[1]{{\color{magenta}\oldtodo[fancyline]{ \color{white}\textsf{#1} }}}
 \newcommand{\inlinetodo}[1]{{\color{magenta}\oldtodo[inline]{\color{white}\textsf{#1}}}}
-
-% Leave a blank line between paragraphs instead of using \\
-
-%\setsecheadstyle{\LARGE}
-%\setsubsecheadstyle{\large}
-%\setsubsubsecheadstyle{\itshape}
-%\setparaheadstyle{\normalsize\scshape\liningnums}
-%\counterwithout{figure}{chapter}
-%\counterwithout{table}{chapter}
-%\captionnamefont{\textsf\small}
-%\captiontitlefont{\textsf\small}
-%\let\thempfootnote\thefootnote
-
 
 \def\keyFont{\fontsize{8}{11}\helveticabold }
 \def\firstAuthorLast{Lampa {et~al.}} %use et al only if is more than 1 author
@@ -127,22 +99,6 @@ $^{2}$Predictive Compound ADME \& Safety, Drug Safety \& Metabolism, AstraZeneca
 
 \def\corrEmail{samuel.lampa@farmbio.uu.se}
 
-
-\newenvironment{wideMinipage}
-{ \vskip 1\baselineskip
-  \noindent
-  \checkoddpage%
-  \ifoddpage%
-     \hspace*{-3em}%
-  \else%
-     \hspace*{-3em}%
-  \fi%
-  \begin{minipage}{1\textwidth + 6em}
-}
-{
-    \end{minipage}
-    \vskip 1\baselineskip
-}
 
 \begin{document}
 
@@ -240,13 +196,13 @@ attractive complementary method is to use computational (in silico) profiling
 of binding profiles for ligands~\cite{Cereto-Massague:2015px}, which also opens the possibility
 to predict virtual compounds. A common approach to the target prediction
 problem is to use a panel of structure-activity relationship (QSAR) models%
-%{\color{magenta}[REF\todo{missing ref} QSAR]}
+{\color{magenta}[REF\todo{missing ref} QSAR]}
 , where chemicals in a knowledge base with known interaction values (numerical
 or categorial) are described numerically by descriptors and a statistical
 learning model is trained to predict numerical values (regression) or
-categorial values (classification). %The recent increase in the number of
-%available data points in interaction databases such as ChEMBL and
-%PubChem{\color{magenta}\todo{unfinished sentense}\ldots}
+categorial values (classification). The recent increase in the number of
+available data points in interaction databases such as ChEMBL and
+PubChem{\color{magenta}\todo{unfinished sentense}\ldots}
 
 Several methods and tools are available for target prediction and for
 constructing and using target profiles.
@@ -352,11 +308,8 @@ non-active compounds, and whether they are included or not, are summarized in
 table~\ref{tbl:targets}.
 
 \begin{table}[p]
-% TODO: @jonalv, check:
-%\begin{wideMinipage}
 \small
 \centering
-%\vspace*{-45pt} % This is cheating, top margin should be holy, but this table is HUGE!
 \caption{The panel of targets used in this study, identified by gene symbol.
     Actives and non-actives refer to the number of ligand interactions marked
     as active and non-active in ExcapeDB. Included indicates if the target was
@@ -421,8 +374,6 @@ table~\ref{tbl:targets}.
 
 \bottomrule
 \end{tabular}
-% TODO: @jonalv, check:
-%\end{wideMinipage}
 \end{table}
 
 \subsection*{Conformal prediction}
@@ -430,7 +381,7 @@ Conformal Prediction (CP)~\cite{Vovk2005} provides a layer on top of
 existing machine learning methods and yields valid prediction regions for test
 examples. This contrasts to standard machine learning that delivers point
 estimates. In conformal prediction a prediction region contains the true
-value with probability equal to a selected significance level $\varepsilon$. Such
+value with probability equal to a selected significance level $\epsilon$. Such
 a prediction region can be obtained under the assumption that the observed data
 is exchangeable. An important impact is that the size of this region directly
 relate to the `strangeness' of the test example, and is an alternative to the
@@ -562,7 +513,7 @@ significance levels.
 \includegraphics[width=0.3\textwidth]{figures/calibration_plots/pde3a_calib.pdf}
 \includegraphics[width=0.3\textwidth]{figures/calibration_plots/slc6a2_calib.pdf}
 \includegraphics[width=0.3\textwidth]{figures/calibration_plots/htr2a_calib.pdf}
-    %\inlinetodo{Make the axes gradation 0, 0.5, 1.0}
+    \inlinetodo{Make the axes gradation 0, 0.5, 1.0}
     \caption{Three representative calibration plots, for models PDE3A, SLC6A2
     and HTR2A, based on the smallest, the median, and the largest data sets in
     terms of total number of compounds. The plots show accuracy versus
@@ -586,10 +537,8 @@ by the green and blue lines respectively, improve). Thus, this strategy of
 filling up the ``small'' target datasets in Dataset2 was chosen for the
 subsequent analysis workflows.
 
-%\todo{Ola does not like the term 'fill up', can we not simply say adding
-%assumed non-actives? Also, please ask Phil/Wes about assumed/presumed.}
-%\todo{Samuel thinks we can fix this for the final version, but won't really
-%have time right now.}
+\inlinetodo{Ola does not like the term 'fill up', can we not simply say adding
+assumed non-actives? Also, please ask Phil/Wes about assumed/presumed.}
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{figures/21small_orig.pdf}
@@ -598,7 +547,7 @@ subsequent analysis workflows.
     \label{fig:21small_orig}
 \end{figure}
 
-%    \inlinetodo{Remove plot heading for fig 3 and 4, they are on top pf the plots.}
+\inlinetodo{Remove plot heading for fig 3 and 4, they are on top pf the plots.}
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{figures/21small_fill.pdf}
@@ -649,13 +598,13 @@ This behaviour might seem backwards, but at a higher confidence the predictor
 has to include less likely predictions for it not to miss fewer of the true labels, leading
 to larger prediction sets.
 
-%\inlinetodo{well, what do we observe in the class membership change plots? It
-%is not obvious to me that it is correct... we should get fewer certain
-%predictions with increasing confidence - not sure that we see that now. Maybe
-%add the exact number for each bar? \\
-%I have added one explanation now ... but I have a harder time explaining the
-%``None'' prediction ... gotta check Norinder's paper /SL
-%(... and, Staffan promisedto add something about the change in "None"/"null")/SL}
+\inlinetodo{well, what do we observe in the class membership change plots? It
+is not obvious to me that it is correct... we should get fewer certain
+predictions with increasing confidence - not sure that we see that now. Maybe
+add the exact number for each bar? \\
+I have added one explanation now ... but I have a harder time explaining the
+``None'' prediction ... gotta check Norinder's paper /SL
+(... and, Staffan promisedto add something about the change in "None"/"null")/SL}
 
 \begin{figure}[h!]
 \begin{minipage}{0.45\textwidth}
@@ -671,7 +620,7 @@ to larger prediction sets.
     was Non-Active (N).
     }
     \label{fig:validation_plots}
-    %\inlinetodo{Increase Y-axis to 3000, now it does not look good.}
+    \inlinetodo{Increase Y-axis to 3000, now it does not look good.}
 \end{figure}
 
 \subsection*{Target Profile-as-a-Service}
@@ -696,9 +645,6 @@ direction. Hovering it will give information about exactly which model a
 certain peak in the bar charts corresponds to. The web page is accessible at
 \url{http://modelingweb.service.pharmb.io/predict/profile/ptp-wo-drugbank}.
 \begin{figure}
-%\vspace*{-60pt} % Yea here we go again, call me a cheater if you want to...
-% TODO: @jonalv, check:
-%\begin{wideMinipage}
     \begin{minipage}{0.8\textwidth}
     \subcaption[The profile as it looks on the web page. The user draws a molecule, selects a confidence and then the profile updates underneath.]{\includegraphics[height=0.41\textheight]{figures/terbutaline.png}}
     \end{minipage}
@@ -706,8 +652,6 @@ certain peak in the bar charts corresponds to. The web page is accessible at
     \subcaption[Coloring of which parts of the molecule contributed the most to the prediction for ADBR2.]{\fbox{\includegraphics[height=0.22\textheight]{figures/terbutaline2.png}}}
     \end{minipage}
     \caption{The prediction profile for Terbutaline, a known selective beta-2 adrenergic agonist  used as a broncho\-dilator and tocolytic \label{fig:web}}
-% TODO: @jonalv, check:
-%\end{wideMinipage}
 \end{figure}
 Using the models from the external validation dataset (Dataset 3) profiles were
 created for three molecules from the test set (figure~\ref{fig:threeprofiles},
@@ -732,7 +676,8 @@ before.
 \end{figure}
 
 \FloatBarrier
-%\section*{Conclusion}
+\section*{Conclusion}
+\inlinetodo{This versions needs a conclusion though}
 
 \section*{Abbreviations}
 
