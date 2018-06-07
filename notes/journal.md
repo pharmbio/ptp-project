@@ -631,3 +631,32 @@ Attending: Ola, Jonathan, Arvid, Samuel
 - [ ] Shape up prediction web UI
 - [ ] Re-compute final models (including the Drugbank compounds)
 
+# Quick Project follow up 2018-06-07
+
+Time: Ca 15:00
+
+Attending: Ola, Jonathan, Staffan, Samuel
+
+# Notes
+
+- Plan: Send to EA on friday.
+
+## Todos
+
+- [ ] Extend discussion
+- [ ] Write conclusion
+- [ ] Press more on what we provide and what is new, and its implications
+- [ ] Write about separate treatment of assumed negatives, and explain what
+  this means
+- [ ] Describe "Original CP Efficiency" (Staffan)
+- [ ] Include plot of large targets (wo-drugbank)
+- Plot the large targets as a separate plot
+- Maybe do 1, 2 and 3 as subplots
+- [ ] Original class: Observed
+- [ ] Write something about "Credibility" in discussion
+- [ ] Try making class membership plots into bubble plots (Staffan)
+- [ ] Rename class membership plots to "predicted versus observed" or similar,
+  in the text
+- [ ] Add some inline labels denoting gene names and such, in the target
+  profile plots (Jonathan)
+
