@@ -24,16 +24,16 @@
 - [x] Class membership plots: Use same order of plot labels as in Norinder 2015
 - [x] Class membership plots: Use same colors as in fillup plots
 - [x] Add 0, 0.5 and 1 as ticks in calibration plots
-- [ ] Extend discussion
+- [>] Include plot of large targets (wo-drugbank) (Samuel)
+  - Plot the large targets as a separate plot
+  - Maybe do 1, 2 and 3 as subplots
+- [>] Extend discussion (Ola)
+- [ ] Original class: Observed
 - [ ] Write conclusion
 - [ ] Press more on what we provide and what is new, and its implications
 - [ ] Write about separate treatment of assumed negatives, and explain what
   this means
 - [ ] Describe "Original CP Efficiency" (Staffan)
-- [ ] Include plot of large targets (wo-drugbank)
-  - Plot the large targets as a separate plot
-  - Maybe do 1, 2 and 3 as subplots
-- [ ] Original class: Observed
 - [ ] Write something about "Credibility" in discussion
 - [ ] Try making class membership plots into bubble plots (Staffan)
 - [ ] Rename class membership plots to "predicted versus observed" or similar,
