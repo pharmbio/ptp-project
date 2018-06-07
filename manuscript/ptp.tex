@@ -660,11 +660,14 @@ certain peak in the bar charts corresponds to. The web page is accessible at
 \url{http://modelingweb.service.pharmb.io/predict/profile/ptp-wo-drugbank}\todo{make
 short nice URL with pharmb.io and UU logo}.
 \begin{figure}
-    \begin{minipage}{0.8\textwidth}
-    \subcaption[The profile as it looks on the web page. The user draws a molecule, selects a confidence and then the profile updates underneath.]{\includegraphics[height=0.41\textheight]{figures/terbutaline.png}}
+    \begin{minipage}{0.70\textwidth}
+        \includegraphics[height=0.37\textheight]{figures/terbutaline.png}
+        \subcaption{The profile as it looks on the web page. The user draws a molecule, selects a confidence and then the profile updates underneath.}    
     \end{minipage}
-    \begin{minipage}{0.19\textwidth}
-    \subcaption[Coloring of which parts of the molecule contributed the most to the prediction for ADBR2.]{\fbox{\includegraphics[height=0.22\textheight]{figures/terbutaline2.png}}}
+    \quad
+    \begin{minipage}{0.25\textwidth}
+        \fbox{\includegraphics[height=0.23\textheight]{figures/terbutaline2.png}}
+        \subcaption{Coloring of which parts of the molecule contributed the most to the prediction for ADBR2.}
     \end{minipage}
     \inlinetodo{Strange letters in subfigures and the subcaptions are lost}
     \caption{The prediction profile for Terbutaline, a known selective beta-2 adrenergic agonist  used as a broncho\-dilator and tocolytic \label{fig:web}}
@@ -677,15 +680,22 @@ before.
 \begin{figure}
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
-    \subcaption[The profile for Tacrine, a centrally acting anticholinesterase, with a distinct peak for the ACHE gene.]{\includegraphics[width=\linewidth]{figures/chembl95.png}}
+    \includegraphics[width=\linewidth]{figures/chembl95.png}
+    \subcaption{The profile for Tacrine, a centrally acting anticholinesterase, with a distinct peak for the ACHE gene.}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
-    \subcaption[The profile for Pilocarpine, a muscarinic acetylcholine receptor M$_1$ agonist, with two higher peaks, CHRM1 and LCK, only CHRM1 has a really low p-value for non-active though (0.001).]{\includegraphics[width=\linewidth]{figures/chembl550.png}}
+    \includegraphics[width=\linewidth]{figures/chembl550.png}
+    \subcaption{The profile for Pilocarpine, a muscarinic acetylcholine
+    receptor M$_1$ agonist, with two higher peaks, CHRM1 and LCK, only CHRM1
+    has a really low p-value for non-active though (0.001).}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
-    \subcaption[The profile for Pergolide, a DRD1, DRD2, HTR1A, and HTR2A agonist. This can be seen in the profile as these four genes have the four highest p-values for active.]{\includegraphics[width=\linewidth]{figures/chembl531.png}}
+    \includegraphics[width=\linewidth]{figures/chembl531.png}
+    \subcaption{The profile for Pergolide, a DRD1, DRD2, HTR1A, and HTR2A
+    agonist. This can be seen in the profile as these four genes have the four
+    highest p-values for active.}
 \end{minipage}
 \hfill
     \inlinetodo{Strange letters in subfigures and the subcaptions are lost}
