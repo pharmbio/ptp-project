@@ -24,10 +24,10 @@
 - [x] Class membership plots: Use same order of plot labels as in Norinder 2015
 - [x] Class membership plots: Use same colors as in fillup plots
 - [x] Add 0, 0.5 and 1 as ticks in calibration plots
-- [>] Include plot of large targets (wo-drugbank) (Samuel)
-  - Plot the large targets as a separate plot
-  - Maybe do 1, 2 and 3 as subplots
-- [>] Extend discussion (Ola)
+- [x] Include plot of large targets (wo-drugbank) (Samuel)
+  - [x] Plot the large targets as a separate plot
+  - [x] Maybe do 1, 2 and 3 as subplots
+- [x] Extend discussion (Ola)
 - [ ] Original class: Observed
 - [ ] Write conclusion
 - [ ] Press more on what we provide and what is new, and its implications

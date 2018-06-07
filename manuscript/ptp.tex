@@ -308,6 +308,8 @@ selected examples from the raw dataset which were not reported to be active for
 this target, thus being `assumed non-active'. The number of new examples was chosen such that the total
 number of non-actives and assumed non-actives added up to twice the number of
 actives, for each target respectively. This dataset was named Dataset2.
+The compounds for the remaining 10 targets, which were not filled-up, were
+named Dataset3.
 % (See
 % \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L308-L328}{here}
 % for workflow code).
@@ -532,6 +534,8 @@ significance levels.
     \label{fig:calibration_plots}
 \end{figure}
 
+\inlinetodo{Ola does not like the term 'fill up', it sounds non-scientific. Can we not simply say adding
+assumed non-actives?}
 
 %\subsection*{Before and after fill up with assumed non-actives}
 \subsection*{Efficiency of models}
@@ -548,25 +552,33 @@ by the green and blue lines respectively, improve). Thus, this strategy of
 filling up the ``small'' target datasets in Dataset2 was chosen for the
 subsequent analysis workflows.
 
-\inlinetodo{Ola does not like the term 'fill up', it sounds non-scientific. Can we not simply say adding
-assumed non-actives?}
-
 \begin{figure}[h!]
-\includegraphics[width=\textwidth]{figures/21small_orig.pdf}
-    \caption{Dataset2 without fill up of assumed non-actives.
-    Circles show individual results from the three replicate runs that were
-    run, while the lines show the median value from the individual replicate
-    results. Targets are here sorted by number of active compounds.}
-    \label{fig:21small_orig}
-\end{figure}
-
-\begin{figure}[h!]
-\includegraphics[width=\textwidth]{figures/21small_fill.pdf}
-    \caption{Dataset2 after fill up with assumed non-actives.
-    Circles show individual results from the three replicate runs that were
-    run, while the lines show the median value from the individual replicate
-    results. Targets are here sorted by number of active compounds.}
-    \label{fig:21small_fill}
+    \begin{minipage}[t]{0.62\textwidth}
+        \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
+        \includegraphics[width=\textwidth]{figures/21small_orig.pdf}
+        \subcaption{Dataset2 without fill up of assumed non-actives.
+            Circles show individual results from the three replicate runs that were
+            run, while the lines show the median value from the individual replicate
+            results. Targets are here sorted by number of active compounds.}
+        \label{fig:21small_orig}
+    \end{minipage} \\
+    \begin{minipage}[t]{0.62\textwidth}
+        \includegraphics[width=\textwidth]{figures/21small_fill.pdf}
+        \subcaption{Dataset2 after fill up with assumed non-actives.
+            Circles show individual results from the three replicate runs that were
+            run, while the lines show the median value from the individual replicate
+            results. Targets are here sorted by number of active compounds.}
+        \label{fig:21small_fill}
+    \end{minipage}
+    \begin{minipage}[t]{0.38\textwidth}
+        \includegraphics[width=\textwidth]{figures/10large.pdf}
+        \subcaption{Dataset3, the 10 largest target datasets.
+        These were not filled up with assumed non-actives.
+        Targets are here sorted by total number of compounds.}
+        \label{fig:10large}
+    \end{minipage}
+    \caption{Efficiency metrics for Dataset1 (Efficiency, Observed Fuzziness
+    and Class-Averaged Observed Fuzziness) for Dataset2 and Dataset3.}
 \end{figure}
 
 %\subsection*{Efficiency}
@@ -585,22 +597,22 @@ assumed non-actives?}
 \subsection*{External validation}
 
 In order to validate the predictive ability of the trained models, a new
-dataset was created (Dataset 3)\todo{Create a table with the three Datasets and
-how they differ} where data about 1\,000 compounds were withheld from the
-ExcapeDB dataset. The compounds chosen to be withheld were the following: i)
-all small molecules in DrugBank (version 5.0.11) with status ``withdrawn'', for
-which we could find either a pubchem ID or a CHEMBL ID, ii) a randomly selected
-subset of the remaining compounds in DrugBank 5.0.11, with status ``approved'',
-for which we could also find PubChem or CHEMBL IDs, until a total number of
-1\,000 compounds was reached.  No regard was paid to other drug statuses in
-DrugBank such as ``investigational''.
+dataset was created (Dataset4)\todo{Create a table with the three Datasets and
+how they differ} by withholding 1\,000 compounds from the ExcapeDB dataset, to
+form an external validation dataset. The compounds chosen to be withheld were
+the following: i) all small molecules in DrugBank (version 5.0.11) with status
+``withdrawn'', for which we could find either a pubchem ID or a CHEMBL ID, ii)
+a randomly selected subset of the remaining compounds in DrugBank 5.0.11, with
+status ``approved'', for which we could also find PubChem or CHEMBL IDs, until
+a total number of 1\,000 compounds was reached.  No regard was paid to other
+drug statuses in DrugBank such as ``investigational''.
 
 The models built were validated by predicting the binding activity against each
 of the 31 targets for all compounds for which we had known binding data for a
 particular target. The validation was done with CPSign's \texttt{validate}
 command, predicting values at confidence levels 0.8 and 0.9.
 %
-In figure \ref{fig:valplots} the class membership change for Dataset 3,
+In figure \ref{fig:valplots} the class membership change for Dataset4,
 for confidence levels 0.8 and 0.9 respectively is shown. We see how the number
 of prediction of ``both'' labels increase when the confidence level increases
 from 0.8 to 0.9. This is as expected, as this means that fewer compounds could
@@ -614,6 +626,7 @@ level, which leads to larger prediction sets.
 
 \begin{figure}[h!]
 \begin{minipage}{0.45\textwidth}
+    \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
     \subcaption[Class membership changes for all targets at confidence level 0.8]{
     \includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p8_valplot.pdf}
     }\label{fig:valplots:a}
@@ -677,7 +690,7 @@ short nice URL with pharmb.io and UU logo}.
 \end{figure}
 
 \subsection*{Example predictions}
-Using the models from the external validation dataset (Dataset 3), target
+Using the models from the external validation dataset (Dataset4), target
 profiles were predicted for three molecules from the test set
 (figure~\ref{fig:threeprofiles}), \textit{i.e.}, the profiles were made for
 drugs that the models have not seen before. Figure~\ref{fig:threeprofiles:a}

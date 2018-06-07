@@ -632,7 +632,7 @@ func main() {
 	mergeCalibPlots.SetPathStatic("merged", "dat/calibration_plots.png")
 	mergeCalibPlots.In("plots").Connect(sts.OutSubStream())
 
-	sortSummaryOnDataSize := wf.NewProc("sort_summary", "head -n 1 {i:summary} > {o:sorted} && tail -n +2 {i:summary} | sort -k 15n,15 -k 2,2 -k 3r,3 >> {o:sorted}")
+	sortSummaryOnDataSize := wf.NewProc("sort_summary", "head -n 1 {i:summary} > {o:sorted} && tail -n +2 {i:summary} | sort -k 17n,17 -k 2,2 -k 3r,3 >> {o:sorted}")
 	sortSummaryOnDataSize.SetPathReplace("summary", "sorted", ".tsv", ".sorted.tsv")
 	sortSummaryOnDataSize.In("summary").Connect(finalModelsSummary.OutSummary())
 
