@@ -180,7 +180,7 @@ Chemicals were represented by the signature molecular descriptor and
 support vector machines were used as the underlying machine learning method. With
 conformal prediction, results from predictions are in the form of confidence
 p-values for each class.  The full pre-processing and model training
-process is openly available as a scientific workflow on github, rendering it
+process is openly available as a scientific workflow on GitHub, rendering it
 fully reproducible.  We illustrate the usefulness of the methodology on a set
 of compounds extracted from DrugBank.  The resulting models are published
 online and are available via a graphical web interface and an OpenAPI interface
@@ -216,18 +216,18 @@ PubChem{\color{magenta}\todo{unfinished sentense}\ldots}
 Several methods and tools are available for target prediction and for
 constructing and using target profiles.
 %
-Bender \textit{et al}. used a Bayesian approach to train models for 70 selected targets
+Bender \textit{et al}. use a Bayesian approach to train models for 70 selected targets
 and use these for target profiling to classify adverse drug
 reactions~\cite{Bender:2007ib}.
 %
 Yao \textit{et al}. describes TargetNet~\cite{Yao:2016ij}, a web service for
 multi-target QSAR models; an online service that uses Na\"ive Bayes.
 %
-Yu \textit{et al}. used Random Forest (RF) and Support Vector Machines (SVM) to predict
+Yu \textit{et al}. use Random Forest (RF) and Support Vector Machines (SVM) to predict
 drug-target interactions from heterogeneous biological data~\cite{Yu:2012ol}.
 %
 TargetHunter~\cite{Wang:2013le} is another online tool that uses chemical
-similarity to predict targets for ligands, and showed how training models on
+similarity to predict targets for ligands, and show how training models on
 ChEMBL data can enable useful predictions on examples taken from PubChem
 bioassays.
 
@@ -250,7 +250,7 @@ The goal of this study was to create an automated and reproducible approach for
 generating a predicted target profile by QSAR binding models, with the models
 making up the profile published online as microservices and the profile
 accessible from a web page. Although the models give a confidence measure we
-also set out to evaluate them on test sets to see how well they perform on some
+also set out to evaluate them on test sets to see how well they performed on some
 representable data. We exemplified the process by creating a profile on the
 targets for broad early hazard assessment presented by Bowes \textit{et
 al.}~\cite{Bowes2012}.
@@ -493,7 +493,7 @@ implemented in the Go programming language using the SciPipe workflow library
 that is available as open source software at
 \href{http://scipipe.org}{scipipe.org} or \href{https://github.com/scipipe/scipipe}{github.com/scipipe/scipipe}.
 The cost values for each target is stored in the workflow code, available on
-github (https://github.com/pharmbio/ptp-project).  An example of the modeling
+GitHub (https://github.com/pharmbio/ptp-project).  An example of the modeling
 workflow is shown in figure \ref{fig:workflow_graph_clean}, which shows the workflow
 used for comparison conformal metric when filling up with assumed non-actives, versus
 not filling up. More detailed workflow graphs are shown in the supplemental material.
@@ -585,14 +585,15 @@ assumed non-actives? Also, please ask Phil/Wes about assumed/presumed.}
 \subsection*{External validation}
 
 In order to validate the predictive ability of the trained models, a new
-dataset was created (Dataset 3) where data about 1\,000 compounds were withheld
-from the ExcapeDB dataset. The compounds chosen to be withheld were the
-following: i) all small molecules in DrugBank (version 5.0.11) with status
-``withdrawn'', for which we could find either a pubchem ID or a CHEMBL ID, ii)
-a randomly selected subset of the remaining compounds in DrugBank 5.0.11, with
-status ``approved'', for which we could also find PubChem or CHEMBL IDs, until
-a total number of 1\,000 compounds was reached.  No regard was paid to other
-drug statuses in DrugBank such as ``investigational''.
+dataset was created (Dataset 3)\todo{Create a table with the three Datasets and
+how they differ} where data about 1\,000 compounds were withheld from the
+ExcapeDB dataset. The compounds chosen to be withheld were the following: i)
+all small molecules in DrugBank (version 5.0.11) with status ``withdrawn'', for
+which we could find either a pubchem ID or a CHEMBL ID, ii) a randomly selected
+subset of the remaining compounds in DrugBank 5.0.11, with status ``approved'',
+for which we could also find PubChem or CHEMBL IDs, until a total number of
+1\,000 compounds was reached.  No regard was paid to other drug statuses in
+DrugBank such as ``investigational''.
 
 The models built were validated by predicting the binding activity against each
 of the 31 targets for all compounds for which we had known binding data for a
@@ -601,7 +602,7 @@ command, predicting values at confidence levels 0.8 and 0.9.
 %
 In figure \ref{fig:validation_plots} the class membership change for Dataset 3,
 for confidence levels 0.8 and 0.9 respectively is shown. We see how the number
-of prediction of ``both'' labels increases when the confidence level increases
+of prediction of ``both'' labels increase when the confidence level increases
 from 0.8 to 0.9. This is as expected, as this means that fewer compounds could
 be predicted to only one specific label with the higher confidence level. The number of
 ``None'' predictions decreases at a higher confidence, which is expected as the
@@ -644,7 +645,7 @@ specification is a standardisation for how REST APIs are described, it means
 that there is a common way for looking up how to use the REST API of a web
 service and that greatly simplifies the process of tying multiple different web
 services together. It simplifies calling the services from scripts as well as
-from other web pages, such as the web page~\ref{fig:web} that makes a profile image out of
+from other web pages, such as the web page(figure~\ref{fig:web}) that makes a profile image out of
 the multiple QSAR models. At the top of the web page (See figure~\ref{fig:web})
 is an instance of the JSME editor~\cite{Bienfait2013} in which the user can
 draw a molecule. As the user draws the molecule the web page extracts the
@@ -652,11 +653,12 @@ SMILES from the editor and sends it to the model services to make predictions
 based on all available models. The user can set a threshold for the confidence
 and get visual feedback on whether the models predict the drawn molecule as
 active or non-active, for each of the targets, with the chosen confidence.  On the right hand is also a
-graphical profile in the form of a bar plot where confidence as binding is
-drawn in the positive direction and confidence for non-binding is the reverse
+graphical profile in the form of a bar plot where confidence of active is
+drawn in the positive direction and confidence for non-active is the reverse
 direction. Hovering it will give information about exactly which model a
 certain peak in the bar charts corresponds to. The web page is accessible at
-\url{http://modelingweb.service.pharmb.io/predict/profile/ptp-wo-drugbank}.
+\url{http://modelingweb.service.pharmb.io/predict/profile/ptp-wo-drugbank}\todo{make
+short nice URL with pharmb.io and UU logo}.
 \begin{figure}
     \begin{minipage}{0.8\textwidth}
     \subcaption[The profile as it looks on the web page. The user draws a molecule, selects a confidence and then the profile updates underneath.]{\includegraphics[height=0.41\textheight]{figures/terbutaline.png}}
@@ -664,6 +666,7 @@ certain peak in the bar charts corresponds to. The web page is accessible at
     \begin{minipage}{0.19\textwidth}
     \subcaption[Coloring of which parts of the molecule contributed the most to the prediction for ADBR2.]{\fbox{\includegraphics[height=0.22\textheight]{figures/terbutaline2.png}}}
     \end{minipage}
+    \inlinetodo{Strange letters in subfigures and the subcaptions are lost}
     \caption{The prediction profile for Terbutaline, a known selective beta-2 adrenergic agonist  used as a broncho\-dilator and tocolytic \label{fig:web}}
 \end{figure}
 Using the models from the external validation dataset (Dataset 3) profiles were
@@ -685,6 +688,7 @@ before.
     \subcaption[The profile for Pergolide, a DRD1, DRD2, HTR1A, and HTR2A agonist. This can be seen in the profile as these four genes have the four highest p-values for active.]{\includegraphics[width=\linewidth]{figures/chembl531.png}}
 \end{minipage}
 \hfill
+    \inlinetodo{Strange letters in subfigures and the subcaptions are lost}
 \caption{Profiles for a few of the removed drugs using the validation models, \textit{e.g.}, these molecules are not in the training sets for the models.\label{fig:threeprofiles}}
 \end{figure}
 
