@@ -611,20 +611,23 @@ modifications can be done after that).
 
 Attending: Ola, Jonathan, Arvid, Samuel
 
-## Notes and Todo's
-
-- We'll make the ptp-project github repo open
-- Jonathan will move back content from the `manuscript_disp` version, to the
-  frontiers template, before we finalize stuff for submission.
-- Not many changes after AstraZeneca review.
-- Include Observed Fuzziness in plots (not only Class-Averaged OF)
+## Notes
 - Describe Original CP effiency (but with other name) (Like "Single value
   efficiency")
-- Remake the plot (so axles don't cut the bars)
 - Accuracy: 1 - error rate
 - Validity: Integrerad skillnad mellan error rate från diagonalen, på
   kalibrerplottarna
-- Models on Zenodo (as a backup)?
-- Shape up prediction web UI
-- Re-compute final models (including the Drugbank compounds)
 - Timeplan: Wrap up this week
+
+## Todos
+
+- [x] We'll make the ptp-project github repo open
+- [x] Jonathan will move back content from the `manuscript_disp` version, to
+  the frontiers template, before we finalize stuff for submission.
+- Not many changes after AstraZeneca review.
+- [x] Include Observed Fuzziness in plots (not only Class-Averaged OF)
+- [x] Remake the plot (so axles don't cut the bars)
+- [ ] Models on Zenodo (as a backup)?
+- [ ] Shape up prediction web UI
+- [ ] Re-compute final models (including the Drugbank compounds)
+
