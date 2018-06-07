@@ -608,8 +608,8 @@ be predicted to only one specific label with the higher confidence level. The nu
 predictor must accept less probable (in the Conformal Prediction ranking sense)
 predictions to be considered part of the prediction region at a higher confidence.
 This behaviour might seem backwards, but at a higher confidence the predictor
-has to include less likely predictions for it not to miss fewer of the true labels, leading
-to larger prediction sets.
+has to include less likely predictions for it to reach the specified confidence
+level, which leads to larger prediction sets.
 
 \inlinetodo{well, what do we observe in the class membership change plots? It
 is not obvious to me that it is correct... we should get fewer certain
