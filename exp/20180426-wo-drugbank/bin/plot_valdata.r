@@ -26,7 +26,7 @@ if ( is.null(opt$format) || is.null(opt$infile) || is.null(opt$outfile) || is.nu
 if (opt$format == 'png') {
   png(opt$outfile, width=320, height=280, units="px")
 } else if (opt$format =='pdf') {
-  pdf(opt$outfile, width=4, height=4);
+  pdf(opt$outfile, width=3, height=3.2);
 }
 
 d <- read.csv(opt$infile, sep = '\t', header = TRUE);
@@ -36,9 +36,13 @@ d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 rownames(d) = d[,1] # Set rownames from first column
 colnames(d) = c("Orig Label", "Both", "A", "N", "None")
 dplot <- as.matrix(d[,2:5]) # Don't include first col in matrix, and make into matrix
-barplot(dplot, col=c("white", "#dddddd"))
+if (opt$gene == "all targets") {
+    barplot(dplot, beside=TRUE, col=c("white", "#dddddd"), ylim=c(0,3000))
+} else {
+    barplot(dplot, beside=TRUE, col=c("white", "#dddddd"), ylim=range(pretty(c(0, dplot))))
+}
 #legend("topright", c("Orig A", "Orig N"), fill=c("black", "grey"))
-mtext(paste("Class membership change (", opt$gene, ")", sep=""))
+mtext(opt$gene)
 dev.off()
 # Avoid sending non-zero exit values on exit
 quit(save = "no", status = 0, runLast = FALSE)
