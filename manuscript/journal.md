@@ -23,7 +23,7 @@
 - [x] Write Methods section about fillup-vs-not (Samuel)
 - [x] Class membership plots: Use same order of plot labels as in Norinder 2015
 - [x] Class membership plots: Use same colors as in fillup plots
-- [ ] Add 0, 0.5 and 1 as ticks in calibration plots
+- [x] Add 0, 0.5 and 1 as ticks in calibration plots
 
 ## On Hold
 
