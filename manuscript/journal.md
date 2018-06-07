@@ -35,6 +35,9 @@
   - Maybe do 1, 2 and 3 as subplots
 - [ ] Original class: Observed
 - [ ] Write something about "Credibility" in discussion
+- [ ] Try making class membership plots into bubble plots (Staffan)
+- [ ] Rename class membership plots to "predicted versus observed" or similar,
+  in the text
 
 ## On Hold
 
