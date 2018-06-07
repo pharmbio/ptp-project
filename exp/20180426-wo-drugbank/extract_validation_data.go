@@ -62,11 +62,11 @@ func main() {
 		})
 		extractGene.In().Connect(valDataPerTarget.Out("valstats"))
 
-		plotValData := wf.NewProc("plot_valdata_"+confLevel, `Rscript bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g {k:valdata.gene}`)
+		plotValData := wf.NewProc("plot_valdata_"+confLevel, `Rscript bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g {k:valdata.gene} -c `+strings.Replace(confLevel, "p", ".", 1))
 		plotValData.SetPathExtend("valdata", "plot", ".pdf")
 		plotValData.In("valdata").Connect(extractGene.Out())
 
-		plotValDataAll := wf.NewProc("plot_valdata_all_"+confLevel, `Rscript bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g "all targets"`)
+		plotValDataAll := wf.NewProc("plot_valdata_all_"+confLevel, `Rscript bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g "all targets" -c `+strings.Replace(confLevel, "p", ".", 1))
 		plotValDataAll.SetPathExtend("valdata", "plot", ".pdf")
 		plotValDataAll.In("valdata").Connect(valDataAll.Out("valstats"))
 	}

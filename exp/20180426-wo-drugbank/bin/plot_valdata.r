@@ -8,14 +8,15 @@ optspec = matrix(c(
   'infile', 'i', 1, 'character',
   'outfile', 'o', 1, 'character',
   'format', 'f', 1, 'character',
-  'gene', 'g', 2, 'character'
+  'gene', 'g', 2, 'character',
+  'confidence', 'c', 2, 'character'
 ), byrow=TRUE, ncol=4);
 opt = getopt(optspec);
 
 # if help was asked for print a friendly message
 # and exit with a non-zero error code
-if ( is.null(opt$format) || is.null(opt$infile) || is.null(opt$outfile) || is.null(opt$gene) ) {
-  cat('Usage: Rscript plot_heatmap.r -i infile -o outfile -f (png|pdf) -g genename\n');
+if ( is.null(opt$format) || is.null(opt$infile) || is.null(opt$outfile) || is.null(opt$gene) || is.null(opt$confidence) ) {
+  cat('Usage: Rscript plot_heatmap.r -i infile -o outfile -f (png|pdf) -g genename -c confidence_level\n');
   q(status=1);
 }
 
@@ -26,7 +27,7 @@ if ( is.null(opt$format) || is.null(opt$infile) || is.null(opt$outfile) || is.nu
 if (opt$format == 'png') {
   png(opt$outfile, width=320, height=280, units="px")
 } else if (opt$format =='pdf') {
-  pdf(opt$outfile, width=3, height=3.2);
+    pdf(opt$outfile, width=3, height=3.2);
 }
 
 d <- read.csv(opt$infile, sep = '\t', header = TRUE);
@@ -37,12 +38,14 @@ rownames(d) = d[,1] # Set rownames from first column
 colnames(d) = c("Orig Label", "Both", "A", "N", "None")
 dplot <- as.matrix(d[,2:5]) # Don't include first col in matrix, and make into matrix
 if (opt$gene == "all targets") {
-    barplot(dplot, beside=TRUE, col=c("white", "#dddddd"), ylim=c(0,3000))
+    barplot(dplot, beside=TRUE, col=c("white", "#dddddd"), ylim=c(0,3000), axes=FALSE)
+    axis(side=2, at=c(0,1000,2000,3000), labels=c("0", "1000", "", "3000"), tick=TRUE)
+    mtext(paste("Confidence:", opt$confidence, sep=" "))
 } else {
     barplot(dplot, beside=TRUE, col=c("white", "#dddddd"), ylim=range(pretty(c(0, dplot))))
+    mtext(opt$gene)
 }
 #legend("topright", c("Orig A", "Orig N"), fill=c("black", "grey"))
-mtext(opt$gene)
 dev.off()
 # Avoid sending non-zero exit values on exit
 quit(save = "no", status = 0, runLast = FALSE)
