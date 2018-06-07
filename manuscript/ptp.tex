@@ -598,7 +598,7 @@ of the 31 targets for all compounds for which we had known binding data for a
 particular target. The validation was done with CPSign's \texttt{validate}
 command, predicting values at confidence levels 0.8 and 0.9.
 %
-In figure \ref{fig:validation_plots} the class membership change for Dataset 3,
+In figure \ref{fig:valplots} the class membership change for Dataset 3,
 for confidence levels 0.8 and 0.9 respectively is shown. We see how the number
 of prediction of ``both'' labels increase when the confidence level increases
 from 0.8 to 0.9. This is as expected, as this means that fewer compounds could
@@ -612,18 +612,23 @@ level, which leads to larger prediction sets.
 
 \begin{figure}[h!]
 \begin{minipage}{0.45\textwidth}
-    \subcaption[Class membership changes for all targets at confidence level 0.8]{\includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p8_valplot.pdf}}\label{fig:validation_plots:a}
+    \subcaption[Class membership changes for all targets at confidence level 0.8]{
+    \includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p8_valplot.pdf}
+    }\label{fig:valplots:a}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
-    \subcaption[Class membership changes for all targets at confidence level 0.9]{\includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p9_valplot.pdf}}\label{fig:validation_plots:b}
+    \subcaption[Class membership changes for all targets at confidence level 0.9]{
+        \includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p9_valplot.pdf}
+    }\label{fig:valplots:b}
 \end{minipage}
-    \caption{Class membership change for all targets, for the prediction data, at confidence level 0.8 (\ref{fig:validation_plots:a}) and 0.9 (\ref{fig:validation_plots:b}).
-    The labels on the X-axis indicate predicted labels (None, Active (A),
-    Non-active (N) or Both). White in the stacked bar plot means the
-    original label was Active (A), while grey means the original label
-    was Non-Active (N).
+    \caption{Class membership change for all targets, for the prediction data,
+    at confidence level 0.8 (\ref{fig:valplots:a}) and 0.9
+    (\ref{fig:valplots:b}).  The labels on the X-axis indicate predicted labels
+    (None, Active (A), Non-active (N) or Both). White in the stacked bar plot
+    means that the original label was Active (A), while grey means the original
+    label was Non-Active (N).
     }
-    \label{fig:validation_plots}
+    \label{fig:valplots}
 \end{figure}
 
 \subsection*{Target Profile-as-a-Service}
@@ -650,27 +655,31 @@ certain peak in the bar charts corresponds to. The web page is accessible at
 short nice URL with pharmb.io and UU logo}.
 \begin{figure}
     \begin{minipage}{0.70\textwidth}
+        \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
         \includegraphics[height=0.37\textheight]{figures/terbutaline.png}
-        \subcaption{The profile as it looks on the web page. The user draws a molecule, selects a confidence and then the profile updates underneath.}    
+        \subcaption{The profile as it looks on the web page. The user draws a molecule, selects a confidence and then the profile updates underneath.}
+        \label{fig:terbutaline:a}
     \end{minipage}
     \quad
     \begin{minipage}{0.25\textwidth}
         \fbox{\includegraphics[height=0.23\textheight]{figures/terbutaline2.png}}
         \subcaption{Coloring of which parts of the molecule contributed the most to the prediction for ADBR2.}
+        \label{fig:terbutaline:b}
     \end{minipage}
-    \inlinetodo{Strange letters in subfigures}
     \caption{The prediction profile for Terbutaline, a known selective beta-2 adrenergic agonist  used as a broncho\-dilator and tocolytic \label{fig:web}}
 \end{figure}
 Using the models from the external validation dataset (Dataset 3) profiles were
-created for three molecules from the test set (figure~\ref{fig:threeprofiles},
+created for three molecules from the test set (figure~\ref{fig:terbutaline},
 \textit{i.e.}, the profiles were made for drugs that the models have not seen
 before.
 
 \begin{figure}
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
+    \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
     \includegraphics[width=\linewidth]{figures/chembl95.png}
     \subcaption{The profile for Tacrine, a centrally acting anticholinesterase, with a distinct peak for the ACHE gene.}
+    \label{fig:threeprofiles:a}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
@@ -678,6 +687,7 @@ before.
     \subcaption{The profile for Pilocarpine, a muscarinic acetylcholine
     receptor M$_1$ agonist, with two higher peaks, CHRM1 and LCK, only CHRM1
     has a really low p-value for non-active though (0.001).}
+    \label{fig:threeprofiles:b}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
@@ -685,10 +695,11 @@ before.
     \subcaption{The profile for Pergolide, a DRD1, DRD2, HTR1A, and HTR2A
     agonist. This can be seen in the profile as these four genes have the four
     highest p-values for active.}
+    \label{fig:threeprofiles:c}
 \end{minipage}
 \hfill
-    \inlinetodo{Strange letters in subfigures}
-\caption{Profiles for a few of the removed drugs using the validation models, \textit{e.g.}, these molecules are not in the training sets for the models.\label{fig:threeprofiles}}
+\caption{Profiles for a few of the removed drugs using the validation models, \textit{e.g.}, these molecules are not in the training sets for the models.
+    \label{fig:threeprofiles}}
 \end{figure}
 
 \FloatBarrier
@@ -812,7 +823,7 @@ Supplemental 1: Calibration plots for all targets. See figure
 \end{figure}
 
 Supplemental 2: Class membership change at 0.8 confidence level, for all
-targets. See figure \ref{fig:validation_plots_all_0.8}.
+targets. See figure \ref{fig:valplots_all_0.8}.
 
 \begin{figure}[h!]
 \vspace*{-15pt} % This is cheating, top margin should be holy, but this table is HUGE!
@@ -860,11 +871,11 @@ targets. See figure \ref{fig:validation_plots_all_0.8}.
     original label was Active (A), while grey means the original label
     was Non-Active (N).
     }
-    \label{fig:validation_plots_all_0.8}
+    \label{fig:valplots_all_0.8}
 \end{figure}
 
 Supplemental 3: Class membership change at 0.9 confidence level, for all
-targets. See figure \ref{fig:validation_plots_all_0.9}.
+targets. See figure \ref{fig:valplots_all_0.9}.
 
 \begin{figure}[h!]
 
@@ -913,7 +924,7 @@ targets. See figure \ref{fig:validation_plots_all_0.9}.
     original label was Active (A), while grey means the original label
     was Non-Active (N).
     }
-    \label{fig:validation_plots_all_0.9}
+    \label{fig:valplots_all_0.9}
 \end{figure}
 
 Supplemental 4: Detailed workflow graphs.
