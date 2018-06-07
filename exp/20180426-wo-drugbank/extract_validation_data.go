@@ -26,15 +26,15 @@ func main() {
 		// ------------------------------------------------------------------------
 		// Extract data from JSON
 		// ------------------------------------------------------------------------
-		extractCmdTpl := `echo -e "orig_lab\tpred_none\tpred_a\tpred_n\tpred_both" > {o:valstats} \
+		extractCmdTpl := `echo -e "orig_lab\tpred_both\tpred_a\tpred_n\tpred_none" > {o:valstats} \
 		&& cat %s \
 		| jq -c '[.molecule.activity,.prediction.predictedLabels[%d].labels[]]' \
 		| tr -d "[" | tr -d "]" | tr -d '"' | \
 		awk -F, '{
 			d[$1][$2,$3]++ }
 			END {
-				print "A" "\t" d["A"]["",""] "\t" d["A"]["A",""] "\t" d["A"]["N",""] "\t" d["A"]["A","N"]
-				print "N" "\t" d["N"]["",""] "\t" d["N"]["A",""] "\t" d["N"]["N",""] "\t" d["N"]["A","N"]
+				print "A" "\t" d["A"]["A","N"] "\t" d["A"]["A",""] "\t" d["A"]["N",""] "\t" d["A"]["",""]
+				print "N" "\t" d["N"]["A","N"] "\t" d["N"]["A",""] "\t" d["N"]["N",""] "\t" d["N"]["",""]
 			}' >> {o:valstats}`
 
 		valDataAll := wf.NewProc("extract_valdata_all_"+confLevel, fmt.Sprintf(extractCmdTpl, "{i:valjson:r: }", confIdx))

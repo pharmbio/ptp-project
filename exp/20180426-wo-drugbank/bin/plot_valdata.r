@@ -36,7 +36,7 @@ d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 rownames(d) = d[,1] # Set rownames from first column
 colnames(d) = c("Orig Label", "None", "A", "N", "Both")
 dplot <- as.matrix(d[,2:5]) # Don't include first col in matrix, and make into matrix
-barplot(dplot)
+barplot(dplot, col=c("white", "#dddddd"))
 #legend("topright", c("Orig A", "Orig N"), fill=c("black", "grey"))
 mtext(paste("Class membership change (", opt$gene, ")", sep=""))
 dev.off()
