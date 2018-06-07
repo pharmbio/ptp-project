@@ -26,7 +26,7 @@ if ( is.null(opt$runset) || is.null(opt$infile) || is.null(opt$outfile) || is.nu
 if (opt$format == 'png') {
 	png(opt$outfile, width=1200, height=800, units="px")
 } else if (opt$format =='pdf') {
-	pdf(opt$outfile, width=12, height=8);
+	pdf(opt$outfile, width=9, height=6);
 }
 
 d <- read.csv(opt$infile, sep = '\t', header = TRUE);
@@ -87,7 +87,7 @@ sort_vector <- aggregate(drunset$ActiveCnt, by=list(Gene = drunset$Gene), FUN=su
 col_eff <- "#368645" # "#F36E48" # "#993366"
 col_of <- "#167391" # "#1985A8" # "#336633"
 col_caof <- "#673BA8" # "#1EA0CB" # "#336699"
-line_width <- 2;
+line_width <- 1;
 
 # --------------------------------------------------------------------------------
 # Plot Efficiency
