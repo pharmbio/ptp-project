@@ -40,12 +40,21 @@
 \usepackage{multirow}
 \usepackage{rotating}
 \usepackage{placeins}
-\usepackage[textsize=tiny, linecolor=magenta, bordercolor=magenta,
-            backgroundcolor=magenta, textwidth=1.5cm]{todonotes}
+\usepackage[textsize=miniscule, linecolor=magenta, bordercolor=magenta,
+            backgroundcolor=magenta, textwidth=1.1cm]{todonotes}
 
 %\linenumbers
 
 \makeatletter
+
+\ifcase \@ptsize \relax% 10pt
+  \newcommand{\miniscule}{\@setfontsize\miniscule{4}{5}}% \tiny: 5/6
+\or% 11pt
+  \newcommand{\miniscule}{\@setfontsize\miniscule{5}{6}}% \tiny: 6/7
+\or% 12pt
+  \newcommand{\miniscule}{\@setfontsize\miniscule{5}{6}}% \tiny: 6/7
+\fi
+
     \renewcommand{\@todonotes@drawMarginNoteWithLine}{%
     \begin{tikzpicture}[remember picture, overlay, baseline=-0.75ex]%
         \node [coordinate] (inText) {};%
@@ -77,8 +86,8 @@
     }}
 \makeatother
 \LetLtxMacro{\oldtodo}{\todo}
-\renewcommand{\todo}[1]{{\color{magenta}\oldtodo[fancyline]{ \color{white}\textsf{#1} }}}
-\newcommand{\inlinetodo}[1]{{\color{magenta}\oldtodo[inline]{\color{white}\textsf{#1}}}}
+\renewcommand{\todo}[1]{{\miniscule \color{magenta}\oldtodo[fancyline]{ \color{white}\textsf{#1} }}}
+\newcommand{\inlinetodo}[1]{{\color{magenta}\oldtodo[inline]{\color{white}\textsf{\small#1}}}}
 
 \def\keyFont{\fontsize{8}{11}\helveticabold }
 \def\firstAuthorLast{Lampa {et~al.}} %use et al only if is more than 1 author
