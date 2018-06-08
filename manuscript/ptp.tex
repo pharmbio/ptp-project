@@ -518,20 +518,33 @@ an error rate in accordance to the selected significance setting), calibration p
 were generated in the cross validation step of the workflow. Three example
 plots, for three representative targets (the smallest, the median-sized and the
 largest, in terms of compounds in ExcapeDB) can be seen in figure
-\ref{fig:calibration_plots}, while calibration plots for all targets can be
-found in the supplemental material (figure~\ref{fig:calibration_plots_all}).
+\ref{fig:calplots}, while calibration plots for all targets can be
+found in the supplemental material (figure~\ref{fig:calplot_all}).
 From these calibration plots we conclude that all models produce valid results over all
 significance levels.
 
 \begin{figure}[h!]
-\includegraphics[width=0.3\textwidth]{figures/calibration_plots/pde3a_calib.pdf}
-\includegraphics[width=0.3\textwidth]{figures/calibration_plots/slc6a2_calib.pdf}
-\includegraphics[width=0.3\textwidth]{figures/calibration_plots/htr2a_calib.pdf}
-    \caption{Three representative calibration plots, for models PDE3A, SLC6A2
-    and HTR2A, based on the smallest, the median, and the largest data sets in
+    \begin{minipage}[c]{0.3\textwidth}
+        \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
+        \includegraphics[width=\textwidth]{figures/calibration_plots/pde3a_calib.pdf}
+        \label{fig:calplots:a}
+        \subcaption{}
+    \end{minipage}
+    \begin{minipage}[c]{0.3\textwidth}
+    \includegraphics[width=\textwidth]{figures/calibration_plots/slc6a2_calib.pdf}
+        \label{fig:calplots:b}
+        \subcaption{}
+    \end{minipage}
+    \begin{minipage}[c]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figures/calibration_plots/htr2a_calib.pdf}
+        \label{fig:calplots:c}
+        \subcaption{}
+    \end{minipage}
+    \caption{Three representative calibration plots, for models PDE3A (\ref{fig:calplots}a), SLC6A2  (\ref{fig:calplots}b),
+    and HTR2A (\ref{fig:calplots}c), based on the smallest, the median, and the largest data sets in
     terms of total number of compounds. The plots show accuracy versus
     confidence, for confidence values 0.05 to 0.95 with a step size of 0.05.}
-    \label{fig:calibration_plots}
+    \label{fig:calplots}
 \end{figure}
 
 \inlinetodo{Ola does not like the term 'fill up', it sounds non-scientific. Can we not simply say adding
@@ -831,7 +844,7 @@ Project SNIC 2017/7-89.
 %
 
 Supplemental 1: Calibration plots for all targets. See figure
-\ref{fig:calibration_plots_all}.
+\ref{fig:calplots_all}.
 
 \begin{figure}[h!]
 
@@ -875,7 +888,7 @@ Supplemental 1: Calibration plots for all targets. See figure
 \includegraphics[width=0.19\textwidth]{figures/calibration_plots/slc6a4_calib.pdf}
     \caption{Calibration plots for all targets. The plots show accuracy against
         confidence, for confidence values 0.05 to 0.95 with a step size of 0.05.}
-    \label{fig:calibration_plots_all}
+    \label{fig:calplots_all}
 \end{figure}
 
 Supplemental 2: Class membership change at 0.8 confidence level, for all
