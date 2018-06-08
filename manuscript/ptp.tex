@@ -313,7 +313,8 @@ this target, thus being `assumed non-active'. The number of new examples was cho
 number of non-actives and assumed non-actives added up to twice the number of
 actives, for each target respectively. This dataset was named Dataset2.
 The compounds for the remaining 10 targets, which were not extended with
-assumed non-actives, were named Dataset3.
+assumed non-actives, were named Dataset3 (See table~\ref{tbl:datasets} for
+an overview of all datasets).
 % (See
 % \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L308-L328}{here}
 % for workflow code).
@@ -388,6 +389,26 @@ table~\ref{tbl:targets}.
 &    MINK1   &       929     &       8           &            &       & Synonym to KCNE1 \\
 &    PDE4D   &       484     &       98          &            &       &       \\
 
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[p]
+\small
+\centering
+\caption{Summary of datasets discussed.}
+\label{tbl:datasets}
+\begin{tabular}{rll}
+\toprule
+& Name     & Description \\
+\midrule
+%\multirow{31}{*}{\begin{turn}{90}\textsc{Included}\end{turn}}
+& Dataset1 & All 31 targets selected from the set of 44 targets in~\cite{Bowes2012}. \\
+& Dataset2 & Targets from Dataset1 with at least 100 actives, and at least 100 non-actives. \\
+& Dataset3 & The remaining 10 ``large'' target datasets, from Dataset1 which were not included in Dataset2 \\
+& Dataset4 & The external test set created by extracting rows from ExcapeDB for a selected set of \\
+&          & 1\,000 compounds in DrugBank (All withdrawn, and randomly sampled approved, drugs,\\
+&          & until reaching 1000 drugs). \\
 \bottomrule
 \end{tabular}
 \end{table}
