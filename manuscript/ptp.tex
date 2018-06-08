@@ -230,7 +230,9 @@ similarity to predict targets for ligands, and show how training models on
 ChEMBL data can enable useful predictions on examples taken from PubChem
 bioassays.
 %
-The polypharmacology browser~\cite{Awale:2017is} is a web-based target prediction tool that queries ChEMBL bioactivity data using multiple fingerprints.
+The polypharmacology browser~\cite{Awale:2017is} is a web-based target
+prediction tool that queries ChEMBL bioactivity data using multiple
+fingerprints.
 
 
 We note two important shortcomings among previous works. Primarily, available
@@ -759,17 +761,55 @@ positive predictions in the profile.
 % Discussion  %
 %%%%%%%
 \section*{Discussion}
-The use of workflows to automate preprocessing and model training and make it completely reproducible has several implications. Primarily, the entire process can be repeated as data change, e.g. new data is made available or data is curated. In our case, the preprocessing can be re-run when a new version of ExCAPE-DB is released, and new models trained on up-to-date data can be deployed and published without delay. The components of the preprocessing workflow are however general, and can be re-used in other settings as well. Further, a user can select the specific targets that will be preprocessed, and focus the analysis on smaller subsets without having to preprocess and train models on all targets which could be resource-demanding. With a modular workflow it is also easy to replace specific components, such as evaluating different strategies and modeling methods.
+The use of workflows to automate preprocessing and model training and make it
+completely reproducible has several implications. Primarily, the entire process
+can be repeated as data change, e.g. new data is made available or data is
+curated. In our case, the preprocessing can be re-run when a new version of
+ExCAPE-DB is released, and new models trained on up-to-date data can be
+deployed and published without delay. The components of the preprocessing
+workflow are however general, and can be re-used in other settings as well.
+Further, a user can select the specific targets that will be preprocessed, and
+focus the analysis on smaller subsets without having to preprocess and train
+models on all targets which could be resource-demanding. With a modular
+workflow it is also easy to replace specific components, such as evaluating
+different strategies and modeling methods.
 
-Conformal
+Conformal \todoil{Incomplete sentence?}
 
-The packaging of models as docker containers makes them portable, to be transferred and deployed on different systems, including servers or laptops on public and private networks without cumbersome dependency management. We chose to deploy our services inside RedHat OpenShift container orchestration system, which has the benefit of providing a resilient and scalable service, but any readily available infrastructure provider is sufficient. The use of OpenAPI for deploying an interoperable service API menas that the service is simple to integrate and consume in many different ways, including being called from a web page (such as our reference page on \$URL\todo{add url to page here}, but also into third party applications and workflow systems. With the flexibility to consume models on individual level comes the power to put together custom profiles (panels) of targets. In this work we have selected targets based on usefulness in a drug safety setting, but it is easy to envision other types of panels for other purposes. While there has been some previous research on the use of predicted target profiles earlier~\cite{Awale:2017is,Yao:2016ij}, further research is needed to maximize their usefulness and also integrate with other types of in vitro and in silico measures. Our methodology and implementation facilitates such large-scale and integrative studies, and paves the way for target predictions that can be integrated in different stages of the drug discovery process. 
+The packaging of models as docker containers makes them portable, to be
+transferred and deployed on different systems, including servers or laptops on
+public and private networks without cumbersome dependency management. We chose
+to deploy our services inside RedHat OpenShift container orchestration system,
+which has the benefit of providing a resilient and scalable service, but any
+readily available infrastructure provider is sufficient. The use of OpenAPI for
+deploying an interoperable service API menas that the service is simple to
+integrate and consume in many different ways, including being called from a web
+page (such as our reference page on \$URL\todo{add url to page here}, but also
+into third party applications and workflow systems. With the flexibility to
+consume models on individual level comes the power to put together custom
+profiles (panels) of targets. In this work we have selected targets based on
+usefulness in a drug safety setting, but it is easy to envision other types of
+panels for other purposes. While there has been some previous research on the
+use of predicted target profiles earlier~\cite{Awale:2017is,Yao:2016ij},
+further research is needed to maximize their usefulness and also integrate with
+other types of in vitro and in silico measures. Our methodology and
+implementation facilitates such large-scale and integrative studies, and paves
+the way for target predictions that can be integrated in different stages of
+the drug discovery process.
 
 
 
 \FloatBarrier
 \section*{Conclusion}
-We developed a methodology and implementation of target prediction profiles, with fully automated and reproducible data preprocessing and model training with models packaged as portable docker containers that can be deployed on any system. We trained data on 31 targets related to drug safety from the ExCAPE database and published these as a predictive profiles using conformal prediction to deliver prediction intervals for each target. The example profiles are deployed as online services with an interoperable API, and we showed how these can be integrated to form a profile or targets to illustrate multi-target bindning for chemical compounds.
+We developed a methodology and implementation of target prediction profiles,
+with fully automated and reproducible data preprocessing and model training
+with models packaged as portable docker containers that can be deployed on any
+system. We trained data on 31 targets related to drug safety from the ExCAPE
+database and published these as a predictive profiles using conformal
+prediction to deliver prediction intervals for each target. The example
+profiles are deployed as online services with an interoperable API, and we
+showed how these can be integrated to form a profile or targets to illustrate
+multi-target bindning for chemical compounds.
 
 
 
