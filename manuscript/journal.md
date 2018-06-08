@@ -35,10 +35,10 @@
 - [x] Write something about "Credibility" in discussion (Staffan?)
 - [x] Original class: Observed
 - [x] Update plots about "M criterion" (Samuel)
+- [x] Reword "fill-up" to something like "adding assumed non-actives" (Samuel)
 - [>] Write conclusion (All)
 - [>] Write about separate treatment of assumed negatives, and explain what
   this means (Staffan?, Samuel?)
-- [ ] Reword "fill-up" to something like "adding assumed non-actives" (Samuel)
 - [ ] Create table of all the datasets (Samuel)
 - [ ] Press more on what we provide and what is new, and its implications (All)
 - [ ] Add URL to reference page (Jonathan?)
