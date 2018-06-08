@@ -444,10 +444,10 @@ class $A$ and $N$ respectively. $OF$ is basicly an average of the p-values for
 the wrong class, \textit{i.e.}, lower fuzziness means better prediction.
 
 To study the effect of imbalanced datasets on efficiency, we also implemented a
-modified version of OF, due to the fact that OF is influenced more
+modified version of $OF$, due to the fact that $OF$ is influenced more
 by values in the larger class in case of imbalanced datasets, referred to as
 ``class-averaged
-observed fuzziness'' (CAOF) as:
+observed fuzziness'' ($CAOF$) as:
 \begin{equation}
 CAOF = \frac
         {\quad\sum\limits_{\mathclap{\substack{\scriptscriptstyle i,\ y_i=A}}}p_i^N}
@@ -470,7 +470,7 @@ by the larger class and $CAOF$ is equally contributed to from both classes.
 %(specified to cpsign's crossvalidate and train commands using the
 %\texttt{--nr-models} flag).
 %
-CAOF was not used for cost selection, but is provided for information in the
+$CAOF$ was not used for cost selection, but is provided for information in the
 results from the workflow.
 
 
