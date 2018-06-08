@@ -35,7 +35,7 @@ d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 #setwd("~/mnt/ptp/exp/20180426-wo-drugbank/")
 
 #rownames(d) = d[,1] # Set rownames from first column
-#colnames(d) = c("Orig Label", "Both", "A", "N", "None")
+#colnames(d) = c("Orig Label", "Both", "A", "N", "Null")
 #dplot <- as.data.frame(d[,2:5]) # Don't include first col in matrix, and make into matrix
 dplot <- as.data.frame(c(d[1,2],d[1,3],d[1,4],d[1,5],d[2,2],d[2,3],d[2,4],d[2,5]))
 
@@ -44,20 +44,22 @@ dplot <- as.data.frame(c(d[1,2],d[1,3],d[1,4],d[1,5],d[2,2],d[2,3],d[2,4],d[2,5]
 # ------------------------------------------------------------------------
 library(ggplot2)
 # SET FONTS
-m<-20
-label_font <- element_text(family="Helvetica",size=16) # family="Arial" - did not work to save with Arial
-axis_font <- element_text(family="Helvetica", size=16, margin = margin(t = m,r = m,b = m,l = m))
-
 # PARAMTERS
 
 if (opt$gene == "all targets") {
+    m<-50
     chart_title <- paste("Confidence:", opt$confidence, sep=" ")
+    label_font <- element_text(family="Helvetica",size=12) # family="Arial" - did not work to save with Arial
+    axis_font <- element_text(family="Helvetica", size=12, margin = margin(t = m,r = m,b = m,l = m))
 } else {
+    m<-20
     chart_title <- opt$gene
+    label_font <- element_text(family="Helvetica",size=16) # family="Arial" - did not work to save with Arial
+    axis_font <- element_text(family="Helvetica", size=16, margin = margin(t = m,r = m,b = m,l = m))
 }
-circle_max_size <- 18
+circle_max_size <- 20
 xlabs <- c("A", "A", "A", "A", "N", "N", "N", "N")
-ylabs <- c("Both", "A", "N", "None", "Both", "A", "N", "None")
+ylabs <- c("Both", "A", "N", "Null", "Both", "A", "N", "Null")
 # PLOT
 ggplot(dplot, aes(xlabs, factor(ylabs, levels=ylabs, ordered=TRUE)))+
   geom_point(aes(size=dplot), shape=21, fill="#dddddd")+
