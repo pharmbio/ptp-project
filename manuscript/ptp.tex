@@ -655,15 +655,14 @@ subsequent analysis workflows.
 \subsection*{External validation}
 
 In order to validate the predictive ability of the trained models, a new
-dataset was created (Dataset4)\todo{Create a table with the three Datasets and
-how they differ} by withholding 1\,000 compounds from the ExcapeDB dataset, to
-form an external validation dataset. The compounds chosen to be withheld were
-the following: i) all small molecules in DrugBank (version 5.0.11) with status
-``withdrawn'', for which we could find either a pubchem ID or a CHEMBL ID, ii)
-a randomly selected subset of the remaining compounds in DrugBank 5.0.11, with
-status ``approved'', for which we could also find PubChem or CHEMBL IDs, until
-a total number of 1\,000 compounds was reached.  No regard was paid to other
-drug statuses in DrugBank such as ``investigational''.
+dataset was created (Dataset4) by withholding 1\,000 compounds from the
+ExcapeDB dataset, to form an external validation dataset. The compounds chosen
+to be withheld were the following: i) all small molecules in DrugBank (version
+5.0.11) with status ``withdrawn'', for which we could find either a pubchem ID
+or a CHEMBL ID, ii) a randomly selected subset of the remaining compounds in
+DrugBank 5.0.11, with status ``approved'', for which we could also find PubChem
+or CHEMBL IDs, until a total number of 1\,000 compounds was reached.  No regard
+was paid to other drug statuses in DrugBank such as ``investigational''.
 
 The models built were validated by predicting the binding activity against each
 of the 31 targets for all compounds for which we had known binding data for a
