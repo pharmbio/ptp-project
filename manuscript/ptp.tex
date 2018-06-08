@@ -179,12 +179,14 @@ database, selected for their utility in broad early hazard assessment.
 Chemicals were represented by the signature molecular descriptor and
 support vector machines were used as the underlying machine learning method. With
 conformal prediction, results from predictions are in the form of confidence
-p-values for each class.  The full pre-processing and model training
-process is openly available as a scientific workflow on GitHub, rendering it
-fully reproducible.  We illustrate the usefulness of the methodology on a set
-of compounds extracted from DrugBank.  The resulting models are published
+p-values for each class. The full pre-processing and model training
+process is openly available as scientific workflows on GitHub, rendering it
+fully reproducible. We illustrate the usefulness of the methodology on a set
+of compounds extracted from DrugBank. The resulting models are published
 online and are available via a graphical web interface and an OpenAPI interface
-for programmatic access.\todo{Push more on workflow as a method?}
+for programmatic access.
+%\todo{Push more on workflow as a method?}
+%SL: I think we do it enough now, don't we? // SL
 
 \tiny
  \keyFont{ \section{Keywords:} drug discovery, predictive modelling, conformal prediction, machine learning, off-target, adverse effects} %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
@@ -500,23 +502,25 @@ for test example $i$.  A smaller value is preferable.
 \end{figure}
 
 \subsection*{Modeling workflow}
-Before the training, the CPSign \texttt{precompute} command was run, in order to
-generate a sparse representation of each target's dataset.
-ACPs consisting of 10 models were then trained for each target using the CPSign software using the \texttt{train} command.
-The cost value used was the one obtained from the hyperparameter tuning.
-The observations added as `assumed non-actives' were not included in the calibration set to avoid biasing the evaluation.
+Before the training, the CPSign \texttt{precompute} command was run, in order
+to generate a sparse representation of each target's dataset.  ACPs consisting
+of 10 models were then trained for each target using the CPSign software using
+the \texttt{train} command.  The cost value used was the one obtained from the
+hyperparameter tuning.  The observations added as `assumed non-actives' were
+not included in the calibration set to avoid biasing the evaluation.
 % (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L69-L101}{here}).
-The computational workflows for orchestrating the extraction of data, model building,
-and the collection of results for summarization and plotting were
+The computational workflows for orchestrating the extraction of data, model
+building, and the collection of results for summarization and plotting were
 implemented in the Go programming language using the SciPipe workflow library
 that is available as open source software at
-\href{http://scipipe.org}{scipipe.org} or \href{https://github.com/scipipe/scipipe}{github.com/scipipe/scipipe}.
-The cost values for each target is stored in the workflow code, available on
-GitHub (https://github.com/pharmbio/ptp-project).  An example of the modeling
-workflow is shown in figure \ref{fig:workflow_graph_clean}, which shows the workflow
-used for comparing efficiency metrics when adding assumed non-actives, versus
-when not adding them. More detailed workflow graphs are available in the supplemental
-material (figure \ref{fig:workflow_detailed_fillup_vs_not} and
+\href{http://scipipe.org}{scipipe.org}.  The cost values for each target is
+stored in the workflow code, available on GitHub
+(\href{https://github.com/pharmbio/ptp-project}{github.com/pharmbio/ptp-project}).
+A graphical overview of the modeling workflow is shown in figure
+\ref{fig:workflow_graph_clean}, which shows the workflow used for comparing
+efficiency metrics when adding assumed non-actives, versus when not adding
+them. More detailed workflow graphs are available in the supplemental material
+(figure \ref{fig:workflow_detailed_fillup_vs_not} and
 \ref{fig:workflow_detailed_wo_drugbank}).
 
 
@@ -527,6 +531,14 @@ material (figure \ref{fig:workflow_detailed_fillup_vs_not} and
 % Results  %
 %%%%%%%
 \section*{Results}
+
+\subsection*{Published models}
+Models for all targets in Dataset1 were produced, in the form of portable Java
+Archive (JAR) files, which were also build into similarly portable Docker
+containers. The model JAR files contain inside an audit log produced by
+SciPipe, containing a trace of the workflow (all the shell commands and
+parameters) used to produce them. They are available for download at
+Zenodo\todo{Upload to Zenodo and add link}.
 
 \subsection*{Validity of models}
 To check that the conformal prediction models are valid (i.e. that they predict with
@@ -811,14 +823,14 @@ the drug discovery process.
 \FloatBarrier
 \section*{Conclusion}
 We developed a methodology and implementation of target prediction profiles,
-with fully automated and reproducible data preprocessing and model training
-with models packaged as portable docker containers that can be deployed on any
-system. We trained data on 31 targets related to drug safety from the ExCAPE
-database and published these as a predictive profiles using conformal
-prediction to deliver prediction intervals for each target. The example
-profiles are deployed as online services with an interoperable API, and we
-showed how these can be integrated to form a profile or targets to illustrate
-multi-target bindning for chemical compounds.
+with fully automated and reproducible data pre-processing and model training
+workflows to build them. Models are packaged as portable Java Archive (JAR)
+files, and as docker containers that can be deployed on any system. We trained
+data on 31 targets related to drug safety from the ExCAPE dataset and published
+these as a predictive profiles using conformal prediction to deliver prediction
+intervals for each target. The example profiles are deployed as online services
+with an interoperable API, and we showed how these can be integrated to form a
+profile or targets to illustrate multi-target bindning for chemical compounds.
 
 
 
@@ -831,6 +843,7 @@ multi-target bindning for chemical compounds.
     \item ACP: Aggregated Conformal Predictor
     \item CAOF: Class-Averaged Observed Fuzziness
     \item CP: Conformal Prediction
+    \item JAR: Java Archive (A file format)
     \item MC: M Criterion (Fraction of multi-label predictions)
     \item N: Non-active
     \item OF: Observed Fuzziness
