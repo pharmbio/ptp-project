@@ -440,7 +440,7 @@ OF =  \frac
 
 where $p_i^N$ is the $i^{th}$ p-value for class $N$, $p_i^A$ is the $i^{th}$
 p-value for class $A$ and $m_A$ and $m_N$ is the number of test examples in
-class $A$ and $N$ respectively. $OF$ is basicly an average of the p-values for
+class $A$ and $N$ respectively. $OF$ is basically an average of the p-values for
 the wrong class, \textit{i.e.}, lower fuzziness means better prediction.
 
 To study the effect of imbalanced datasets on efficiency, we also implemented a
@@ -472,6 +472,19 @@ by the larger class and $CAOF$ is equally contributed to from both classes.
 %
 $CAOF$ was not used for cost selection, but is provided for information in the
 results from the workflow.
+
+A commonly used efficiency measure in CP is the size of the prediction region or set 
+given by the predictor. In a classification setting, this is expressed as the fraction of
+\textit{multilabel} predictions. This measure is denoted as the \textit{M criterion} and described 
+in \cite{Vovk2016}:
+
+\begin{equation}
+\text{\textit{M criterion}} = \frac{ 1}{m} \sum\limits_{i=1}^{m}  \boldsymbol{1}_{\{|\Gamma_i|>1\}}	
+\end{equation}
+where $\boldsymbol{1}_E$ denotes the indicator function of event $E$, returning the 
+value 1 if $E$ occurs and 0 otherwise, and $\Gamma_i$ denotes the prediction set 
+for test example $i$.  A smaller value is preferable. 
+
 
 
 \begin{figure}[h!]
