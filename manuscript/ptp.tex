@@ -475,7 +475,7 @@ results from the workflow.
 
 A commonly used efficiency measure in CP is the size of the prediction region or set 
 given by the predictor. In a classification setting, this is expressed as the fraction of
-\textit{multilabel} predictions. This measure is denoted as the \textit{M criterion} and described 
+\textit{multi-label} predictions. This measure is denoted as the \textit{M criterion} (MC) and described
 in \cite{Vovk2016}:
 
 \begin{equation}
@@ -567,7 +567,7 @@ assumed non-actives?}
 
 %\subsection*{Before and after fill up with assumed non-actives}
 \subsection*{Efficiency of models}
-The efficiency metric CAOF for Dataset2 (without adding assumed non-actives)
+The efficiency metrics OF, CAOF and MC for Dataset2 (without adding assumed non-actives)
 are shown in figure~\ref{fig:21small_orig}. In figure \ref{fig:21small_fill},
 the same metrics are shown for when all target datasets (still in Dataset2)
 have been filled up with assumed non-actives, to compensate these target
@@ -575,9 +575,8 @@ datasets' imbalanced nature.
 %, after fillup with assumed non-actives for the 21 targets with less than
 %10\,000 non-actives in ExcapeDB.
 We observe that by adding assumed non-actives for small, imbalanced datasets we
-improve the efficiency of models trained on these datasets (OF, and CAOF, shown
-by the green and blue lines respectively, improve). Thus, this strategy of
-filling up the ``small'' target datasets in Dataset2 was chosen for the
+improve the efficiency of models trained on these datasets. Thus, this strategy
+of filling up the ``small'' target datasets in Dataset2 was chosen for the
 subsequent analysis workflows.
 
 \begin{figure}[h!]
@@ -605,7 +604,7 @@ subsequent analysis workflows.
         Targets are here sorted by total number of compounds.}
         \label{fig:10large}
     \end{minipage}
-    \caption{Efficiency metrics for Dataset1 (Efficiency, Observed Fuzziness
+    \caption{Efficiency metrics for Dataset1 (M Criterion, Observed Fuzziness
     and Class-Averaged Observed Fuzziness) for Dataset2 and Dataset3.}
 \end{figure}
 
@@ -834,6 +833,7 @@ multi-target bindning for chemical compounds.
     \item ACP: Aggregated Conformal Predictor
     \item CAOF: Class-Averaged Observed Fuzziness
     \item CP: Conformal Prediction
+    \item MC: M Criterion (Fraction of multi-label predictions)
     \item N: Non-active
     \item OF: Observed Fuzziness
     \item QSAR: Quantitative Structure-Activity Relationship

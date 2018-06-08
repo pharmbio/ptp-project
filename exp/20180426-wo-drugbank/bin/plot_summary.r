@@ -106,7 +106,7 @@ eff_median <- eff_median[order(sort_vector_totcounts$x),]
 par(new=TRUE);
 plot(bplt, 1-eff_median$x, type="l", axes=FALSE, col=col_eff, col.axis=col_eff, las=2, ylab=NA, xlab=NA, ylim=c(0,1));
 axis(4, las=2, col="black", col.axis="black", at=c(0,0.5,1), labels=c("1", "0.5", "0"));
-mtext("Efficiency (prediction set size)", side=4, line=3.6, col=col_eff)
+mtext("M Criterion (MC)", side=4, line=3.6, col=col_eff)
 # --------------------------------------------------------------------------------
 
 
