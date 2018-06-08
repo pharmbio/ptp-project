@@ -640,7 +640,7 @@ of the 31 targets for all compounds for which we had known binding data for a
 particular target. The validation was done with CPSign's \texttt{validate}
 command, predicting values at confidence levels 0.8 and 0.9.
 %
-In figure \ref{fig:valplots} the class membership change for Dataset4,
+In figure \ref{fig:valplots} predicted versus observed labels for Dataset4,
 for confidence levels 0.8 and 0.9 respectively is shown. We see how the number
 of prediction of ``both'' labels increase when the confidence level increases
 from 0.8 to 0.9. This is as expected, as this means that fewer compounds could
@@ -669,7 +669,7 @@ level, which leads to larger prediction sets.
     at confidence level 0.8 (\ref{fig:valplots:a}) and 0.9
     (\ref{fig:valplots:b}).  The labels on the X-axis indicate predicted labels
     (Null, Active (A), Non-active (N) or Both). White in the stacked bar plot
-    means that the original label was Active (A), while grey means the original
+    means that the observed label was Active (A), while grey means the observed
     label was Non-Active (N).
     }
     \label{fig:valplots}

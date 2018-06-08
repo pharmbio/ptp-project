@@ -28,20 +28,21 @@
   - [x] Plot the large targets as a separate plot
   - [x] Maybe do 1, 2 and 3 as subplots
 - [x] Extend discussion (Ola)
-- [ ] Create table of all the datasets (Samuel)
-- [ ] Reword "fill-up" to something like "adding assumed non-actives" (All)
-- [ ] Make a short nice URL via pharmb.io and logo
-- [ ] Add URL to reference page
-- [ ] Original class: Observed
-- [ ] Write conclusion (All)
-- [ ] Press more on what we provide and what is new, and its implications (All)
-- [ ] Write about separate treatment of assumed negatives, and explain what
-  this means (Staffan?, Samuel?)
-- [ ] Describe "Original CP Efficiency" (Staffan?)
-- [ ] Write something about "Credibility" in discussion (Staffan?)
-- [ ] Try making class membership plots into bubble plots (Staffan)
-- [ ] Rename class membership plots to "predicted versus observed" or similar,
+- [x] Describe "Original CP Efficiency" (Staffan?)
+- [x] Try making class membership plots into bubble plots (Staffan)
+- [x] Rename class membership plots to "predicted versus observed" or similar,
   in the text (Samuel)
+- [x] Write something about "Credibility" in discussion (Staffan?)
+- [x] Original class: Observed
+- [>] Write conclusion (All)
+- [>] Write about separate treatment of assumed negatives, and explain what
+  this means (Staffan?, Samuel?)
+- [ ] Press more on what we provide and what is new, and its implications (All)
+- [ ] Update plots about "M criterion" (Samuel)
+- [ ] Create table of all the datasets (Samuel)
+- [ ] Reword "fill-up" to something like "adding assumed non-actives" (Samuel)
+- [ ] Add URL to reference page (Jonathan?)
+- [ ] Make a short nice URL via pharmb.io and logo (Jonathan?)
 
 ## On Hold
 
