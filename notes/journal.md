@@ -627,7 +627,7 @@ Attending: Ola, Jonathan, Arvid, Samuel
 - Not many changes after AstraZeneca review.
 - [x] Include Observed Fuzziness in plots (not only Class-Averaged OF)
 - [x] Remake the plot (so axles don't cut the bars)
-- [ ] Models on Zenodo (as a backup)?
+- [x] Models on Zenodo (as a backup)?
 - [ ] Shape up prediction web UI
 - [ ] Re-compute final models (including the Drugbank compounds)
 
@@ -643,20 +643,19 @@ Attending: Ola, Jonathan, Staffan, Samuel
 
 ## Todos
 
-- [ ] Extend discussion
-- [ ] Write conclusion
-- [ ] Press more on what we provide and what is new, and its implications
-- [ ] Write about separate treatment of assumed negatives, and explain what
+- [x] Extend discussion
+- [x] Write conclusion
   this means
-- [ ] Describe "Original CP Efficiency" (Staffan)
-- [ ] Include plot of large targets (wo-drugbank)
+- [x] Describe "Original CP Efficiency" (Staffan)
+- [x] Include plot of large targets (wo-drugbank)
 - Plot the large targets as a separate plot
 - Maybe do 1, 2 and 3 as subplots
-- [ ] Original class: Observed
-- [ ] Write something about "Credibility" in discussion
-- [ ] Try making class membership plots into bubble plots (Staffan)
-- [ ] Rename class membership plots to "predicted versus observed" or similar,
+- [x] Original class: Observed
+- [x] Write something about "Credibility" in discussion
+- [x] Try making class membership plots into bubble plots (Staffan)
+- [x] Rename class membership plots to "predicted versus observed" or similar,
   in the text
-- [ ] Add some inline labels denoting gene names and such, in the target
+- [x] Add some inline labels denoting gene names and such, in the target
   profile plots (Jonathan)
-
+- [?] Press more on what we provide and what is new, and its implications
+- [ ] Write about separate treatment of assumed negatives, and explain what

@@ -38,6 +38,7 @@
 - [x] Reword "fill-up" to something like "adding assumed non-actives" (Samuel)
 - [x] Create table of all the datasets (Samuel)
 - [x] Write conclusion (All)
+- [x] Upload models to Zenodo, and cite
 - [ ] Write about separate treatment of assumed negatives, and explain what
   this means (Staffan?, Samuel?)
 - [ ] Press more on what we provide and what is new, and its implications (All)
