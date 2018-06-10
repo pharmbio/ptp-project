@@ -90,7 +90,7 @@
 \newcommand{\inlinetodo}[1]{{\color{magenta}\oldtodo[inline]{\color{white}\textsf{\small#1}}}}
 
 \def\keyFont{\fontsize{8}{11}\helveticabold }
-\def\firstAuthorLast{Lampa {et~al.}} %use et al only if is more than 1 author
+\def\firstAuthorLast{Lamp's {et~al.}} %use et al only if is more than 1 author
 \def\Authors{Samuel Lampa\,$^{1,*}$, Jonathan Alvarsson\,$^{1}$, Staffan Arvidsson Mc Shane\,$^{1}$, Arvid Berg\,$^{1}$, Ernst Ahlberg\,$^{2}$  and Ola Spjuth\,$^{1}$}
 % Affiliations should be keyed to the author's name with superscript numbers
 % and be listed as follows: Laboratory, Institute, Department, Organization,
@@ -208,9 +208,9 @@ of binding profiles for ligands~\cite{Cereto-Massague:2015px}, which also opens 
 to predict virtual compounds. A common approach to the target prediction
 problem is to use a panel of structure-activity relationship (QSAR)
 models~\cite{HanschQSAR}, where chemicals in a knowledge base with known
-interaction values (numerical or categorial) are described numerically by
+interaction values (numerical or categorical) are described numerically by
 descriptors and a statistical learning model is trained to predict numerical
-values (regression) or categorial values (classification). The recent increase
+values (regression) or categorical values (classification). The recent increase
 in the number of available data points in interaction databases such as ChEMBL~\cite{Gaulton:2017tm} and
 PubChem~\cite{Wang:2017cy} makes it possible to using ligand-based models to predict not only targets but also panels of targets.
 
@@ -359,7 +359,7 @@ al.}~\cite{Bowes2012}.
 \subsection*{Training data}
 
 A scientific workflow was constructed to automate the entire data
-preprocessing.  The first step comprised extracting data on binding association
+pre-processing.  The first step comprised extracting data on binding association
 between ligands and targets from the ExcapeDB dataset~\cite{Sun2017}, more
 specifically the columns Gene name, Original entry ID (PubChem CID or CHEMBL
 ID), SMILES and Activity flag. This was performed early in the workflow to make
@@ -381,9 +381,9 @@ form in the ExcapeDB dataset. To resolve this, PubMed was consulted to find
 synonymous gene symbols with the following replacements done:
 %
 \textit{KCNE1} was replaced with \textit{MINK1} which is present in ExcapeDB.
-\textit{CHRNA1} (coding for the $\alpha1$ subunit of the Acetylcholine
+\textit{CHRNA1} (coding for the $\alpha1$ sub-unit of the Acetylcholine
 receptor) is excluded, as it is not present in the dataset (\textit{CHRNA4},
-coding for the $\alpha4$ subunit of the Acetylcholine receptor, is present in
+coding for the $\alpha4$ sub-unit of the Acetylcholine receptor, is present in
 the dataset). We note that both \textit{MINK1} and \textit{CHRNA4} were removed
 in the filtering step mentioned above, since the dataset did not contain more
 than 100 active and 100 non-active compounds for \textit{MINK1} nor
@@ -420,11 +420,11 @@ examples. This contrasts to standard machine learning that delivers point
 estimates. In conformal prediction a prediction region contains the true
 value with probability equal to a selected significance level $\epsilon$. Such
 a prediction region can be obtained under the assumption that the observed data
-is exchangeable. An important impact is that the size of this region directly
-relate to the `strangeness' of the test example, and is an alternative to the
+is exchangeable. An important consequence is that the size of this region directly
+relates to the `strangeness' of the test example, and is an alternative to the
 concept of a model's `applicability domain'~\cite{norinder2014introducing}. For
-the classification case, a prediction comes as a set of p-values (one for each
-class), and in a Mondrian setting the classes are handled independently,
+the classification case, a prediction is represented as a set of p-values (one for each
+class), and in the Mondrian setting the classes are handled independently,
 which has attractive properties when dealing with imbalanced
 datasets~\cite{Norinder:2017qc,Sun:2017qm}.
 
@@ -432,7 +432,7 @@ In this study we used the Mondrian conformal prediction implementation in the
 software CPSign~\cite{CPSignDocs}, leveraging the
 liblinear SVM implementation~\cite{fan2008liblinear} together with the
 signatures molecular descriptor~\cite{faulon2003signature}.  This descriptor is
-based on the neighbouring of atoms in a molecule and has been shown to work
+based on the neighboring of atoms in a molecule and has been shown to work
 well for QSAR studies~\cite{lapins2018confidence,Alvarsson:2016pw} and for
 ligand-based target prediction~\cite{alvarsson2014ligand}. Support vector
 machines is a machine learning algorithm which is commonly used in QSAR
@@ -446,7 +446,7 @@ were treated separately, by providing them to the CPSign software with the
 documentation~\cite{CPSignDocs}.
 
 
-\subsection*{Hyperparameter tuning}
+\subsection*{Hyper-parameter tuning}
 For each of the 31 targets, a parameter sweep was run to find the optimal value
 of the cost parameter of liblinear, optimizing modeling efficiency using
 10-fold cross validation. The training approach used an Aggregated Conformal
@@ -534,11 +534,11 @@ Before the training, the CPSign \texttt{precompute} command was run, in order
 to generate a sparse representation of each target's dataset.  ACPs consisting
 of 10 models were then trained for each target using the CPSign software using
 the \texttt{train} command.  The cost value used was the one obtained from the
-hyperparameter tuning.  The observations added as `assumed non-actives' were
+hyper-parameter tuning.  The observations added as `assumed non-actives' were
 not included in the calibration set to avoid biasing the evaluation.
 % (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L69-L101}{here}).
 The computational workflows for orchestrating the extraction of data, model
-building, and the collection of results for summarization and plotting were
+building, and the collection of results for summarizing and plotting were
 implemented in the Go programming language using the SciPipe workflow library
 that is available as open source software at
 \href{http://scipipe.org}{scipipe.org}.  The cost values for each target is
@@ -664,7 +664,7 @@ In order to validate the predictive ability of the trained models, a new
 dataset was created (Dataset4) by withholding 1\,000 compounds from the
 ExcapeDB dataset, to form an external validation dataset. The compounds chosen
 to be withheld were the following: i) all small molecules in DrugBank (version
-5.0.11) with status ``withdrawn'', for which we could find either a pubchem ID
+5.0.11) with status ``withdrawn'', for which we could find either a PubChem ID
 or a CHEMBL ID, ii) a randomly selected subset of the remaining compounds in
 DrugBank 5.0.11, with status ``approved'', for which we could also find PubChem
 or CHEMBL IDs, until a total number of 1\,000 compounds was reached.  No regard
@@ -683,7 +683,7 @@ be predicted to only one specific label with the higher confidence level. The nu
 ``Null'' predictions decreases at a higher confidence, which is expected as the
 predictor must accept less probable (in the Conformal Prediction ranking sense)
 predictions to be considered part of the prediction region at a higher confidence.
-This behaviour might seem backwards, but at a higher confidence the predictor
+This behavior might seem backwards, but at a higher confidence the predictor
 has to include less likely predictions for it to reach the specified confidence
 level, which leads to larger prediction sets.
 
@@ -711,10 +711,10 @@ level, which leads to larger prediction sets.
 \end{figure}
 
 \subsection*{Target Profile-as-a-Service}
-All models based on Dataset2 were published as microservices with REST APIs
+All models based on Dataset2 were published as micro-services with REST APIs
 publicly made available using the OpenAPI specification on an OpenShift cluster
 and a web page federating all the models were created. The OpenAPI
-specification is a standardisation for how REST APIs are described, it means
+specification is a standardization for how REST APIs are described, it means
 that there is a common way for looking up how to use the REST API of a web
 service and that greatly simplifies the process of tying multiple different web
 services together. It simplifies calling the services from scripts as well as
@@ -810,15 +810,15 @@ positive predictions in the profile.
 % Discussion  %
 %%%%%%%
 \section*{Discussion}
-The use of workflows to automate preprocessing and model training and make it
+The use of workflows to automate pre-processing and model training and make it
 completely reproducible has several implications. Primarily, the entire process
 can be repeated as data change, e.g. new data is made available or data is
-curated. In our case, the preprocessing can be re-run when a new version of
+curated. In our case, the pre-processing can be re-run when a new version of
 ExCAPE-DB is released, and new models trained on up-to-date data can be
-deployed and published without delay. The components of the preprocessing
+deployed and published without delay. The components of the pre-processing
 workflow are however general, and can be re-used in other settings as well.
-Further, a user can select the specific targets that will be preprocessed, and
-focus the analysis on smaller subsets without having to preprocess and train
+Further, a user can select the specific targets that will be pre-processed, and
+focus the analysis on smaller subsets without having to pre-process and train
 models on all targets which could be resource-demanding. With a modular
 workflow it is also easy to replace specific components, such as evaluating
 different strategies and modeling methods.
@@ -829,7 +829,7 @@ public and private networks without cumbersome dependency management. We chose
 to deploy our services inside RedHat OpenShift container orchestration system,
 which has the benefit of providing a resilient and scalable service, but any
 readily available infrastructure provider is sufficient. The use of OpenAPI for
-deploying an interoperable service API menas that the service is simple to
+deploying an interoperable service API means that the service is simple to
 integrate and consume in many different ways, including being called from a web
 page (such as our reference page on \$URL\todo{add url to page here}, but also
 into third party applications and workflow systems. With the flexibility to
@@ -856,7 +856,7 @@ data on 31 targets related to drug safety from the ExCAPE dataset and published
 these as a predictive profiles using conformal prediction to deliver prediction
 intervals for each target. The example profiles are deployed as online services
 with an interoperable API, and we showed how these can be integrated to form a
-profile or targets to illustrate multi-target bindning for chemical compounds.
+profile or targets to illustrate multi-target binding for chemical compounds.
 
 
 
@@ -1090,7 +1090,7 @@ Detailed workflow graph for the comparing the effect of extending target
 datasets with assumed non-actives, can be seen in figure
 \ref{fig:workflow_detailed_fillup_vs_not}.
 
-Detailed workflow graph for the workflow where drugbank compounds were removed,
+Detailed workflow graph for the workflow where DrugBank compounds were removed,
 can be seen in figure~\ref{fig:workflow_detailed_wo_drugbank}.
 
 \begin{figure}[h!]
@@ -1102,9 +1102,9 @@ can be seen in figure~\ref{fig:workflow_detailed_wo_drugbank}.
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{figures/workflow_graph_wo_drugbank.pdf}
-    \caption{Detailed workflow graph for the workflow where drugbank compounds
+    \caption{Detailed workflow graph for the workflow where DrugBank compounds
     were removed. Note the additional components in the top of the figure, for
-    preparing and extracting data from the drugbank dataset.}
+    preparing and extracting data from the DrugBank dataset.}
     \label{fig:workflow_detailed_wo_drugbank}
 \end{figure}
 
