@@ -439,6 +439,11 @@ machines is a machine learning algorithm which is commonly used in QSAR
 studies~\cite{norinder2003support,zhou2011qsar} together with molecular
 signatures and similar molecular descriptors, \textit{e.g.}, the extended
 connectivity fingerprints~\cite{rogers2010extended}.
+In order to not use the assumed non-active compounds in Dataset2 in the
+calibration step in the Conformal Prediction method, these additional compounds
+were treated separately, by providing them to the CPSign software with the
+\texttt{--proper-train} parameter, as documented in the CPSign
+documentation~\cite{CPSignDocs}.
 
 
 \subsection*{Hyperparameter tuning}
