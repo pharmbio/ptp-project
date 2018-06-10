@@ -39,9 +39,9 @@
 - [x] Create table of all the datasets (Samuel)
 - [x] Write conclusion (All)
 - [x] Upload models to Zenodo, and cite
-- [ ] Write about separate treatment of assumed negatives, and explain what
+- [x] Write about separate treatment of assumed negatives, and explain what
   this means (Staffan?, Samuel?)
-- [ ] Press more on what we provide and what is new, and its implications (All)
+- [?] Press more on what we provide and what is new, and its implications (All)
 - [ ] Add URL to reference page (Jonathan?)
 - [ ] Make a short nice URL via pharmb.io and logo (Jonathan?)
 
