@@ -237,14 +237,14 @@ prediction tool that queries ChEMBL bioactivity data using multiple
 fingerprints.
 
 
-We note two important shortcomings among previous works. Primarily, available
+We observe three important shortcomings among previous works. Primarily, available
 methods for ligand-based target profiling often do not offer valid measures of
 confidence in predictions, leaving the user uncertain about the usefulness of
 predictions. Secondly, the majority of the web tools lack an open and
 standardized API, meaning that it is not straightforward (and in most cases not
 possible at all) to consume the services programmatically, such as from a
 script, or a scientific workflow management system used in drug discovery like
-KNIME~\cite{Mazanetz:2012gy}.
+KNIME~\cite{Mazanetz:2012gy}. Thirdly, previous works do not publish the preprocessing and modeling workflows in reproducible formats, rendering it hard to update the models as data changes, and limits the portability of methods. In fact, most implementations are only accessible from a website without the underlying implementations being openly available for inspection.
 
 We here present an approach for ligand-based target profiling using a
 confidence framework, delivering target profiles with confidence scores for the
@@ -392,14 +392,11 @@ an automated and reproducible data processing workflow, these targets could
 potentially be included in subsequent runs on later versions of the database
 with additional data available.
 
-The resulting set (named Dataset1. See table~\ref{tbl:datasets} for
-an overview of all datasets) consisted of 31 targets (marked as included in
+The resulting set (named Dataset1) consisted of 31 targets (marked as included in
 Table~\ref{tbl:targets}). For 21 of these targets, the dataset contained less
 than 10\,000 non-active compounds, leading to imbalanced datasets (marked with
 a \checkmark\ in the `Assumed non-actives added' column of Table~\ref{tbl:targets}).
-These 21 targets were called Dataset2.
-%
-For these 21 targets making up Dataset2, we extended their respective datasets with randomly
+These 21 targets are referred to as Dataset2, and their respective target datasets was expanded with randomly
 selected examples from the ExcapeDB dataset which were not reported to be active for
 the target, thus being `assumed non-active'. The number of new examples was chosen such that the total
 number of non-actives and assumed non-actives added up to twice the number of
@@ -415,8 +412,8 @@ table~\ref{tbl:targets}.
 
 \subsection*{Conformal prediction}
 Conformal Prediction (CP)~\cite{Vovk2005} provides a layer on top of
-existing machine learning methods and yields valid prediction regions for test
-examples. This contrasts to standard machine learning that delivers point
+existing machine learning methods and produces valid prediction regions for test
+objects. This contrasts to standard machine learning that delivers point
 estimates. In conformal prediction a prediction region contains the true
 value with probability equal to a selected significance level $\epsilon$. Such
 a prediction region can be obtained under the assumption that the observed data
@@ -442,12 +439,12 @@ connectivity fingerprints~\cite{rogers2010extended}.
 In order to not use the assumed non-active compounds in Dataset2 in the
 calibration step in the Conformal Prediction method, these additional compounds
 were treated separately, by providing them to the CPSign software with the
-\texttt{--proper-train} parameter, as documented in the CPSign
+\texttt{--proper-train} parameter, see the CPSign
 documentation~\cite{CPSignDocs}.
 
 
 \subsection*{Hyper-parameter tuning}
-For each of the 31 targets, a parameter sweep was run to find the optimal value
+For each of the 31 targets in Dataset 1, a parameter sweep was run to find the optimal value
 of the cost parameter of liblinear, optimizing modeling efficiency using
 10-fold cross validation. The training approach used an Aggregated Conformal
 Predictor (ACP) with 10 aggregated models.  The parameter sweep evaluated three
@@ -716,7 +713,7 @@ larger prediction sets.
 \subsection*{Target Profile-as-a-Service}
 All models based on Dataset2 were published as micro-services with REST APIs
 publicly made available using the OpenAPI specification~\cite{OpenAPI} on an OpenShift~\cite{OpenShift} cluster.
-A web page federating all the models was also created. The OpenAPI
+A web page aggregating all the models was also created. The OpenAPI
 specification is a standardization for how REST APIs are described, meaning
 that there is a common way for looking up how to use the REST API of a web
 service and that greatly simplifies the process of tying multiple different web
@@ -728,13 +725,13 @@ draw a molecule. As the user draws the molecule, the web page extracts the
 SMILES from the editor and sends it to the individual model services to get predictions
 based on all available models. The user can set a threshold for the confidence
 and get visual feedback on whether the models predict the drawn molecule as
-active or non-active for each of the targets, at the chosen confidence. On
-theright hand is a graphical profile in the form of a bar plot where confidence of
+active or non-active for each of the targets, at the chosen confidence. In figure~\ref{fig:web} on
+the right side is a graphical profile in the form of a bar plot where confidence of
 the active label is drawn in the upward direction and the confidence for
 non-active is drawn in the downward direction. Hovering a bar in the plot will
 give information about which model a the bar corresponds to. The web page is
 accessible at
-\url{http://ptp.os.pharmb.io/}
+\url{http://ptp.os.pharmb.io/}\todo{why not \url{http://ptp.services.pharmb.io/}}
 %\inlinetodo{make short nice URL with pharmb.io and UU logo}.
 \begin{figure}
     \begin{minipage}{0.70\textwidth}
@@ -771,7 +768,7 @@ muscarinic acetylcholine receptor M$_1$ agonist, with a target profile
 consisting of mostly non-active predictions, and only mildly two active targets
 (CHRM1 and LCK). We note that LCK has a similar p-value for active and
 non-active. For a conformal prediction in binary classification setting, the 
-\textit{confidence} of a prediction is defined as 1-`lowest p-value' \cite{Vovk2005}
+\textit{confidence}\todo{credibility?} of a prediction is defined as 1-`lowest p-value' \cite{Vovk2005}
 - meaning that even if a prediction has one high p-value, its confidence and hence 
 usefulness in a decision setting might be low. Figure~\ref{fig:threeprofiles:c} 
 shows the target profile for Pergolide,
@@ -896,7 +893,7 @@ OS conceived the study. OS, JA, SA and SL designed the study, interpreted
 results, and wrote the manuscript. SL implemented the workflow and carried out
 the analysis. SA extended CPSign with new features. JA, SA and AB contributed
 with model deployment and APIs. EA contributed with expertise in target
-profiles and cheminformatics. All authors read and approved the manuscript.
+profiles and modeling. All authors read and approved the manuscript.
 
 
 %The Author Contributions section is mandatory for all articles, including
