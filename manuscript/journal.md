@@ -41,9 +41,9 @@
 - [x] Upload models to Zenodo, and cite
 - [x] Write about separate treatment of assumed negatives, and explain what
   this means (Staffan?, Samuel?)
-- [?] Press more on what we provide and what is new, and its implications (All)
-- [ ] Add URL to reference page (Jonathan?)
-- [ ] Make a short nice URL via pharmb.io and logo (Jonathan?)
+- [x] Press more on what we provide and what is new, and its implications (All)
+- [x] Add URL to reference page (Jonathan?)
+- [x] Make a short nice URL via pharmb.io and logo (Jonathan?)
 
 ## EAs suggestions
 
