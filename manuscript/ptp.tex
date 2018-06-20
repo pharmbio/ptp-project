@@ -527,7 +527,7 @@ for test example $i$.  A smaller value is preferable.
     from top to bottom, of the graph. Each experiment contains additions and
     modifications to the workflow, but the workflow shown here, exemplifies
     the basic structure, common among most of the workflows. For more
-    detailed workflow plots, see the supplemental material.}
+    detailed workflow plots, see the supplemental material, figures 4 and 5.}
     \label{fig:workflow_graph_clean}
 \end{center}
 \end{figure}
@@ -549,12 +549,7 @@ stored in the workflow code, available on GitHub
 (\href{https://github.com/pharmbio/ptp-project}{github.com/pharmbio/ptp-project}).
 A graphical overview of the modeling workflow is shown in
 figure~\ref{fig:workflow_graph_clean}. More detailed workflow graphs are
-available in the supplemental material
-(figure~\ref{fig:workflow_detailed_fillup_vs_not} and
-\ref{fig:workflow_detailed_wo_drugbank}).
-
-
-
+available in the supplemental material (figure~4 and 5).
 
 
 %%%%%%%
@@ -577,7 +572,7 @@ were generated in the cross validation step of the workflow. Three example
 plots, for three representative targets (the smallest, the median-sized and the
 largest, in terms of compounds in ExcapeDB) can be seen in figure
 \ref{fig:calplots}, while calibration plots for all targets can be
-found in the supplemental material (figure~\ref{fig:calplots_all}).
+found in the supplemental material (figure~1).
 From these calibration plots we conclude that all models produce valid results over all
 significance levels.
 
@@ -691,7 +686,8 @@ predictor must consider less probable (in the Conformal Prediction ranking
 sense) predictions to be part of the prediction region. This behavior might seem
 backwards, but at a higher confidence the predictor has to include less likely
 predictions in order to reach the specified confidence level, which leads to
-larger prediction sets.
+larger prediction sets. For predicted versus observed labels for each target
+individually, see the supplemental material, figure 2 and 3.
 
 \begin{figure}[h!]
 \begin{minipage}[c]{0.38\textwidth}
@@ -711,7 +707,9 @@ larger prediction sets.
     (\ref{fig:valplots:b}). The x-axis show observed labels (as found in
     ExcapeDB), while the y-axis show the set of predicted labels. The areas of
     the circles are proportional to the number of compound-target binding data
-    points, for each observed label/predicted label combination.}
+    points, for each observed label/predicted label combination.
+    For predicted versus observed labels for each target individually, see
+    the supplemental material, figure 2 and 3.}
     \label{fig:valplots}
 \end{figure}
 
