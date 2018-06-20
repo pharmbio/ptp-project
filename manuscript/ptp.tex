@@ -431,7 +431,9 @@ liblinear SVM implementation~\cite{fan2008liblinear} together with the
 signatures molecular descriptor~\cite{faulon2003signature}.  This descriptor is
 based on the neighboring of atoms in a molecule and has been shown to work
 well for QSAR studies~\cite{lapins2018confidence,Alvarsson:2016pw} and for
-ligand-based target prediction~\cite{alvarsson2014ligand}. Support vector
+ligand-based target prediction~\cite{alvarsson2014ligand}. Signatures were
+generated with height 3, which means that molecular subgraphs including all atoms
+of distance 3 from initial atoms, are generated. Support vector
 machines is a machine learning algorithm which is commonly used in QSAR
 studies~\cite{norinder2003support,zhou2011qsar} together with molecular
 signatures and similar molecular descriptors, \textit{e.g.}, the extended
