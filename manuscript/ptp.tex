@@ -737,16 +737,26 @@ accessible at
     \begin{minipage}{0.70\textwidth}
         \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
         \includegraphics[height=0.37\textheight]{figures/terbutaline.png}
-        \subcaption{The profile as it looks on the web page. The user draws a
-        molecule, selects a confidence, whereafter the profile updates
-        underneath.}
+        \subcaption{The profile as seen on the web page (on the right hand in
+        the figure). To show the profile, the user draws a molecule and
+        selects a confidence level, whereafter the profile will update
+        underneath. The profile is shown as a bar plot with two bars for each
+        target: A purple bar, pointing in the upward direction, indicating
+        the size of the p-value of the "Active" label, and a green bar,
+        pointing downwards, indicating the size of the p-value for the
+        "Non-active" label.}
         \label{fig:terbutaline:a}
     \end{minipage}
     \quad
     \begin{minipage}{0.25\textwidth}
         \fbox{\includegraphics[height=0.23\textheight]{figures/terbutaline2.png}}
         \subcaption{Coloring of which parts of the molecule contributed the
-        most to the prediction for ADBR2.}
+        most to the prediction for ADBR2. Red color indicates the centers of
+        molecular fragments (of height 3) that contributed most to the larger
+        class, while blue color indicates center of fragments contributing
+        most to the smaller class. In this case the larger class is "Active",
+        which can be seen in the size of the p-values in the bottom left of
+        the figure (p[A]=0.481 \textgreater p[N]=0.001).}
         \label{fig:terbutaline:b}
     \end{minipage}
     \caption{The prediction profile for Terbutaline, a known selective beta-2

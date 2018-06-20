@@ -49,8 +49,8 @@
 
 - [ ] Add Bender CP refs
 - [x] Add line of unity in calibration plots
-- [ ] Describe graph and colors in fig 5a
-- [ ] Write about color scale in fig 5b
+- [x] Describe graph and colors in fig 5a
+- [x] Write about color scale in fig 5b
 - [ ] Describe colors in fig 6
 
 ## Project pre-publication todos (not tied to manuscript)
