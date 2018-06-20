@@ -2,12 +2,89 @@
 %% http://bibdesk.sourceforge.net/
 
 
-%% Created for Ola Spjuth at 2018-06-07 20:37:22 +0200 
+%% Created for Ola Spjuth at 2018-06-20 20:35:38 +0200 
 
 
 %% Saved with string encoding Unicode (UTF-8) 
 
 
+
+@article{Norinder:2016qf,
+	Abstract = {A fundamental element when deriving a robust and predictive in silico model is not only the statistical quality of the model in question but, equally important, the estimate of its predictive boundaries. This work presents a new method, conformal prediction, for applicability domain estimation in the field of endocrine disruptors. The method is applied to binders and non-binders related to the oestrogen and androgen receptors. Ensembles of decision trees are used as statistical method and three different sets (dragon, rdkit and signature fingerprints) are investigated as chemical descriptors. The conformal prediction method results in valid models where there is an excellent balance in quality between the internally validated training set and the corresponding external test set, both in terms of validity and with respect to sensitivity and specificity. With this method the level of confidence can be readily altered by the user and the consequences thereof immediately inspected. Furthermore, the predictive boundaries for the derived models are rigorously defined by using the conformal prediction framework, thus no ambiguity exists as to the level of similarity needed for new compounds to be in or out of the predictive boundaries of the derived models where reliable predictions can be expected. },
+	Author = {Norinder, U and Rybacka, A and Andersson, P L},
+	Date-Added = {2018-06-20 18:35:17 +0000},
+	Date-Modified = {2018-06-20 18:35:17 +0000},
+	Doi = {10.1080/1062936X.2016.1172665},
+	Journal = {SAR QSAR Environ Res},
+	Journal-Full = {SAR and QSAR in environmental research},
+	Keywords = {Conformal prediction; androgen receptor; oestrogen receptor; random forest; signature descriptors},
+	Mesh = {Androgens; Computer Simulation; Endocrine Disruptors; Estrogens; Molecular Conformation; Protein Binding; Quantitative Structure-Activity Relationship; Receptors, Androgen; Receptors, Estrogen},
+	Month = {Apr},
+	Number = {4},
+	Pages = {303-16},
+	Pmid = {27088868},
+	Pst = {ppublish},
+	Title = {Conformal prediction to define applicability domain - A case study on predicting ER and AR binding},
+	Volume = {27},
+	Year = {2016},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1080/1062936X.2016.1172665}}
+
+@article{Forreryd:2018kb,
+	Abstract = {GARD - Genomic Allergen Rapid Detection is a cell based alternative to animal testing for identification of skin sensitizers. The assay is based on a biomarker signature comprising 200 genes measured in an in vitro model of dendritic cells following chemical stimulations, and consistently reports predictive performances ~90% for classification of external test sets. Within the field of in vitro skin sensitization testing, definition of applicability domain is often neglected by test developers, and assays are often considered applicable across the entire chemical space. This study complements previous assessments of model performance with an estimate of confidence in individual classifications, as well as a statistically valid determination of the applicability domain for the GARD assay. Conformal prediction was implemented into current GARD protocols, and a large external test dataset (n = 70) was classified at a confidence level of 85%, to generate a valid model with a balanced accuracy of 88%, with none of the tested chemical reactivity domains identified as outside the applicability domain of the assay. In conclusion, results presented in this study complement previously reported predictive performances of GARD with a statistically valid assessment of uncertainty in each individual prediction, thus allowing for classification of skin sensitizers with confidence.},
+	Author = {Forreryd, Andy and Norinder, Ulf and Lindberg, Tim and Lindstedt, Malin},
+	Date-Added = {2018-06-20 18:34:40 +0000},
+	Date-Modified = {2018-06-20 18:34:40 +0000},
+	Doi = {10.1016/j.tiv.2018.01.021},
+	Journal = {Toxicol In Vitro},
+	Journal-Full = {Toxicology in vitro : an international journal published in association with BIBRA},
+	Keywords = {Applicability domain; Conformal prediction; GARD; In vitro assay; Skin sensitization},
+	Month = {Apr},
+	Pages = {179-187},
+	Pmid = {29374571},
+	Pst = {ppublish},
+	Title = {Predicting skin sensitizers with confidence - Using conformal prediction to determine applicability domain of GARD},
+	Volume = {48},
+	Year = {2018},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1016/j.tiv.2018.01.021}}
+
+@article{Cortes-Ciriano:2015ec,
+	Abstract = {Poly(ADP-ribose) polymerases (PARPs) play a key role in DNA damage repair. PARP inhibitors act as chemo- and radio- sensitizers and thus potentiate the cytotoxicity of DNA damaging agents. Although PARP inhibitors are currently investigated as chemotherapeutic agents, their cross-reactivity with other members of the PARP family remains unclear. Here, we apply Proteochemometric Modelling (PCM) to model the activity of 181 compounds on 12 human PARPs. We demonstrate that PCM (R0 (2) test =0.65-0.69; RMSEtest =0.95-1.01 $\,^{\circ}$C) displays higher performance on the test set (interpolation) than Family QSAR and Family QSAM (Tukey's HSD, α 0.05), and outperforms Inductive Transfer knowledge among targets (Tukey's HSD, α 0.05). We benchmark the predictive signal of 8 amino acid and 11 full-protein sequence descriptors, obtaining that all of them (except for SOCN) perform at the same level of statistical significance (Tukey's HSD, α 0.05). The extrapolation power of PCM to new compounds (RMSE=1.02$\pm$0.80 $\,^{\circ}$C) and targets (RMSE=1.03$\pm$0.50 $\,^{\circ}$C) is comparable to interpolation, although the extrapolation ability is not uniform across the chemical and the target space. For this reason, we also provide confidence intervals calculated with conformal prediction. In addition, we present the R package conformal, which permits the calculation of confidence intervals for regression and classification caret models.},
+	Author = {Cort{\'e}s-Ciriano, Isidro and Bender, Andreas and Malliavin, Th{\'e}r{\`e}se},
+	Date-Added = {2018-06-20 18:33:55 +0000},
+	Date-Modified = {2018-06-20 18:33:55 +0000},
+	Doi = {10.1002/minf.201400165},
+	Journal = {Mol Inform},
+	Journal-Full = {Molecular informatics},
+	Keywords = {Chemogenomics; PARP; Proteochemometrics; QSAR; Selectivity},
+	Mesh = {Humans; Models, Molecular; Poly(ADP-ribose) Polymerase Inhibitors; Poly(ADP-ribose) Polymerases; Sequence Analysis, Protein},
+	Month = {06},
+	Number = {6-7},
+	Pages = {357-66},
+	Pmid = {27490382},
+	Pst = {ppublish},
+	Title = {Prediction of PARP Inhibition with Proteochemometric Modelling and Conformal Prediction},
+	Volume = {34},
+	Year = {2015},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1002/minf.201400165}}
+
+@article{Norinder:2014fe,
+	Abstract = {Conformal prediction is introduced as an alternative approach to domain applicability estimation. The advantages of using conformal prediction are as follows: First, the approach is based on a consistent and well-defined mathematical framework. Second, the understanding of the confidence level concept in conformal predictions is straightforward, e.g. a confidence level of 0.8 means that the conformal predictor will commit, at most, 20% errors (i.e., true values outside the assigned prediction range). Third, the confidence level can be varied depending on the situation where the model is to be applied and the consequences of such changes are readily understandable, i.e. prediction ranges are increased or decreased, and the changes can immediately be inspected. We demonstrate the usefulness of conformal prediction by applying it to 10 publicly available data sets. },
+	Author = {Norinder, Ulf and Carlsson, Lars and Boyer, Scott and Eklund, Martin},
+	Date-Added = {2018-06-20 18:33:54 +0000},
+	Date-Modified = {2018-06-20 18:33:54 +0000},
+	Doi = {10.1021/ci5001168},
+	Journal = {J Chem Inf Model},
+	Journal-Full = {Journal of chemical information and modeling},
+	Mesh = {Computer Simulation; Models, Chemical; Molecular Conformation; Quantitative Structure-Activity Relationship; Regression Analysis},
+	Month = {Jun},
+	Number = {6},
+	Pages = {1596-603},
+	Pmid = {24797111},
+	Pst = {ppublish},
+	Title = {Introducing conformal prediction in predictive modeling. A transparent and flexible alternative to applicability domain determination},
+	Volume = {54},
+	Year = {2014},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1021/ci5001168}}
 
 @article{Hansch1964,
 	Author = {Hansch, C. and Fujita, T.},
@@ -507,40 +584,38 @@ CONCLUSION: PPB offers a versatile platform for target prediction based on multi
 	Bdsk-Url-1 = {https://doi.org/10.1186/s13321-017-0203-5},
 	Bdsk-Url-2 = {http://dx.doi.org/10.1186/s13321-017-0203-5}}
 
-@Article{HanschQSAR,
-    Title = {{A Quantitative Approach to Biochemical Structure-Activity Relationships.}},
-    Author = {Hansch C.},
-    Journal = {Acc. Chem. Res.},
-    Year = {1969},
-    Pages = {232-239},
-    Volume = {2},
-}
+@article{HanschQSAR,
+	Author = {Hansch C.},
+	Journal = {Acc. Chem. Res.},
+	Pages = {232-239},
+	Title = {{A Quantitative Approach to Biochemical Structure-Activity Relationships.}},
+	Volume = {2},
+	Year = {1969}}
 
 @misc{ModelsZenodo,
-    author = {Lampa, Samuel and Alvarsson, Jonathan and Arvidsson Mc Shane, Staffan and Berg, Arvid and Ahlberg, Ernst and Spjuth, Ola},
-    title = {{Predictive models for off-target binding profiles generation}},
-    month = jun,
-    year = 2018,
-    doi = {10.5281/zenodo.1286304},
-    url = {https://doi.org/10.5281/zenodo.1286304}
-}
+	Author = {Lampa, Samuel and Alvarsson, Jonathan and Arvidsson Mc Shane, Staffan and Berg, Arvid and Ahlberg, Ernst and Spjuth, Ola},
+	Doi = {10.5281/zenodo.1286304},
+	Month = jun,
+	Title = {{Predictive models for off-target binding profiles generation}},
+	Url = {https://doi.org/10.5281/zenodo.1286304},
+	Year = 2018,
+	Bdsk-Url-1 = {https://doi.org/10.5281/zenodo.1286304},
+	Bdsk-Url-2 = {http://dx.doi.org/10.5281/zenodo.1286304}}
 
 @electronic{OpenAPI,
-	Author = {},
 	Howpublished = {\url{https://www.openapi.org/}},
 	Note = {[Online; Accessed 11-June-2018]},
 	Title = {{OpenAPI Origin - Open Source Container Application Platform}},
 	Url = {https://www.openapi.org/},
 	Urldate = {2018-06-11},
-	Year = {2018}}
-
+	Year = {2018},
+	Bdsk-Url-1 = {https://www.openapi.org/}}
 
 @electronic{OpenShift,
-	Author = {},
 	Howpublished = {\url{https://www.openshift.org/}},
 	Note = {[Online; Accessed 11-June-2018]},
 	Title = {{OpenShift Origin - Open Source Container Application Platform}},
 	Url = {https://www.openshift.org/},
 	Urldate = {2018-06-11},
-	Year = {2018}}
-
+	Year = {2018},
+	Bdsk-Url-1 = {https://www.openshift.org/}}
