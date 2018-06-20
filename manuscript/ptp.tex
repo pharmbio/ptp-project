@@ -782,12 +782,13 @@ muscarinic acetylcholine receptor M$_1$ agonist, with a target profile
 consisting of mostly non-active predictions, and only mildly two active targets
 (CHRM1 and LCK). We note that LCK has a similar p-value for active and
 non-active. For a conformal prediction in binary classification setting, the 
-\textit{confidence}\todo{credibility?} of a prediction is defined as 1-`lowest p-value' \cite{Vovk2005}
-- meaning that even if a prediction has one high p-value, its confidence and hence 
-usefulness in a decision setting might be low. Figure~\ref{fig:threeprofiles:c} 
-shows the target profile for Pergolide,
-an agonist for DRD1, DRD2, HTR1A, and HTR2A which shows up as the four highest
-positive predictions in the profile.
+\textit{confidence} of a prediction is defined as $1 - p_2$ where $p_2$ is the
+lower p-value of the two, or in other words, the p-value for the class that was
+not predicted~\cite{Saunders1999}.  This means that even if a prediction has
+one high p-value, its confidence and hence usefulness in a decision setting
+might be low. Figure~\ref{fig:threeprofiles:c} shows the target profile for
+Pergolide, an agonist for DRD1, DRD2, HTR1A, and HTR2A which shows up as the
+four highest positive predictions in the profile.
 
 \begin{figure}
 \hfill
