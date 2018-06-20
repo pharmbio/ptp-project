@@ -518,7 +518,7 @@ for test example $i$.  A smaller value is preferable.
 \begin{figure}[h!]
 %\vspace{2\baselineskip}
 \begin{center}
-\includegraphics[width=0.63\textwidth]{figures/workflow_graph_clean.pdf}
+\includegraphics[width=0.63\textwidth]{figures/fig1_schematic_workflow.pdf}
     \caption{Schematic directed graph of processes and their data
     dependencies in the the modeling workflow used in the experiments in this
     study. Boxes represent processes, while edges represent data dependencies
@@ -584,17 +584,17 @@ significance levels.
 \begin{figure}[h!]
     \begin{minipage}[c]{0.3\textwidth}
         \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
-        \includegraphics[width=\textwidth]{figures/calibration_plots/pde3a_calib.pdf}
+        \includegraphics[width=\textwidth]{figures/fig2a_pde3a_calib.pdf}
         \label{fig:calplots:a}
         \subcaption{}
     \end{minipage}
     \begin{minipage}[c]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{figures/calibration_plots/slc6a2_calib.pdf}
+    \includegraphics[width=\textwidth]{figures/fig2b_slc6a2_calib.pdf}
         \label{fig:calplots:b}
         \subcaption{}
     \end{minipage}
     \begin{minipage}[c]{0.3\textwidth}
-        \includegraphics[width=\textwidth]{figures/calibration_plots/htr2a_calib.pdf}
+        \includegraphics[width=\textwidth]{figures/fig2c_htr2a_calib.pdf}
         \label{fig:calplots:c}
         \subcaption{}
     \end{minipage}
@@ -624,7 +624,7 @@ subsequent analysis workflows.
 \begin{figure}[h!]
     \begin{minipage}[t]{0.62\textwidth}
         \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
-        \includegraphics[width=\textwidth]{figures/21small_orig.pdf}
+        \includegraphics[width=\textwidth]{figures/fig3a_21small_orig.pdf}
         \subcaption{Dataset2 without extending with assumed non-actives.
             Circles show individual results from the three replicate runs that were
             run, while the lines show the median value from the individual replicate
@@ -632,7 +632,7 @@ subsequent analysis workflows.
         \label{fig:21small_orig}
     \end{minipage} \\
     \begin{minipage}[t]{0.62\textwidth}
-        \includegraphics[width=\textwidth]{figures/21small_fill.pdf}
+        \includegraphics[width=\textwidth]{figures/fig3b_21small_fill.pdf}
         \subcaption{Dataset2 after extending with assumed non-actives.
             Circles show individual results from the three replicate runs that were
             run, while the lines show the median value from the individual replicate
@@ -640,7 +640,7 @@ subsequent analysis workflows.
         \label{fig:21small_fill}
     \end{minipage}
     \begin{minipage}[t]{0.38\textwidth}
-        \includegraphics[width=\textwidth]{figures/10large.pdf}
+        \includegraphics[width=\textwidth]{figures/fig3c_10large.pdf}
         \subcaption{Dataset3, the 10 largest target datasets,
         which were not extended with assumed non-actives.
         Targets are here sorted by total number of compounds.}
@@ -697,13 +697,13 @@ larger prediction sets.
 \begin{minipage}[c]{0.38\textwidth}
     \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
     \subcaption[Predicted versus observed labels, for all targets at confidence level 0.8]{
-    \includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p8_valplot.pdf}
+    \includegraphics[width=1\textwidth]{figures/fig4a_alltargets_0p8_valplot.pdf}
     }\label{fig:valplots:a}
 \end{minipage}
 \hspace{0.10\textwidth}
 \begin{minipage}[c]{0.38\textwidth}
     \subcaption[Predicted versus observed labels, for all targets at confidence level 0.9]{
-        \includegraphics[width=1\textwidth]{figures/validation_plots/alltargets_0p9_valplot.pdf}
+        \includegraphics[width=1\textwidth]{figures/fig4b_alltargets_0p9_valplot.pdf}
     }\label{fig:valplots:b}
 \end{minipage}
     \caption{Predicted versus observed labels, for all targets, for the
@@ -740,7 +740,7 @@ accessible at \url{http://ptp.service.pharmb.io/}
 \begin{figure}
     \begin{minipage}{0.70\textwidth}
         \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
-        \includegraphics[height=0.37\textheight]{figures/terbutaline.png}
+        \includegraphics[height=0.37\textheight]{figures/fig5a_terbutaline.png}
         \subcaption{The profile as seen on the web page (on the right hand in
         the figure). To show the profile, the user draws a molecule and
         selects a confidence level, whereafter the profile will update
@@ -753,7 +753,7 @@ accessible at \url{http://ptp.service.pharmb.io/}
     \end{minipage}
     \quad
     \begin{minipage}{0.25\textwidth}
-        \fbox{\includegraphics[height=0.23\textheight]{figures/terbutaline2.png}}
+        \fbox{\includegraphics[height=0.23\textheight]{figures/fig5b_terbutaline2.png}}
         \subcaption{Coloring of which parts of the molecule contributed the
         most to the prediction for ADBR2. Red color indicates the centers of
         molecular fragments (of height 3) that contributed most to the larger
@@ -794,14 +794,14 @@ four highest positive predictions in the profile.
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
     \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
-    \includegraphics[width=\linewidth]{figures/chembl95.png}
+    \includegraphics[width=\linewidth]{figures/fig6a_chembl95.png}
     \subcaption{The profile for Tacrine, a centrally acting anticholinesterase,
     with a distinct peak for the ACHE gene.}
     \label{fig:threeprofiles:a}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
-    \includegraphics[width=\linewidth]{figures/chembl550.png}
+    \includegraphics[width=\linewidth]{figures/fig6b_chembl550.png}
     \subcaption{The profile for Pilocarpine, a muscarinic acetylcholine
     receptor M$_1$ agonist, with only two moderately higher peaks for positive
     prediction, CHRM1 and LCK.}
@@ -809,7 +809,7 @@ four highest positive predictions in the profile.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
-    \includegraphics[width=\linewidth]{figures/chembl531.png}
+    \includegraphics[width=\linewidth]{figures/fig6c_chembl531.png}
     \subcaption{The profile for Pergolide, a DRD1, DRD2, HTR1A, and HTR2A
     agonist, which is reflected by the four highest p-values for a positive
     prediction.}
