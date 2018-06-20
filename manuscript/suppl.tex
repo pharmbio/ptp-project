@@ -10,12 +10,35 @@
 \begin{document}
 
 \begin{center}
-{\LARGE\noindent Supplemental Material for: Predicting off-target binding
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TITLE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+{\LARGE\noindent Supplemental Material for article: Predicting off-target binding
     profiles with confidence using Conformal Prediction}
 \end{center}
 
-Supplemental 1: Calibration plots for all targets. See figure
-\ref{fig:calplots_all}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIGURE REFERENCES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Figure \ref{fig:calplots_all}: Calibration plots for all targets.
+
+Figure \ref{fig:valplots_all_0.8}: Predicted versus observed labels, at confidence level 0.8, for all targets.
+
+Figure \ref{fig:valplots_all_0.9}: Predicted versus observed labels, at confidence level 0.9 ,for all targets.
+
+Figure \ref{fig:workflow_detailed_fillup_vs_not}: Detailed workflow graph for
+the workflow comparing the effect of extending target datasets with assumed
+non-actives.
+
+Figure \ref{fig:workflow_detailed_wo_drugbank}: Detailed workflow graph for the
+workflow where DrugBank compounds were removed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIGURES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{figure}[h!]
 
@@ -61,9 +84,6 @@ Supplemental 1: Calibration plots for all targets. See figure
         confidence, for confidence values 0.05 to 0.95 with a step size of 0.05.}
     \label{fig:calplots_all}
 \end{figure}
-
-Supplemental 2: Predicted versus observed labels, at confidence level 0.8,
-    for all targets \ref{fig:valplots_all_0.8}.
 
 \begin{figure}[h!]
 
@@ -114,9 +134,6 @@ Supplemental 2: Predicted versus observed labels, at confidence level 0.8,
     \label{fig:valplots_all_0.8}
 \end{figure}
 
-Supplemental 3: Predicted versus observed labels, at confidence level 0.9,
-    for all targets \ref{fig:valplots_all_0.9}.
-
 \begin{figure}[h!]
 
 \includegraphics[width=0.15\textwidth]{figures/validation_plots/ache_0p9_valplot.pdf}
@@ -166,15 +183,6 @@ Supplemental 3: Predicted versus observed labels, at confidence level 0.9,
     \label{fig:valplots_all_0.9}
 \end{figure}
 
-Supplemental 4: Detailed workflow graphs.
-
-Detailed workflow graph for the comparing the effect of extending target
-datasets with assumed non-actives, can be seen in figure
-\ref{fig:workflow_detailed_fillup_vs_not}.
-
-Detailed workflow graph for the workflow where DrugBank compounds were removed,
-can be seen in figure~\ref{fig:workflow_detailed_wo_drugbank}.
-
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{figures/workflow_graph_fillup_vs_not.pdf}
     \caption{Detailed workflow graph for comparing the effect of extending
@@ -191,5 +199,4 @@ can be seen in figure~\ref{fig:workflow_detailed_wo_drugbank}.
 \end{figure}
 
 \end{document}
-
 
