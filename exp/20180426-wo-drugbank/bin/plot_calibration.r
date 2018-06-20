@@ -32,6 +32,8 @@ if (opt$format == 'png') {
 d <- read.csv(opt$infile, sep = '\t', header = TRUE);
 
 plot(d$confidence, d$accuracty, xlab="Confidence", ylab="Accuracy", xlim=c(0,1), ylim=c(0,1), axes=FALSE)
+par(new=TRUE)
+plot(c(0,1), c(0,1), type="l", axes=FALSE, xlab="", ylab="")
 axis(side=1, at=c(0.0,0.5,1.0), labels=c("0", "0.5", "1.0"), tick=TRUE)
 axis(side=2, at=c(0.0,0.5,1.0), labels=c("0", "0.5", "1.0"), tick=TRUE)
 #box()

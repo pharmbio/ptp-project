@@ -44,17 +44,20 @@
 - [?] Press more on what we provide and what is new, and its implications (All)
 - [ ] Add URL to reference page (Jonathan?)
 - [ ] Make a short nice URL via pharmb.io and logo (Jonathan?)
-- [ ] Rerun with DrugBank data included
-  - [ ] Publish updated models on Zenodo
-- [ ] Make a packaged and "re-usable" pipeline?
 
 ## EAs suggestions
 
 - [ ] Add Bender CP refs
-- [ ] Add line of unity in calibration plots
+- [x] Add line of unity in calibration plots
 - [ ] Describe graph and colors in fig 5a
 - [ ] Write about color scale in fig 5b
 - [ ] Describe colors in fig 6
+
+## Project pre-publication todos (not tied to manuscript)
+
+- [ ] Rerun with DrugBank data included
+  - [ ] Publish updated models on Zenodo
+- [ ] Make a packaged and "re-usable" pipeline?
 
 ## On Hold
 
