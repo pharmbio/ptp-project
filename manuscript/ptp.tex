@@ -43,7 +43,7 @@
 \usepackage[textsize=miniscule, linecolor=magenta, bordercolor=magenta,
             backgroundcolor=magenta, textwidth=1.1cm]{todonotes}
 
-%\linenumbers
+\linenumbers
 
 \makeatletter
 
@@ -191,7 +191,7 @@ interface and an OpenAPI interface for programmatic access.
  \keyFont{ \section{Keywords:} target profiles, predictive modelling, conformal prediction, machine learning, off-target, adverse effects} %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
 \end{abstract}
 
-\section*{Introduction}
+\section{Introduction}
 
 %Introduce off target binding as a problem, and the value of predictions
 Drug-target interactions are central to the drug discovery
@@ -353,9 +353,9 @@ al.}~\cite{Bowes2012}.
 %%%%%%%%%%%%%%%%%%
 %Methods
 %%%%%%%%%%%%%%%%%%
-\section*{Methods}
+\section{Methods}
 
-\subsection*{Training data}
+\subsection{Training data}
 
 A scientific workflow was constructed to automate the entire data
 pre-processing pipeline.  The first step comprises extracting data on binding association
@@ -409,7 +409,7 @@ All the targets, with details about their respective number of active and
 non-active compounds, and whether they are included or not, are summarized in
 table~\ref{tbl:targets}.
 
-\subsection*{Conformal prediction}
+\subsection{Conformal prediction}
 Conformal Prediction (CP)~\cite{Vovk2005} provides a layer on top of
 existing machine learning methods and produces valid prediction regions for test
 objects. This contrasts to standard machine learning that delivers point
@@ -444,7 +444,7 @@ were treated separately, by providing them to the CPSign software with the
 documentation~\cite{CPSignDocs}.
 
 
-\subsection*{Hyper-parameter tuning}
+\subsection{Hyper-parameter tuning}
 For each of the 31 targets in Dataset 1, a parameter sweep was run to find the optimal value
 of the cost parameter of liblinear, optimizing modeling efficiency using
 10-fold cross validation. The training approach used an Aggregated Conformal
@@ -532,7 +532,7 @@ for test example $i$.  A smaller value is preferable.
 \end{center}
 \end{figure}
 
-\subsection*{Modeling workflow}
+\subsection{Modeling workflow}
 Before the training, the CPSign \texttt{precompute} command was run, in order
 to generate a sparse representation of each target's dataset.  ACPs consisting
 of 10 models were then trained for each target using the CPSign \texttt{train}
@@ -554,9 +554,9 @@ available in the supplementary material, figures S4 and S5).
 %%%%%%%
 % Results  %
 %%%%%%%
-\section*{Results}
+\section{Results}
 
-\subsection*{Published models}
+\subsection{Published models}
 Models for all targets in Dataset1 were produced in the form of portable Java
 Archive (JAR) files, which were also built into similarly portable Docker
 containers, for easy publication as micro services.  The model JAR files,
@@ -564,7 +564,7 @@ together with audit log files produced by SciPipe, containing trace of the
 workflow (all the shell commands and parameters) used to produce them, are
 available for download at~\cite{ModelsZenodo}
 
-\subsection*{Validity of models}
+\subsection{Validity of models}
 To check that the conformal prediction models are valid (i.e. that they predict with
 an error rate in accordance to the selected significance level), calibration plots
 were generated in the cross validation step of the workflow. Three example
@@ -601,8 +601,8 @@ significance levels.
     \label{fig:calplots}
 \end{figure}
 
-%\subsection*{Before and after fill up with assumed non-actives}
-\subsection*{Efficiency of models}
+%\subsection{Before and after fill up with assumed non-actives}
+\subsection{Efficiency of models}
 The efficiency metrics OF, CAOF and MC for Dataset2 (without adding assumed
 non-actives) are shown in figure~\ref{fig:21small_orig}. In
 figure~\ref{fig:21small_fill}, the same metrics are shown for when all target
@@ -644,7 +644,7 @@ subsequent analysis workflows.
     and Class-Averaged Observed Fuzziness) for Dataset2 and Dataset3.}
 \end{figure}
 
-%\subsection*{Efficiency}
+%\subsection{Efficiency}
 %
 %In figure~\ref{fig:allmodels}, efficiency metrics Observed Fuzziness (OF), Class-Averaged OF
 %(CAOF) for each model is , training time and validation.
@@ -657,7 +657,7 @@ subsequent analysis workflows.
 %    \label{fig:allmodels}
 %\end{figure}
 
-\subsection*{External validation}
+\subsection{External validation}
 
 In order to validate the predictive ability of the trained models, a new
 dataset was created (Dataset4) by withholding 1\,000 compounds from the
@@ -712,7 +712,7 @@ individually, see the supplementary material, figure S2 and S3.
     \label{fig:valplots}
 \end{figure}
 
-\subsection*{Target Profile-as-a-Service}
+\subsection{Target Profile-as-a-Service}
 All models based on Dataset2 were published as micro-services with REST APIs
 publicly made available using the OpenAPI specification~\cite{OpenAPI} on an OpenShift~\cite{OpenShift} cluster.
 A web page aggregating all the models was also created. The OpenAPI
@@ -765,7 +765,7 @@ accessible at \url{http://ptp.service.pharmb.io/}
     \label{fig:web}}
 \end{figure}
 
-\subsection*{Example predictions}
+\subsection{Example predictions}
 Using the models built without the external validation dataset (Dataset4), target
 profiles were predicted for three molecules from the test set
 (figure~\ref{fig:threeprofiles}), \textit{i.e.}, the profiles were made for
@@ -827,7 +827,7 @@ four highest positive predictions in the profile.
 %%%%%%%
 % Discussion  %
 %%%%%%%
-\section*{Discussion}
+\section{Discussion}
 The use of workflows to automate pre-processing and model training and make it
 completely reproducible has several implications. Primarily, the entire process
 can be repeated as data change, e.g. new data is made available or data is
@@ -863,7 +863,7 @@ integrative studies, and paves the way for target predictions that can be
 integrated in different stages of the drug discovery process.
 
 
-\section*{Conclusion}
+\section{Conclusion}
 We developed a methodology and implementation of target prediction profiles,
 with fully automated and reproducible data pre-processing and model training
 workflows to build them. Models are packaged as portable Java Archive (JAR)
@@ -875,7 +875,7 @@ with an interoperable API.
 
 
 
-\section*{Data Availability}
+\section{Data Availability}
 
 \begin{itemize}
     \item The datasets analyzed for this study can be found on Zenodo (for
@@ -889,7 +889,7 @@ with an interoperable API.
 
 \newpage
 
-\section*{Abbreviations}
+\section{Abbreviations}
 
 \begin{itemize}
     \item A: Active
@@ -907,7 +907,7 @@ with an interoperable API.
 \end{itemize}
 
 
-\section*{Conflict of Interest Statement}
+\section{Conflict of Interest Statement}
 %All financial, commercial or other relationships that might be perceived by
 %the academic community as representing a potential conflict of interest must
 %be disclosed. If no such relationship exists, authors will be asked to confirm
@@ -916,7 +916,7 @@ OS, JA, AB, and SA are involved in Genetta Soft AB, a Swedish based company
 developing the CPSign software.
 
 
-\section*{Author Contributions}
+\section{Author Contributions}
 OS conceived the study. OS, JA, SA and SL designed the study, interpreted
 results, and wrote the manuscript. SL implemented the workflow and carried out
 the analysis. SA extended CPSign with new features. JA, SA and AB contributed
@@ -933,14 +933,14 @@ profiles and modeling. All authors read and approved the manuscript.
 %\href{http://home.frontiersin.org/about/author-guidelines#AuthorandContributors}{here}
 %for full authorship criteria.
 
-\section*{Funding}
+\section{Funding}
 %Details of all funding sources should be provided, including grant numbers if
 %applicable. Please ensure to add all necessary funding information, as after
 %publication this is no longer possible.
 This study was supported by OpenRiskNet (Grant Agreement 731075), a project
 funded by the European Commission under the Horizon 2020 Programme.
 
-\section*{Acknowledgments}
+\section{Acknowledgments}
 The computations were performed on resources provided by SNIC through Uppsala
 Multidisciplinary Center for Advanced Computational Science (UPPMAX) under
 Project SNIC 2017/7-89.
