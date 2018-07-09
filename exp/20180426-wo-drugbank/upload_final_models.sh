@@ -19,7 +19,7 @@ for mdl in dat/final_models/*/r1/fill/*r1*jar; do
     echo "--------------------------------------------------------------------------------";
     echo "Trying to upload $mdl ..."
     echo "--------------------------------------------------------------------------------";
-    RESULT=$(curl -F "category=ptp-wo-drugbank" -F "filecontent=@$mdl" --header "Authorization: bearer $TOKEN" ${MW_URL}"/api/v1/models/fromFile");
+    RESULT=$(curl -F "category=ptp" -F "filecontent=@$mdl" --header "Authorization: bearer $TOKEN" ${MW_URL}"/api/v1/models/fromFile");
     echo $RESULT
     sleep 0.5
 done;
