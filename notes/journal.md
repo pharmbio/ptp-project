@@ -163,7 +163,7 @@ in the chat, at 9:02, Sep 29 2017:
 ## Action points
 
 - [ ] Read up on Norinder's paper on imbalanced datasetes in conformal
-  prediction (Jonathan, and Samuel)
+    prediction (Jonathan, and Samuel)
 - [x] Look closer at the "other" efficiency measure, available in:
   - Vovk, V., Fedorova, V., Nouretdinov, I., Gammerman, A., 2016. Criteria of
     efficiency for conformal prediction. In: Symposium on Conformal and
@@ -257,10 +257,10 @@ Participating: Ola, Jonathan, Staffan, Samuel
 
 - Samuel: Tried running with replicates now, and with the new efficiency measure.
   - [x] Ola: Let's plot the new observed fuzziness score both with and without
-    the class-averaging (Samuel).
+      the class-averaging (Samuel).
 - Samuel: We found some inconsistencies in the data.
   - [ ] Needs more investigation as to whether it is like this in the original
-    ExcapeDB data, or has shown up in our own workflow (Samuel).
+      ExcapeDB data, or has shown up in our own workflow (Samuel).
 - How to filter contradictory and possibly duplicate data?
   - Ola: Probably remove
   - Jonalv: For contradictory data, we might want to do majority voting
@@ -288,7 +288,7 @@ assumed negatives" for datasets with smaller than 100 actives.
 
 ## Next steps
 - [ ] Samuel to compare approved / withdrawn drugs with actives / nonactives in
-  ExcapeDB, to get an overview of how they relate.
+    ExcapeDB, to get an overview of how they relate.
 - [ ] From the last meeting we had the idea to also compare with
   actives/nonactives (edit: approved/withdrawn) in DrugBank. (Ola says this is
   the same)
@@ -447,9 +447,9 @@ We concluded:
 So, we have basically two major things we will try to do:
 
 - [x] Run both with and without fillup assumed negatives
-  so that we can compare how the fillup affects performance.
+    so that we can compare how the fillup affects performance.
   - [x] Make sure to not use assumed negatives in calibration and validation,
-  with the help of functionality in Staffan's latest version of CPSign
+    with the help of functionality in Staffan's latest version of CPSign
   - [x] Fill up to double amount of non-actives compared to actives
 
 - [ ] Rebuild everything without drugbank, so that we can try to predict target
@@ -460,7 +460,7 @@ So, we have basically two major things we will try to do:
   - [ ] Use the models to predict binding to each of the targets in our "Bowes"
     profile
     - [ ] Compare with the known binding values for the drugbank compounds in
-      excapedb (Probably at a few different confidence levels)
+        excapedb (Probably at a few different confidence levels)
 
 ## Misc. notes
 
@@ -479,7 +479,7 @@ We also discussed the "Class-averaged Observed Fuzziness" measure that we have u
   cost-values in the cost-parameter optimization, we can just build two sets of
   models with the different values, and compare their performance.
   - [ ] Run two sets of final models: With class-averaged, and without
-    class-averaged observed fuzziness as efficiency score
+      class-averaged observed fuzziness as efficiency score
 
 # Project meeting 2018-04-13
 
@@ -581,8 +581,8 @@ Olas Room, kl 13:35
 (Remember to check the decisions above, about how to modify the workflow!)
 
 - [x] We remove the 101 "Withdrawn" molecules in DrugBank which are available
-  in ExcapeDB, from ExcapeDB, and 899 "Approved" ones, so we get a dataset of
-  1000 molecules for which we have DrugBank data.
+    in ExcapeDB, from ExcapeDB, and 899 "Approved" ones, so we get a dataset of
+    1000 molecules for which we have DrugBank data.
 - [x] Create calibration plots
 - [ ] Predict Active / Non-active on the withdrawn dataset (1000 molecules
   ... ~10k interactions(?))
@@ -659,3 +659,23 @@ Attending: Ola, Jonathan, Staffan, Samuel
   profile plots (Jonathan)
 - [?] Press more on what we provide and what is new, and its implications
 - [ ] Write about separate treatment of assumed negatives, and explain what
+
+# PTP meeting 2018-09-27
+
+We have got review from editors.
+
+- [ ] Clarify the non-conformity score (Staffan?)
+- [ ] Help the reader more to follow the reasoning around Conformal Prediction
+- [ ] Clarify how we do the further dedpucation and cleanup of the data? (Samuel)
+  - [ ] ExcapeDB has done all the cleanup ... so that's not our concern.
+    Since the machine learning method works on the SMILES level, we still have to make sure
+    that we don't have conflicting or duplicate rows, since our machine learning method
+    works on the SMILES level ... to avoid biased "too good" results.
+- [ ] Add more references about QSAR profiles
+- [ ] Make a figure for table 2, explaining how the datasets were created
+- [ ] Introduce more about the different sets of labels that we can get, in the CP intro
+- [ ] Prolong the discussion and press harder on what benefits we get in the
+  discussion ... that we get confidence levels ... which avoid the need for
+  sensitivity/specificity
+- [ ] Refer more clearly to the Norinder "Introducing Conformal..." paper more
+  clearly, earlier.
