@@ -422,7 +422,7 @@ concept of a model's `applicability domain'~\cite{norinder2014introducing}. For
 the classification case, a prediction is represented as a set of p-values (one for each
 class), and in the Mondrian setting the classes are handled independently,
 which has attractive properties when dealing with imbalanced
-datasets~\cite{Norinder:2017qc,Sun:2017qm}.
+datasets~\cite{Norinder:2017qc,Sun:2017qm}. 
 
 In this study we used the Mondrian conformal prediction implementation in the
 software CPSign~\cite{CPSignDocs}, leveraging the
@@ -436,7 +436,10 @@ of distance 3 from initial atoms, are generated. Support vector
 machines is a machine learning algorithm which is commonly used in QSAR
 studies~\cite{norinder2003support,zhou2011qsar} together with molecular
 signatures and similar molecular descriptors, \textit{e.g.}, the extended
-connectivity fingerprints~\cite{rogers2010extended}.
+connectivity fingerprints~\cite{rogers2010extended}. 
+As nonconformity measure we used the distance between the classifier's 
+decision surface and the test object, as previously described 
+by~\cite{eklund2015application}. 
 In order to not use the assumed non-active compounds in Dataset2 in the
 calibration step in the Conformal Prediction method, these additional compounds
 were treated separately, by providing them to the CPSign software with the
