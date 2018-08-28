@@ -21,6 +21,7 @@
 \usepackage{rotating}
 \renewcommand{\thefootnote}{\color{red}\arabic{footnote}}
 \usepackage{placeins}
+\usepackage{subcaption}
 \usepackage[textsize=small, linecolor=magenta, bordercolor=magenta,
             backgroundcolor=magenta, textwidth=3cm]{todonotes}
 
@@ -701,7 +702,7 @@ accessible at \url{http://ptp.service.pharmb.io/}
 \begin{figure}
     \begin{minipage}{0.70\textwidth}
         \setcounter{subfigure}{0} % Ensures that subfigures are labeled from a, b, c...
-        \includegraphics[height=0.37\textheight]{figures/fig5a_terbutaline.png}
+        \includegraphics[width=\textwidth]{figures/fig5a_terbutaline.png}
         \subcaption{The profile as seen on the web page (on the right hand in
         the figure). To show the profile, the user draws a molecule and
         selects a confidence level, whereafter the profile will update
@@ -714,7 +715,7 @@ accessible at \url{http://ptp.service.pharmb.io/}
     \end{minipage}
     \quad
     \begin{minipage}{0.25\textwidth}
-        \fbox{\includegraphics[height=0.23\textheight]{figures/fig5b_terbutaline2.png}}
+        \fbox{\includegraphics[width=\textwidth]{figures/fig5b_terbutaline2.png}}
         \subcaption{Coloring of which parts of the molecule contributed the
         most to the prediction for ADBR2. Red color indicates the centers of
         molecular fragments (of height 3) that contributed most to the larger
