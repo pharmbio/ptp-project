@@ -171,7 +171,7 @@ of potential off-target interactions that could be linked to adverse
 effects. Another application is to combine such models into a panel,
 allowing to compare  and search for compounds with similar profiles. Most
 contemporary methods and implementations however lack valid measures of
-confidence in their predictions, and only providing point predictions. We here
+confidence in their predictions, and only provide point predictions. We here
 describe the use of conformal prediction for predicting off-target
 interactions with models trained on data from 31 targets in the ExCAPE
 dataset, selected for their utility in broad early hazard assessment.
@@ -201,17 +201,19 @@ polypharmacology has important implications on drug efficacy and
 safety~\cite{Peters:2013yg,Ravikumar:2018qd}. Organizations involved in drug
 discovery, such as pharmaceutical companies and academic institutions, use many
 types of experimental techniques and assays to determine target interactions,
-including in vitro pharmacological profiling~\cite{Bowes2012}. However an
+including in vitro pharmacological profiling~\cite{Bowes2012}. However, an
 attractive complementary method is to use computational (in silico) profiling
 of binding profiles for ligands~\cite{Cereto-Massague:2015px}, which also opens the possibility
 to predict hypothetical compounds. A common approach to the target prediction
 problem is to use a panel of structure-activity relationship (QSAR)
-models~\cite{HanschQSAR}, where chemicals in a knowledge base with known
-interaction values (numerical or categorical) are described numerically by
-descriptors and a statistical learning model is trained to predict numerical
-values (regression) or categorical values (classification). The recent increase
-in the number of available data points in interaction databases such as ChEMBL~\cite{Gaulton:2017tm} and
-PubChem~\cite{Wang:2017cy} makes it possible to using ligand-based models to predict not only targets but also panels of targets.
+models, with one model per target~\cite{HanschQSAR}, where chemicals in a
+knowledge base with known interaction values (numerical or categorical) are
+described numerically by descriptors and a statistical learning model is
+trained to predict numerical values (regression) or categorical values
+(classification). The recent increase in the number of available data points
+in interaction databases such as ChEMBL~\cite{Gaulton:2017tm} and
+PubChem~\cite{Wang:2017cy} makes it possible to using ligand-based models to
+predict not only targets but also panels of targets.
 
 Several methods and tools are available for target prediction and for
 constructing and using target profiles.
@@ -220,7 +222,7 @@ Bender \textit{et al}. use a Bayesian approach to train models for 70 selected t
 and use these for target profiling to classify adverse drug
 reactions~\cite{Bender:2007ib}.
 %
-Yao \textit{et al}. describes TargetNet~\cite{Yao:2016ij}, a web service for
+Yao \textit{et al}. describe TargetNet~\cite{Yao:2016ij}, a web service for
 multi-target QSAR models; an online service that uses Na\"ive Bayes.
 %
 Yu \textit{et al}. use Random Forest (RF) and Support Vector Machines (SVM) to predict
@@ -242,7 +244,7 @@ confidence in predictions, leaving the user uncertain about the usefulness of
 predictions. Secondly, the majority of the web tools lack an open and
 standardized API, meaning that it is not straightforward (and in most cases not
 possible at all) to consume the services programmatically, such as from a
-script, or a scientific workflow management system used in drug discovery like
+script or a scientific workflow management system used in drug discovery like
 KNIME~\cite{Mazanetz:2012gy}. Thirdly, previous works do not publish the preprocessing and modeling workflows in reproducible formats, rendering it hard to update the models as data changes, and limits the portability of methods. In fact, most implementations are only accessible from a website without the underlying implementations being openly available for inspection.
 
 We here present an approach for ligand-based target profiling using a
@@ -264,10 +266,11 @@ al.}~\cite{Bowes2012}.
 \small
 \centering
 \caption{The panel of targets used in this study, identified by gene symbol.
-    Actives and non-actives refer to the number of ligand interactions marked
-    as active and non-active in ExcapeDB. Included indicates if the target was
-    included in the study or excluded, based on whether it did pass the
-    filtering criteria of at least 100 actives and 100 non-actives.}
+Actives and non-actives refer to the number of ligand interactions marked as
+active and non-active in ExcapeDB. The labels `included' and `not included'
+to the left, for the two row ranges, indicate whether targets did pass the
+filtering criteria of at least 100 actives and 100 non-actives, to be
+included.}
 \label{tbl:targets}
 \begin{tabular}{crrrrcl}
 \toprule
@@ -391,11 +394,11 @@ an automated and reproducible data processing workflow, these targets could
 potentially be included in subsequent runs on later versions of the database
 with additional data available.
 
-The resulting set (named Dataset1) consisted of 31 targets (marked as included in
+The resulting set (named Dataset1) consists of 31 targets (marked as included in
 Table~\ref{tbl:targets}). For 21 of these targets, the dataset contained less
 than 10\,000 non-active compounds, leading to imbalanced datasets (marked with
 a \checkmark\ in the `Assumed non-actives added' column of Table~\ref{tbl:targets}).
-These 21 targets are referred to as Dataset2, and their respective target datasets was expanded with randomly
+These 21 targets are referred to as Dataset2, and their respective target datasets were expanded with randomly
 selected examples from the ExcapeDB dataset which were not reported to be active for
 the target, thus being `assumed non-active'. The number of new examples was chosen such that the total
 number of non-actives and assumed non-actives added up to twice the number of
@@ -547,7 +550,7 @@ The computational workflows for orchestrating the extraction of data, model
 building, and the collection of results for summarizing and plotting were
 implemented in the Go programming language using the SciPipe workflow library
 that is available as open source software at
-\href{http://scipipe.org}{scipipe.org}.  The cost values for each target is
+\href{http://scipipe.org}{scipipe.org}.  The cost values for each target are
 stored in the workflow code, available on GitHub~\cite{PTPGitHub}.
 A graphical overview of the modeling workflow is shown in
 figure~\ref{fig:workflow_graph_clean}. More detailed workflow graphs are
@@ -610,7 +613,7 @@ The efficiency metrics OF, CAOF and MC for Dataset2 (without adding assumed
 non-actives) are shown in figure~\ref{fig:21small_orig}. In
 figure~\ref{fig:21small_fill}, the same metrics are shown for when all target
 datasets in Dataset2 have been extended with assumed non-actives, to compensate
-these datasets' imbalanced nature.
+for these datasets' imbalanced nature.
 %, after fillup with assumed non-actives for the 21 targets with less than
 %10\,000 non-actives in ExcapeDB.
 We observe that by adding assumed non-actives for small, imbalanced datasets we
@@ -730,12 +733,12 @@ draw a molecule. As the user draws the molecule, the web page extracts the
 SMILES from the editor and sends it to the individual model services to get predictions
 based on all available models. The user can set a threshold for the confidence
 and get visual feedback on whether the models predict the drawn molecule as
-active or non-active for each of the targets, at the chosen confidence. In figure~\ref{fig:web} on
+active or non-active for each of the targets, at the chosen confidence level. In figure~\ref{fig:web} on
 the right side is a graphical profile in the form of a bar plot where confidence of
 the active label is drawn in the upward direction and the confidence for
-non-active is drawn in the downward direction. Hovering a bar in the plot will
-give information about which model a the bar corresponds to. The web page is
-accessible at \url{http://ptp.service.pharmb.io/}
+non-active is drawn in the downward direction. Hovering over a bar in the plot will
+give information about which model the bar corresponds to. The web page can
+be accessed at \url{http://ptp.service.pharmb.io/}
 %\inlinetodo{make short nice URL with pharmb.io and UU logo}.
 \begin{figure}
     \begin{minipage}{0.70\textwidth}
@@ -779,14 +782,14 @@ other targets are predicted as non-active with high p-values (green color) or
 predicted as active with relatively low p-values (purple color).
 Figure~\ref{fig:threeprofiles:b} shows the target profile for Pilocarpine, a
 muscarinic acetylcholine receptor M$_1$ agonist, with a target profile
-consisting of mostly non-active predictions, and only mildly two active targets
+consisting of mostly non-active predictions, and only two mildly active targets
 (CHRM1 and LCK). We note that LCK has a similar p-value for active and
-non-active. For a conformal prediction in binary classification setting, the 
+non-active. For a conformal prediction in the binary classification setting, the 
 \textit{confidence} of a prediction is defined as $1 - p_2$ where $p_2$ is the
 lower p-value of the two, or in other words, the p-value for the class that was
 not predicted~\cite{Saunders1999}.  This means that even if a prediction has
 one high p-value, its confidence and hence usefulness in a decision setting
-might be low. Figure~\ref{fig:threeprofiles:c} shows the target profile for
+might still be low. Figure~\ref{fig:threeprofiles:c} shows the target profile for
 Pergolide, an agonist for DRD1, DRD2, HTR1A, and HTR2A which shows up as the
 four highest positive predictions in the profile.
 
@@ -833,7 +836,7 @@ four highest positive predictions in the profile.
 \section{Discussion}
 The use of workflows to automate pre-processing and model training and make it
 completely reproducible has several implications. Primarily, the entire process
-can be repeated as data change, e.g. new data is made available or data is
+can be repeated as data change, e.g. when new data is made available or data is
 curated. In our case, the pre-processing can be re-run when a new version of
 ExCAPE-DB is released, and new models trained on up-to-date data can be
 deployed and published without delay. The components of the pre-processing
@@ -844,8 +847,8 @@ models on all targets, which could be resource-demanding. With a modular
 workflow it is also easy to replace specific components, such as evaluating
 different strategies and modeling methods.
 
-The packaging of models as JAR-files and Docker containers makes them portable, to be
-transferred and deployed on different systems, including servers or laptops on
+The packaging of models as JAR-files and Docker containers makes them portable and easy to
+transfer and deploy on different systems, including servers or laptops on
 public and private networks without cumbersome dependency management. We chose
 to deploy our services inside RedHat OpenShift container orchestration system,
 which has the benefit of providing a resilient and scalable service, but any
