@@ -358,19 +358,25 @@ included.}
 %%%%%%%%%%%%%%%%%%
 \section{Methods}
 
-\subsection{Training data}
+\subsection{Training data} \label{Training data}
 
 A scientific workflow was constructed to automate the entire data
-pre-processing pipeline.  The first step comprises extracting data on binding association
-between ligands and targets from the ExcapeDB dataset~\cite{Sun2017}, more
-specifically the columns Gene symbol, Original entry ID (PubChem CID or CHEMBL
-ID), SMILES and Activity flag. This was performed early in the workflow to make
-subsequent data transformation steps less time-consuming, given the relatively large
-size of the uncompressed ExcapeDB data file (18 GB).
-%
-From the extracted dataset, all rows for which there existed rows with a conflicting
-activity value for the same target (gene symbol) and SMILES string, were completely removed.
-% (See \footnote{\url{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo\_drugbank\_wf.go\#L239-L246}}).
+pre-processing pipeline. The first step comprises extracting data on binding
+association between ligands and targets from the ExcapeDB
+dataset~\cite{Sun2017}, more specifically the columns Gene symbol, Original
+entry ID (PubChem CID or CHEMBL ID), SMILES and Activity flag. This was
+performed early in the workflow to make subsequent data transformation steps
+less time-consuming, given the relatively large size of the uncompressed
+ExcapeDB data file (18 GB). From the extracted dataset, all rows for which
+there existed rows with a conflicting activity value for the same target
+(gene symbol) and SMILES string, were completely removed. % (See
+\footnote{\url{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo\_drugbank\_wf.go\#L239-L246}}).
+
+For full information about the preprocessing done by the ExcapeDB authors to
+create the values we used, see~\cite{Sun2017}. As a help to the reader we
+note that the activity flag is set to active (or \texttt{A}) if the
+dose-response value in the binding assays was lower than 10 ${\mu}M$ and
+non-active (or \texttt{N}) otherwise.
 
 A subset of the panel of 44 binding targets as suggested in \cite{Bowes2012}
 was selected for inclusion in the study. The selection was based on the
