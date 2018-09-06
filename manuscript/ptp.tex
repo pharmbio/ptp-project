@@ -687,18 +687,19 @@ for a particular target in ExcapeDB. The validation was done with CPSign's
 \texttt{validate} command, predicting values at confidence levels 0.8 and 0.9.
 %
 In figure~\ref{fig:valplots} predicted versus observed labels for Dataset4 is
-shown, for confidence levels 0.8 and 0.9 respectively. It can be seen how the
-number of prediction of ``Both'' labels increase when the confidence level
-increases from 0.8 to 0.9. This is as expected, as this means that fewer
-compounds could be predicted to only one label, with the higher confidence
-level. The number of ``Null'' predictions decreases at the higher confidence,
-which is also as expected. The reason is that with a higher confidence, the
-predictor must consider less probable (in the Conformal Prediction ranking
-sense) predictions to be part of the prediction region. This behavior might seem
-backwards, but at a higher confidence the predictor has to include less likely
-predictions in order to reach the specified confidence level, which leads to
-larger prediction sets. For predicted versus observed labels for each target
-individually, see the supplementary material, figure S2 and S3.
+shown, for confidence levels 0.8 and 0.9 respectively. `A' denotes active
+compounds and `N' denotes non-active ones. It can be seen how the number
+of prediction of ``Both'' labels increase when the confidence level increases
+from 0.8 to 0.9. This is as expected, as this means that fewer compounds
+could be predicted to only one label, with the higher confidence level. The
+number of ``Null'' predictions decreases at the higher confidence, which is
+also as expected. The reason is that with a higher confidence, the predictor
+must consider less probable (in the Conformal Prediction ranking sense)
+predictions to be part of the prediction region. This behavior might seem
+backwards, but at a higher confidence the predictor has to include less
+likely predictions in order to reach the specified confidence level, which
+leads to larger prediction sets. For predicted versus observed labels for
+each target individually, see the supplementary material, figure S2 and S3.
 
 \begin{figure}[h!]
 \begin{minipage}[c]{0.38\textwidth}
