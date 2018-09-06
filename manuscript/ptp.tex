@@ -173,7 +173,7 @@ allowing to compare  and search for compounds with similar profiles. Most
 contemporary methods and implementations however lack valid measures of
 confidence in their predictions, and only provide point predictions. We here
 describe the use of conformal prediction for predicting off-target
-interactions with models trained on data from 31 targets in the ExCAPE
+interactions with models trained on data from 31 targets in the ExCAPE-DB
 dataset, selected for their utility in broad early hazard assessment.
 Chemicals were represented by the signature molecular descriptor and
 support vector machines were used as the underlying machine learning method.
@@ -267,7 +267,7 @@ al.}~\cite{Bowes2012}.
 \centering
 \caption{The panel of targets used in this study, identified by gene symbol.
 Actives and non-actives refer to the number of ligand interactions marked as
-active and non-active in ExcapeDB. The labels `included' and `not included'
+active and non-active in ExCAPE-DB. The labels `included' and `not included'
 to the left, for the two row ranges, indicate whether targets did pass the
 filtering criteria of at least 100 actives and 100 non-actives, to be
 included.}
@@ -316,7 +316,7 @@ included.}
 &    ADRA1A  &       1\,782  &       24          &            &       &       \\
 &    ADRA2A  &       839     &       39          &            &       &       \\
 &    CACNA1C &       166     &       20          &            &       &       \\
-&    CHRNA1  &       -       &       -           &            &       & Not in ExcapeDB \\
+&    CHRNA1  &       -       &       -           &            &       & Not in ExCAPE-DB \\
 &    CHRNA4  &       256     &       17          &            &       &       \\
 &    GABRA1  &       112     &       5           &            &       &       \\
 &    GRIN1   &       555     &       92          &            &       &       \\
@@ -346,7 +346,7 @@ included.}
 & Dataset1 & All 31 targets selected from the set of 44 targets in~\cite{Bowes2012}. \\
 & Dataset2 & Targets from Dataset1 with at least 10\,000 non-actives. \\
 & Dataset3 & The remaining 10 ``large'' target datasets, from Dataset1 which were not included in Dataset2 \\
-& Dataset4 & The external test set created by extracting rows from ExcapeDB for a selected set of \\
+& Dataset4 & The external test set created by extracting rows from ExCAPE-DB for a selected set of \\
 &          & 1\,000 compounds in DrugBank (All withdrawn, and randomly sampled approved, drugs,\\
 &          & until reaching 1000 drugs). \\
 \bottomrule
@@ -362,17 +362,17 @@ included.}
 
 A scientific workflow was constructed to automate the entire data
 pre-processing pipeline. The first step comprises extracting data on binding
-association between ligands and targets from the ExcapeDB
+association between ligands and targets from the ExCAPE-DB
 dataset~\cite{Sun2017}, more specifically the columns Gene symbol, Original
 entry ID (PubChem CID or CHEMBL ID), SMILES and Activity flag. This was
 performed early in the workflow to make subsequent data transformation steps
 less time-consuming, given the relatively large size of the uncompressed
-ExcapeDB data file (18 GB). From the extracted dataset, all rows for which
+ExCAPE-DB data file (18 GB). From the extracted dataset, all rows for which
 there existed rows with a conflicting activity value for the same target
 (gene symbol) and SMILES string, were completely removed. % (See
 \footnote{\url{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo\_drugbank\_wf.go\#L239-L246}}).
 
-For full information about the preprocessing done by the ExcapeDB authors to
+For full information about the preprocessing done by the ExCAPE-DB authors to
 create the values we used, see~\cite{Sun2017}. As a help to the reader we
 note that the activity flag is set to active (or \texttt{A}) if the
 dose-response value in the binding assays was lower than 10 ${\mu}M$ and
@@ -382,13 +382,13 @@ A subset of the panel of 44 binding targets as suggested in \cite{Bowes2012}
 was selected for inclusion in the study. The selection was based on the
 criteria that targets should have at least 100 active and at least 100
 non-active compounds.  In addition some targets were excluded for which data
-was not found in ExcapeDB. This is described in detail below.
+was not found in ExCAPE-DB. This is described in detail below.
 %
 Some of the gene symbols used in \cite{Bowes2012} were not found in their exact
-form in the ExcapeDB dataset. To resolve this, PubMed was consulted to find
+form in the ExCAPE-DB dataset. To resolve this, PubMed was consulted to find
 synonymous gene symbols with the following replacements being done:
 %
-\textit{KCNE1} was replaced with \textit{MINK1} which is present in ExcapeDB.
+\textit{KCNE1} was replaced with \textit{MINK1} which is present in ExCAPE-DB.
 \textit{CHRNA1} (coding for the $\alpha1$ sub-unit of the Acetylcholine
 receptor) was excluded, as it is not present in the dataset (\textit{CHRNA4},
 coding for the $\alpha4$ sub-unit of the Acetylcholine receptor, is present in
@@ -405,7 +405,7 @@ Table~\ref{tbl:targets}). For 21 of these targets, the dataset contained less
 than 10\,000 non-active compounds, leading to imbalanced datasets (marked with
 a \checkmark\ in the `Assumed non-actives added' column of Table~\ref{tbl:targets}).
 These 21 targets are referred to as Dataset2, and their respective target datasets were expanded with randomly
-selected examples from the ExcapeDB dataset which were not reported to be active for
+selected examples from the ExCAPE-DB dataset which were not reported to be active for
 the target, thus being `assumed non-active'. The number of new examples was chosen such that the total
 number of non-actives and assumed non-actives added up to twice the number of
 actives, for each target respectively. The compounds for the remaining 10 targets, which were not extended with
@@ -581,7 +581,7 @@ To check that the conformal prediction models are valid (i.e. that they predict 
 an error rate in accordance to the selected significance level), calibration plots
 were generated in the cross validation step of the workflow. Three example
 plots, for three representative targets (the smallest, the median-sized and the
-largest, in terms of compounds in ExcapeDB) can be seen in figure
+largest, in terms of compounds in ExCAPE-DB) can be seen in figure
 \ref{fig:calplots}, while calibration plots for all targets can be
 found in the supplementary material (figure~S1).
 From these calibration plots we conclude that all models produce valid results over all
@@ -621,7 +621,7 @@ figure~\ref{fig:21small_fill}, the same metrics are shown for when all target
 datasets in Dataset2 have been extended with assumed non-actives, to compensate
 for these datasets' imbalanced nature.
 %, after fillup with assumed non-actives for the 21 targets with less than
-%10\,000 non-actives in ExcapeDB.
+%10\,000 non-actives in ExCAPE-DB.
 We observe that by adding assumed non-actives for small, imbalanced datasets we
 improve the efficiency of models trained on these datasets. Thus, this strategy
 of extending the ``small'' target datasets in Dataset2 was chosen for the
@@ -673,7 +673,7 @@ subsequent analysis workflows.
 
 In order to validate the predictive ability of the trained models, a new
 dataset was created (Dataset4) by withholding 1\,000 compounds from the
-ExcapeDB dataset, to form an external validation dataset. The compounds chosen
+ExCAPE-DB dataset, to form an external validation dataset. The compounds chosen
 to be withheld were the following: i) all small molecules in DrugBank (version
 5.0.11) with status ``withdrawn'', for which we could find either a PubChem ID
 or a CHEMBL ID, ii) a randomly selected subset of the remaining compounds in
@@ -683,7 +683,7 @@ was paid to other drug statuses in DrugBank such as ``investigational''.
 
 The models built were validated by predicting the binding activity against each
 of the 31 targets for all compounds for which there existed known binding data
-for a particular target in ExcapeDB. The validation was done with CPSign's
+for a particular target in ExCAPE-DB. The validation was done with CPSign's
 \texttt{validate} command, predicting values at confidence levels 0.8 and 0.9.
 %
 In figure~\ref{fig:valplots} predicted versus observed labels for Dataset4 is
@@ -717,7 +717,7 @@ each target individually, see the supplementary material, figure S2 and S3.
     \caption{Predicted versus observed labels, for all targets, for the
     prediction data, at confidence level 0.8 (\ref{fig:valplots:a}) and 0.9
     (\ref{fig:valplots:b}). The x-axis show observed labels (as found in
-    ExcapeDB), while the y-axis show the set of predicted labels. The areas of
+    ExCAPE-DB), while the y-axis show the set of predicted labels. The areas of
     the circles are proportional to the number of compound-target binding data
     points, for each observed label/predicted label combination.
     For predicted versus observed labels for each target individually, see
@@ -881,7 +881,7 @@ We developed a methodology and implementation of target prediction profiles,
 with fully automated and reproducible data pre-processing and model training
 workflows to build them. Models are packaged as portable Java Archive (JAR)
 files, and as Docker containers that can be deployed on any system. We trained
-data on 31 targets related to drug safety, from the ExCAPE dataset and published
+data on 31 targets related to drug safety, from the ExCAPE-DB dataset and published
 these as a predictive profile, using conformal prediction to deliver prediction
 intervals for each target. The example profile is deployed as an online service
 with an interoperable API.
@@ -892,7 +892,7 @@ with an interoperable API.
 
 \begin{itemize}
     \item The datasets analyzed for this study can be found on Zenodo (for
-        ExcapeDB)~\cite{ExcapeDBZenodo}, and on the DrugBank website (for
+        ExCAPE-DB)~\cite{ExcapeDBZenodo}, and on the DrugBank website (for
         DrugBank datasets)~\cite{DrugBankWebsite}.
     \item The data (i.e. the predictive models) generated in this study are
         available on Zenodo at~\cite{ModelsZenodo}.
