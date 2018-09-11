@@ -381,9 +381,15 @@ included.}
 
 \subsection{Training data} \label{Training data}
 
-We based this study upon data from the ExCAPE-DB dataset~\cite{Sun2017}
-(EDB). EDB combines data about ligand-target binding from ChEMBL, with
-similar data from PubChem. Importantly, PubChem contains ... \todo{Continue...}
+We based this study upon data from the ExCAPE-DB dataset~\cite{Sun2017}. The
+reason for this is that ExCAPE-DB combines data about ligand-target binding
+from ChEMBL with similar data from PubChem, where importantly, PubChem
+contains many true non-actives, which has been shown earlier to result in
+better models than by using random compounds as
+non-actives~\cite{Mervin2015}. The data in ExCAPE-DB has also gone through
+extensive filtering and pre-processing, specifically to make it more useful
+as a starting point for QSAR studies. For more details on the data filtering
+and processing done in the ExCAPE-DB dataset, we refer to~\cite{Sun2017}.
 
 A scientific workflow was constructed to automate the full data
 pre-processing pipeline. The first step comprises extracting data on binding
