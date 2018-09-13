@@ -438,11 +438,28 @@ active for the target, thus being `assumed non-active'. The number of new
 examples was chosen such that the total number of non-actives and assumed
 non-actives added up to twice the number of actives, for each target
 respectively. The compounds for the remaining 10 targets, which were not
-extended with assumed non-actives, were named Dataset3. The relation of these
-datasets are shown with a graphical overview of how they were created in
-figure~\ref{fig:datasets}, and a table summarizing them, in
-table~\cite{tbl:datasets}.
-%
+extended with assumed non-actives, were named Dataset3.
+
+In order to validate the predictive ability of the trained models, a new
+dataset was created (Dataset4) by withholding 1\,000 compounds from the
+ExCAPE-DB dataset, to form an external validation dataset. The compounds chosen
+to be withheld were the following: i) all small molecules in DrugBank (version
+5.0.11) with status ``withdrawn'', for which we could find either a PubChem ID
+or a CHEMBL ID, ii) a randomly selected subset of the remaining compounds in
+DrugBank 5.0.11, with status ``approved'', for which we could also find PubChem
+or CHEMBL IDs, until a total number of 1\,000 compounds was reached.  No regard
+was paid to other drug statuses in DrugBank such as ``investigational''.
+
+The relation of the mentioned datasets Dataset1-4 are shown in a graphical
+overview of how they were created in figure~\ref{fig:datasets}, and in
+table~\ref{tbl:datasets}, which summarizes in words how each dataset was
+created.
+
+The models built were validated by predicting the binding activity against each
+of the 31 targets for all compounds for which there existed known binding data
+for a particular target in ExCAPE-DB. The validation was done with CPSign's
+\texttt{validate} command, predicting values at confidence levels 0.8 and 0.9.
+
 The conformal prediction methodology, in particular with the mondrian
 approach, can handle differing sizes of the datasets well, and so we see no
 reason to stick to the exact same number of compounds as the actives, but
@@ -651,6 +668,7 @@ workflow (all the shell commands and parameters) used to produce them, are
 available for download at~\cite{ModelsZenodo}
 
 \subsection{Validity of models}
+
 To check that the conformal prediction models are valid (i.e. that they predict with
 an error rate in accordance to the selected significance level), calibration plots
 were generated in the cross validation step of the workflow. Three example
@@ -689,6 +707,7 @@ significance levels.
 
 %\subsection{Before and after fill up with assumed non-actives}
 \subsection{Efficiency of models}
+
 The efficiency metrics OF, CAOF and MC for Dataset2 (without adding assumed
 non-actives) are shown in figure~\ref{fig:21small_orig}. In
 figure~\ref{fig:21small_fill}, the same metrics are shown for when all target
@@ -745,23 +764,10 @@ subsequent analysis workflows.
 
 \subsection{External validation}
 
-In order to validate the predictive ability of the trained models, a new
-dataset was created (Dataset4) by withholding 1\,000 compounds from the
-ExCAPE-DB dataset, to form an external validation dataset. The compounds chosen
-to be withheld were the following: i) all small molecules in DrugBank (version
-5.0.11) with status ``withdrawn'', for which we could find either a PubChem ID
-or a CHEMBL ID, ii) a randomly selected subset of the remaining compounds in
-DrugBank 5.0.11, with status ``approved'', for which we could also find PubChem
-or CHEMBL IDs, until a total number of 1\,000 compounds was reached.  No regard
-was paid to other drug statuses in DrugBank such as ``investigational''.
-
-The models built were validated by predicting the binding activity against each
-of the 31 targets for all compounds for which there existed known binding data
-for a particular target in ExCAPE-DB. The validation was done with CPSign's
-\texttt{validate} command, predicting values at confidence levels 0.8 and 0.9.
-%
 In figure~\ref{fig:valplots} predicted versus observed labels for Dataset4 is
-shown, for confidence levels 0.8 and 0.9 respectively. `A' denotes active
+shown, for confidence levels 0.8 and 0.9 respectively. See the methods section
+and in particular figure~\ref{fig:datasets} and \ref{tbl:datasets}, for
+information about how Dataset4 was created. `A' denotes active
 compounds and `N' denotes non-active ones. It can be seen how the number
 of prediction of ``Both'' labels increase when the confidence level increases
 from 0.8 to 0.9. This is as expected, as this means that fewer compounds
