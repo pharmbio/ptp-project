@@ -255,18 +255,20 @@ The polypharmacology browser~\cite{Awale:2017is} is a web-based target
 prediction tool that queries ChEMBL bioactivity data using multiple
 fingerprints.
 
-We observe three important shortcomings among previous works. Primarily, available
-methods for ligand-based target profiling often do not offer valid measures of
-confidence in predictions, leaving the user uncertain about the usefulness of
-predictions. Secondly, the majority of the web tools lack an open and
-standardized API, meaning that it is not straightforward (and in most cases not
-possible at all) to consume the services programmatically, e.g. from a
-script or a scientific workflow tool such as KNIME~\cite{Mazanetz:2012gy}.
-Thirdly, previous works do not publish the preprocessing and modeling
-workflows in reproducible formats, rendering it hard to update the models as
-data changes, and limits the portability of methods. In fact, most
-implementations are only accessible from a website without the underlying
-implementations being openly available for inspection.
+We observe three important shortcomings among previous works. Primarily,
+available methods for ligand-based target profiling often do not offer valid
+measures of confidence in predictions, leaving the user uncertain about the
+usefulness of predictions. Secondly, the majority of the web tools lack an
+open and standardized API, meaning that it is not straightforward (and in
+most cases not possible at all) to consume the services programmatically,
+e.g. from a script or a scientific workflow tool such as
+KNIME~\cite{Mazanetz:2012gy}. Thirdly, previous works do not publish the
+preprocessing and modeling workflows in reproducible formats, rendering it
+hard to update the models as data changes, and limits the portability of
+methods. In fact, most implementations are only accessible from a website
+without the underlying implementations being openly available for inspection,
+which limits both the reproducibility~\cite{Stodden2016}, and
+verifiability~\cite{Hinsen2018} of their implementation.
 
 We here present an approach for ligand-based target profiling using a
 confidence framework, delivering target profiles with confidence scores for
