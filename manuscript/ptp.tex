@@ -924,6 +924,28 @@ four highest positive predictions in the profile.
 % Discussion  %
 %%%%%%%
 \section{Discussion} \label{Discussion}
+
+We have presented a reproducible workflow for building profiles of predictive
+models for target-binding. We have exemplified our approach on data from
+ExCAPE-DB about 31 targets associated with adverse effects, and made these
+models available both via a graphical web interface, via an OpenAPI interface
+for programmatic access, and made them available for download.
+The Conformal Prediction methodology guarantees validity of the models, which
+we further showed with calibration plots.
+
+Based on the efficiency metrics shown in~\ref{fig:21small_fill}
+and~\ref{fig:10large}, we see that the efficiency, after adding assumed
+non-actives to the datasets with very few (under 10,000) non-actives, is
+good, and not varying too dramatically even for the datasets with relatively
+small numbers of active compounds.
+
+Based on the external testset, Dataset4, though, especially based on the
+plots in figure~\ref{fig:valplots}, how there are a somewhat higher fraction
+of observed non-actives (`N') which are correctly predicted as non-actives,
+than the fraction of observed actives (`A'), correctly predicted as active,
+than non-actives predicted as actives, indicating a somewhat higher
+specificity than sensitivity, generally for all targets.
+
 The use of workflows to automate pre-processing and model training and make it
 completely reproducible has several implications. Primarily, the entire process
 can be repeated as data change, e.g. when new data is made available or data is
