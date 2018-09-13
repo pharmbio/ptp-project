@@ -682,14 +682,16 @@ We have got review from editors.
 
 # PTP meeting 2018-09-13
 
-- Ola, Jonathan, Staffan and Samuel
+- Attending: Ola, Jonathan, Staffan and Samuel
 
-- Add numbers in the ball plot
-- How to extend discussion:
-  - Our graphs show that all (31) models are fine (individually)
-    - How can we know that they are good? Because of the external test set
+Some todos:
+
+- [ ] Add numbers in the ball plot
+- [ ] Extend discussion. How:
+  - [ ] Our graphs show that all (31) models are fine (individually)
+    - [ ] How can we know that they are good? Because of the external test set
       (drugbank compounds) ... here explain proper train also.
-    - Why proper train? Nothing with "balanced" to do, but rather about "different chemistry", in the inactives. ... we don't want to calibrate (or test) on assumed data.
-  - Proper train needs to be explained in the methods
-  - Downplay balanced/unbalanced overall.
-- Add the word "method" earlier in the abstract
+    - [ ] Why proper train? Nothing with "balanced" to do, but rather about "different chemistry", in the inactives. ... we don't want to calibrate (or test) on assumed data.
+  - [ ] Proper train needs to be explained in the methods
+  - [ ] Downplay balanced/unbalanced overall.
+- [ ] Add the word "method" earlier in the abstract
