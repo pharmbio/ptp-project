@@ -45,9 +45,28 @@
 - [x] Add URL to reference page (Jonathan?)
 - [x] Make a short nice URL via pharmb.io and logo (Jonathan?)
 
+## Fixes for revision 1:
+
+- [x] Update figure (explaning A and N labels)
+- [x] Add more references (Chembench, OCHEM etc)
+- [-] Possibly add more general references
+- [x] Explain role of ExCAPE-DB more.
+- [x] Update manuscript about imbalancedness
+- [x] Add refs about CP for unbalanced datasets
+- [x] Clarify what the A label means (in terms of Molar conc)
+- [x] Create dataset figure
+- [x] Add dataset figure
+- [x] Refer to dataset figure from table caption
+- [x] Split methods part of `External validation' subsection and move into Methods section
+- [>] Guide the user more regarding Conformal Prediction
+- [ ] Extend discussion about model quality, based on plots in figure 4 (prev fig 3)
+- [ ] Play down role of imbalanced-ness (don't mention that particular term in most cases)
+- [ ] Add dataset behind the “ball plots” as .TSV file in the supplement
+- [ ] add numbers in the figure as well(?)
+
 ## EAs suggestions
 
-- [ ] Add Bender CP refs
+- [?] Add Bender CP refs
 - [x] Add line of unity in calibration plots
 - [x] Describe graph and colors in fig 5a
 - [x] Write about color scale in fig 5b
