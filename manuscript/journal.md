@@ -47,11 +47,11 @@
 
 ## Fixes for revision 1:
 
-- [x] Update figure (explaning A and N labels)
+- [x] Update figure (explaining A and N labels)
 - [x] Add more references (Chembench, OCHEM etc)
 - [-] Possibly add more general references
 - [x] Explain role of ExCAPE-DB more.
-- [x] Update manuscript about imbalancedness
+- [x] Update manuscript about imbalanced-ness
 - [x] Add refs about CP for unbalanced datasets
 - [x] Clarify what the A label means (in terms of Molar conc)
 - [x] Create dataset figure
