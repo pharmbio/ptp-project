@@ -59,10 +59,11 @@
 - [x] Refer to dataset figure from table caption
 - [x] Split methods part of `External validation' subsection and move into Methods section
 - [>] Guide the user more regarding Conformal Prediction
-- [ ] Extend discussion about model quality, based on plots in figure 4 (prev fig 3)
+- [>] Extend discussion about model quality, based on plots in figure 4 (prev fig 3)
 - [ ] Play down role of imbalanced-ness (don't mention that particular term in most cases)
 - [ ] Add dataset behind the “ball plots” as .TSV file in the supplement
-- [ ] add numbers in the figure as well(?)
+- [ ] Add table with selectivity and specificity for all targets?
+- [ ] Add numbers in the figure as well(?)
 
 ## EAs suggestions
 
