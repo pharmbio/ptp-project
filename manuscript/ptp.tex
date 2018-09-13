@@ -354,26 +354,6 @@ included.}
 \end{tabular}
 \end{table}
 
-\begin{table}[h]
-\small
-\centering
-\caption{Summary of datasets discussed.}
-\label{tbl:datasets}
-\begin{tabular}{rll}
-\toprule
-& Name     & Description \\
-\midrule
-%\multirow{31}{*}{\begin{turn}{90}\textsc{Included}\end{turn}}
-& Dataset1 & All 31 targets selected from the set of 44 targets in~\cite{Bowes2012}. \\
-& Dataset2 & Targets from Dataset1 with at least 10\,000 non-actives. \\
-& Dataset3 & The remaining 10 ``large'' target datasets, from Dataset1 which were not included in Dataset2 \\
-& Dataset4 & The external test set created by extracting rows from ExCAPE-DB for a selected set of \\
-&          & 1\,000 compounds in DrugBank (All withdrawn, and randomly sampled approved, drugs,\\
-&          & until reaching 1000 drugs). \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 %%%%%%%%%%%%%%%%%%
 %Methods
 %%%%%%%%%%%%%%%%%%
@@ -453,7 +433,10 @@ active for the target, thus being `assumed non-active'. The number of new
 examples was chosen such that the total number of non-actives and assumed
 non-actives added up to twice the number of actives, for each target
 respectively. The compounds for the remaining 10 targets, which were not
-extended with assumed non-actives, were named Dataset3.
+extended with assumed non-actives, were named Dataset3. The relation of these
+datasets are shown with a graphical overview of how they were created in
+figure~\ref{fig:datasets}, and a table summarizing them, in
+table~\cite{tbl:datasets}.
 %
 The conformal prediction methodology, in particular with the mondrian
 approach, can handle differing sizes of the datasets well, and so we see no
@@ -467,6 +450,41 @@ instead go for a little bit more data.
 All the targets, with details about their respective number of active and
 non-active compounds, and whether they are included or not, are summarized in
 table~\ref{tbl:targets}.
+
+\begin{figure}[t]
+%\vspace{2\baselineskip}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{figures/datasets/datasets.pdf}
+    \caption{Graphical overview over how the raw datasets used in this study
+    were created. The blue funnel symbol, represents filtering steps, while
+    the barrel and document symbols represent datasets. The criteria for the
+    filtering steps are shown with blue text.}
+    \label{fig:datasets}
+\end{center}
+\end{figure}
+
+\begin{table}[h]
+\small
+\centering
+\caption{Summary of datasets discussed. See also figure~\ref{fig:datasets}
+    for a graphical overview of how each dataset was created.}
+\label{tbl:datasets}
+\begin{tabular}{rll}
+\toprule
+& Name     & Description \\
+\midrule
+%\multirow{31}{*}{\begin{turn}{90}\textsc{Included}\end{turn}}
+& Dataset0 & SAR data points for all 44 targets in~\cite{Bowes2012} which are available in ExCAPE-DB. \\
+& Dataset1 & SAR data points for the 31 targets in Dataset0 for which there were at least 100 actives and 100 non-actives. \\
+& Dataset2 & SAR data points for targets with least 10\,000 non-actives. \\
+& Dataset3 & SAR data points for targets which had less than 10\,000 non-actives, thus the same \\
+&          & as Dataset1 with Dataset2 excluded. \\
+& Dataset4 & SAR points making up the external test, by extracting rows from ExCAPE-DB for a selected set of \\
+&          & 1\,000 compounds in DrugBank (All withdrawn, and randomly sampled approved, drugs,\\
+&          & until reaching 1000 drugs). \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Conformal prediction}
 Conformal Prediction (CP)~\cite{Vovk2005} provides a layer on top of
