@@ -382,7 +382,7 @@ SMILES level.
 \footnote{\url{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo\_drugbank\_wf.go\#L239-L246}}).
 %
 For full information about the preprocessing done by the ExCAPE-DB authors to
-\todo{in creating the values?}create the values we used, see~\cite{Sun2017}. As a help to the reader we
+create the values we used, see~\cite{Sun2017}. As a help to the reader we
 note that the activity flag is -- in the ExCAPE-DB dataset -- set to active
 (or \texttt{A}) if the dose-response value in the binding assays was lower
 than 10 ${\mu}M$ and non-active (or \texttt{N}) otherwise.
@@ -443,9 +443,10 @@ for a particular target in ExCAPE-DB. The validation was done with CPSign's
 \texttt{validate} command, predicting values at confidence levels 0.8 and 0.9.
 
 The conformal prediction methodology, in particular with the mondrian
-approach, can handle differing sizes of the datasets well\todo{ref}, and so we see no
-reason to stick to the exact same number of compounds as the actives, but
-instead go for a little bit more data.
+approach, can handle differing sizes of the datasets
+well~\cite{Norinder:2017qc}, and so we see no reason to stick to the exact
+same number of compounds as the actives, but instead go for a little bit more
+data.
 
 % (See
 % \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L308-L328}{here}
@@ -506,7 +507,7 @@ concept of a model's `applicability domain'~\cite{Norinder:2014fe}. For
 the classification case, a prediction is represented as a set of p-values (one for each
 class), and in the Mondrian setting the classes are handled independently,
 which has attractive properties when dealing with imbalanced
-datasets~\cite{Norinder:2017qc,Sun:2017qm}. 
+datasets~\cite{Norinder:2017qc,Sun:2017qm}.
 
 Staffans suggestion: For the classification case a prediction is given as set of conformal p-values, one for each class,
 which represent a ranking for the test object. The p-values together with the user decided $\epsilon$
