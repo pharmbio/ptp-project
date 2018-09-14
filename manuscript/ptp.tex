@@ -518,7 +518,7 @@ Conformal Prediction (CP)~\cite{Vovk2005} provides a layer on top of
 existing machine learning methods and produces valid prediction regions for test
 objects. This contrasts to standard machine learning that delivers point
 estimates. In conformal prediction a prediction region contains the true
-value with probability equal to a selected significance level $\epsilon$. Such
+value with probability equal to $1-\epsilon$, where $\epsilon$ is the selected significance level. Such
 a prediction region can be obtained under the assumption that the observed data
 is exchangeable. An important consequence is that the size of this region directly
 relates to the `strangeness' of the test example, and is an alternative to the
@@ -527,6 +527,12 @@ the classification case, a prediction is represented as a set of p-values (one f
 class), and in the Mondrian setting the classes are handled independently,
 which has attractive properties when dealing with imbalanced
 datasets~\cite{Norinder:2017qc,Sun:2017qm}. 
+
+Staffans suggestion: For the classification case a prediction is given as set of conformal p-values, one for each class,
+which represent a ranking for the test object. The p-values together with the user decided $\epsilon$
+produces the final prediction set. Conformal predictors are mondrian, meaning that they handle
+the classes independently, which has previously been shown to work very well on imbalanced datasets and remove
+the need for under/oversampling, boosting or similar techniques~\cite{Norinder:2017qc,Sun:2017qm}.
 
 In this study we used the Mondrian conformal prediction implementation in the
 software CPSign~\cite{CPSignDocs}, leveraging the
