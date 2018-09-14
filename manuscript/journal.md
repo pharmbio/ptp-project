@@ -61,6 +61,7 @@
 - [x] Play down role of imbalanced-ness (don't mention that particular term in most cases)
 - [>] Guide the user more regarding Conformal Prediction
 - [>] Extend discussion about model quality, based on plots in figure 4 (prev fig 3)
+- [ ] Height 3 -> Height 1-3
 - [ ] Add dataset behind the “ball plots” as .TSV file in the supplement
 - [ ] Add table with selectivity and specificity for all targets?
 - [ ] Add numbers in the figure as well(?)
