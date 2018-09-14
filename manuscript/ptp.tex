@@ -494,7 +494,8 @@ table~\ref{tbl:targets}.
 \caption{Summary of datasets discussed. See also figure~\ref{fig:datasets}
     for a graphical overview of how each dataset was created.}
 \label{tbl:datasets}
-\begin{tabular}{rll}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{rlp{0.6\textwidth}}
 \toprule
 & Name     & Description \\
 \midrule
@@ -509,6 +510,7 @@ table~\ref{tbl:targets}.
 &          & until reaching 1000 drugs). \\
 \bottomrule
 \end{tabular}
+\renewcommand{\arraystretch}{1}
 \end{table}
 
 \subsection{Conformal prediction}
