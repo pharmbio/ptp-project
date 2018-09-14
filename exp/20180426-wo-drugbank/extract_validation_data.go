@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	sp "github.com/scipipe/scipipe"
-	spc "github.com/scipipe/scipipe/components"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	sp "github.com/scipipe/scipipe"
+	spc "github.com/scipipe/scipipe/components"
 )
 
 func main() {
@@ -17,7 +18,7 @@ func main() {
 
 		validateFiles := spc.NewFileGlobber(wf, "valstat_files_"+confLevel, "dat/validate/*/*1000.json")
 		sts := spc.NewStreamToSubStream(wf, "sts_"+confLevel)
-		sts.In().Connect(validateFiles.Out())
+		sts.In().From(validateFiles.Out())
 
 		// ------------------------------------------------------------------------
 		// Grab input files
@@ -37,38 +38,38 @@ func main() {
 				print "N" "\t" d["N"]["A","N"] "\t" d["N"]["A",""] "\t" d["N"]["N",""] "\t" d["N"]["",""]
 			}' >> {o:valstats}`
 
-		valDataAll := wf.NewProc("extract_valdata_all_"+confLevel, fmt.Sprintf(extractCmdTpl, "{i:valjson:r: }", confIdx))
-		valDataAll.SetPathStatic("valstats", "res/validation/valstats."+confLevel+".tsv")
-		valDataAll.In("valjson").Connect(sts.OutSubStream())
+		valDataAll := wf.NewProc("extract_valdata_all_"+confLevel, fmt.Sprintf(extractCmdTpl, "{i:valjson|join: }", confIdx))
+		valDataAll.SetOut("valstats", "res/validation/valstats."+confLevel+".tsv")
+		valDataAll.In("valjson").From(sts.OutSubStream())
 
 		valDataPerTarget := wf.NewProc("extract_valdata_pertarget_"+confLevel, fmt.Sprintf(extractCmdTpl, "{i:valjson}", confIdx))
-		valDataPerTarget.SetPathCustom("valstats", func(t *sp.Task) string {
+		valDataPerTarget.SetOutFunc("valstats", func(t *sp.Task) string {
 			inFile := filepath.Base(t.InPath("valjson"))
 			replacePtn, err := regexp.Compile(`\..*$`)
 			sp.Check(err)
 			gene := replacePtn.ReplaceAllString(inFile, "")
 			return "res/validation/" + gene + "/" + gene + "." + confLevel + ".valstats.tsv"
 		})
-		valDataPerTarget.In("valjson").Connect(validateFiles.Out())
+		valDataPerTarget.In("valjson").From(validateFiles.Out())
 
 		// ------------------------------------------------------------------------
 		// Plot data
 		// ------------------------------------------------------------------------
-		extractGene := spc.NewMapToKeys(wf, "extract_gene_"+confLevel, func(ip *sp.FileIP) map[string]string {
+		extractGene := spc.NewMapToTags(wf, "extract_gene_"+confLevel, func(ip *sp.FileIP) map[string]string {
 			ptn, err := regexp.Compile(`\.0p.*\.tsv`)
 			sp.Check(err)
 			gene := strings.ToUpper(ptn.ReplaceAllString(filepath.Base(ip.Path()), ""))
 			return map[string]string{"gene": gene}
 		})
-		extractGene.In().Connect(valDataPerTarget.Out("valstats"))
+		extractGene.In().From(valDataPerTarget.Out("valstats"))
 
 		plotValData := wf.NewProc("plot_valdata_"+confLevel, `Rscript bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g {k:valdata.gene} -c `+strings.Replace(confLevel, "p", ".", 1))
-		plotValData.SetPathExtend("valdata", "plot", ".pdf")
-		plotValData.In("valdata").Connect(extractGene.Out())
+		plotValData.SetOut("plot", "{i:valdata}.pdf")
+		plotValData.In("valdata").From(extractGene.Out())
 
 		plotValDataAll := wf.NewProc("plot_valdata_all_"+confLevel, `Rscript bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g "all targets" -c `+strings.Replace(confLevel, "p", ".", 1))
-		plotValDataAll.SetPathExtend("valdata", "plot", ".pdf")
-		plotValDataAll.In("valdata").Connect(valDataAll.Out("valstats"))
+		plotValDataAll.SetOut("plot", "{i:valdata}.pdf")
+		plotValDataAll.In("valdata").From(valDataAll.Out("valstats"))
 	}
 
 	wf.Run()
