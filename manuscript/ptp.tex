@@ -540,11 +540,12 @@ In order to not use the assumed non-active compounds in Dataset2 in the
 calibration set of the ICPs, these additional compounds
 were treated separately, by providing them to the CPSign software with the
 \texttt{--proper-train} parameter, see the CPSign
-documentation~\cite{CPSignDocs}. Using this parameter the additional compounds 
-are only added to the proper training set, thus part of training the underlying SVM, and 
-not part of the calibration of the predictions. This removes potential problems of 
-`strange' chemistry affecting the calibration of the predictions and have a negative 
-influence on the performance of the predictor.
+documentation~\cite{CPSignDocs}. Using this parameter the additional
+compounds are only added to the proper training set, thus part of training
+the underlying SVM, and not part of the calibration of the predictions. This
+removes potential problems from `strange' chemistry in the additional assumed
+non-active compounds, from affecting the calibration of the predictions and having a
+negative influence on the performance of the predictor.
 
 
 \subsection{Hyper-parameter tuning}
