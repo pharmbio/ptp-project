@@ -527,8 +527,8 @@ signatures molecular descriptor~\cite{faulon2003signature}.  This descriptor is
 based on the neighboring of atoms in a molecule and has been shown to work
 well for QSAR studies~\cite{lapins2018confidence,Alvarsson:2016pw} and for
 ligand-based target prediction~\cite{alvarsson2014ligand}. Signatures were
-generated with height 3, which means that molecular sub-graphs including all atoms
-of distance 3 from initial atoms, are generated. Support vector
+generated with height 1-3, which means that molecular sub-graphs including all atoms
+of distance 1, 2 or 3 from initial atoms, are generated. Support vector
 machines is a machine learning algorithm which is commonly used in QSAR
 studies~\cite{norinder2003support,zhou2011qsar} together with molecular
 signatures and similar molecular descriptors, \textit{e.g.}, the extended
@@ -848,7 +848,7 @@ be accessed at \url{http://ptp.service.pharmb.io/}
         \fbox{\includegraphics[height=0.23\textheight]{figures/fig5b_terbutaline2.png}}
         \subcaption{Coloring of which parts of the molecule contributed the
         most to the prediction for ADBR2. Red color indicates the centers of
-        molecular fragments (of height 3) that contributed most to the larger
+        molecular fragments (of height 1-3) that contributed most to the larger
         class, while blue color indicates center of fragments contributing
         most to the smaller class. In this case the larger class is ``Active'',
         which can be seen in the size of the p-values in the bottom left of
