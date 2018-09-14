@@ -402,7 +402,7 @@ this additional deduplication, on the SMILES level.
 \footnote{\url{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo\_drugbank\_wf.go\#L239-L246}}).
 %
 For full information about the preprocessing done by the ExCAPE-DB authors to
-create the values we used, see~\cite{Sun2017}. As a help to the reader we
+\todo{in creating the values?}create the values we used, see~\cite{Sun2017}. As a help to the reader we
 note that the activity flag is -- in the ExCAPE-DB dataset -- set to active
 (or \texttt{A}) if the dose-response value in the binding assays was lower
 than 10 ${\mu}M$ and non-active (or \texttt{N}) otherwise.
@@ -463,7 +463,7 @@ for a particular target in ExCAPE-DB. The validation was done with CPSign's
 \texttt{validate} command, predicting values at confidence levels 0.8 and 0.9.
 
 The conformal prediction methodology, in particular with the mondrian
-approach, can handle differing sizes of the datasets well, and so we see no
+approach, can handle differing sizes of the datasets well\todo{ref}, and so we see no
 reason to stick to the exact same number of compounds as the actives, but
 instead go for a little bit more data.
 
@@ -546,7 +546,7 @@ In order to not use the assumed non-active compounds in Dataset2 in the
 calibration step in the Conformal Prediction method, these additional compounds
 were treated separately, by providing them to the CPSign software with the
 \texttt{--proper-train} parameter, see the CPSign
-documentation~\cite{CPSignDocs}.
+documentation~\cite{CPSignDocs}. \todo{Extend on why}
 
 
 \subsection{Hyper-parameter tuning}
