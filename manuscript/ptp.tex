@@ -242,7 +242,7 @@ open and standardized API, meaning that it is not straightforward (and in
 most cases not possible at all) to consume the services programmatically,
 e.g. from a script or a scientific workflow tool such as
 KNIME~\cite{Mazanetz:2012gy}. Thirdly, previous works do not publish the
-preprocessing and modeling workflows in reproducible formats, rendering it
+pre-processing and modeling workflows in reproducible formats, rendering it
 hard to update the models as data changes, and limits the portability of
 methods. In fact, most implementations are only accessible from a website
 without the underlying implementations being openly available for inspection,
@@ -381,7 +381,7 @@ calibration or test set, we performed this additional deduplication, on the
 SMILES level.
 \footnote{\url{https://github.com/pharmbio/ptp-project/blob/c529cf/exp/20180426-wo-drugbank/wo\_drugbank\_wf.go\#L239-L246}}).
 %
-For full information about the preprocessing done by the ExCAPE-DB authors to
+For full information about the pre-processing done by the ExCAPE-DB authors to
 create the values we used, see~\cite{Sun2017}. As a help to the reader we
 note that the activity flag is -- in the ExCAPE-DB dataset -- set to active
 (or \texttt{A}) if the dose-response value in the binding assays was lower
@@ -442,7 +442,7 @@ of the 31 targets for all compounds for which there existed known binding data
 for a particular target in ExCAPE-DB. The validation was done with CPSign's
 \texttt{validate} command, predicting values at confidence levels 0.8 and 0.9.
 
-The conformal prediction methodology, in particular with the mondrian
+The conformal prediction methodology, in particular with the Mondrian
 approach, can handle differing sizes of the datasets
 well~\cite{Norinder:2017qc}, and so we see no reason to stick to the exact
 same number of compounds as the actives, but instead go for a little bit more
@@ -511,18 +511,18 @@ datasets~\cite{Norinder:2017qc,Sun:2017qm}.
 
 Staffans suggestion: For the classification case a prediction is given as set of conformal p-values, one for each class,
 which represent a ranking for the test object. The p-values together with the user decided $\epsilon$
-produces the final prediction set. Conformal predictors are mondrian, meaning that they handle
+produces the final prediction set. Conformal predictors are Mondrian, meaning that they handle
 the classes independently, which has previously been shown to work very well on imbalanced datasets and remove
 the need for under/oversampling, boosting or similar techniques~\cite{Norinder:2017qc,Sun:2017qm}.
 
 In this study we used the Mondrian conformal prediction implementation in the
 software CPSign~\cite{CPSignDocs}, leveraging the
-liblinear SVM implementation~\cite{fan2008liblinear} together with the
+LIBLINEAR SVM implementation~\cite{fan2008liblinear} together with the
 signatures molecular descriptor~\cite{faulon2003signature}.  This descriptor is
 based on the neighboring of atoms in a molecule and has been shown to work
 well for QSAR studies~\cite{lapins2018confidence,Alvarsson:2016pw} and for
 ligand-based target prediction~\cite{alvarsson2014ligand}. Signatures were
-generated with height 3, which means that molecular subgraphs including all atoms
+generated with height 3, which means that molecular sub-graphs including all atoms
 of distance 3 from initial atoms, are generated. Support vector
 machines is a machine learning algorithm which is commonly used in QSAR
 studies~\cite{norinder2003support,zhou2011qsar} together with molecular
@@ -540,7 +540,7 @@ documentation~\cite{CPSignDocs}. \todo{Extend on why}
 
 \subsection{Hyper-parameter tuning}
 For each of the 31 targets in Dataset 1, a parameter sweep was run to find the optimal value
-of the cost parameter of liblinear, optimizing modeling efficiency using
+of the cost parameter of LIBLINEAR, optimizing modeling efficiency using
 10-fold cross validation. The training approach used an Aggregated Conformal
 Predictor (ACP) with 10 aggregated models.  The parameter sweep evaluated three
 values for the cost parameter for each target; 1, 10 and 100. The efficiency
@@ -653,7 +653,7 @@ available in the supplementary material, figures S4 and S5).
 \subsection{Published models}
 Models for all targets in Dataset1 were produced in the form of portable Java
 Archive (JAR) files, which were also built into similarly portable Docker
-containers, for easy publication as micro services.  The model JAR files,
+containers, for easy publication as microservices.  The model JAR files,
 together with audit log files produced by SciPipe, containing trace of the
 workflow (all the shell commands and parameters) used to produce them, are
 available for download at~\cite{ModelsZenodo}
@@ -798,7 +798,7 @@ each target individually, see the supplementary material, figure S2 and S3.
 \end{figure}
 
 \subsection{Target Profile-as-a-Service}
-All models based on Dataset2 were published as micro-services with REST APIs
+All models based on Dataset2 were published as microservices with REST APIs
 publicly made available using the OpenAPI specification~\cite{OpenAPI} on an OpenShift~\cite{OpenShift} cluster.
 A web page aggregating all the models was also created. The OpenAPI
 specification is a standardization for how REST APIs are described, meaning
@@ -928,7 +928,7 @@ non-actives to the datasets with very few (under 10,000) non-actives, is
 good, and not varying too dramatically even for the datasets with relatively
 small numbers of active compounds.
 
-Based on the external testset, Dataset4, though, especially based on the
+Based on the external test set, Dataset4, though, especially based on the
 plots in figure~\ref{fig:valplots}, how there are a somewhat higher fraction
 of observed non-actives (`N') which are correctly predicted as non-actives,
 than the fraction of observed actives (`A'), correctly predicted as active,
