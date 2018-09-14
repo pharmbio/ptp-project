@@ -927,11 +927,15 @@ good, and not varying too dramatically even for the datasets with relatively
 small numbers of active compounds.
 
 Based on the external test set, Dataset4, though, especially based on the
-plots in figure~\ref{fig:valplots}, how there are a somewhat higher fraction
-of observed non-actives (`N') which are correctly predicted as non-actives,
-than the fraction of observed actives (`A'), correctly predicted as active,
-than non-actives predicted as actives, indicating a somewhat higher
-specificity than sensitivity, generally for all targets.
+plots in figure~\ref{fig:valplots}, we see how there are a somewhat higher
+fraction of observed non-actives (`N') which are correctly predicted as
+non-actives, than the fraction of observed actives (`A'), correctly predicted
+as active, than non-actives predicted as actives, indicating a somewhat
+higher specificity than sensitivity, generally for all targets.
+We want to highlight to the reader though that the definition of specificity
+and sensitivity is not as clear-cut in the conformal prediction setting, as
+we are having four sets of labels for a binary classification setting (`None' and
+`Both', in addition to the prediction labels), rather than just two.
 
 The use of workflows to automate pre-processing and model training and make it
 completely reproducible has several implications. Primarily, the entire process
