@@ -62,7 +62,7 @@
 - [>] Guide the user more regarding Conformal Prediction
 - [>] Extend discussion about model quality, based on plots in figure 4 (prev fig 3)
 - [x] Height 3 -> Height 1-3
-- [ ] Mention that downloadable models need a license and software
+- [x] Mention that downloadable models need a license and software
 - [ ] Add dataset behind the “ball plots” as .TSV file in the supplement
 - [ ] Add table with selectivity and specificity for all targets?
 - [ ] Add numbers in the figure as well(?)
