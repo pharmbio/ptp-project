@@ -502,19 +502,25 @@ value with probability equal to $1-\epsilon$, where $\epsilon$ is the selected s
 a prediction region can be obtained under the assumption that the observed data
 is exchangeable. An important consequence is that the size of this region directly
 relates to the `strangeness' of the test example, and is an alternative to the
-concept of a model's `applicability domain'~\cite{Norinder:2014fe}. For
-the classification case, a prediction is represented as a set of p-values (one for each
-class), and in the Mondrian setting the classes are handled independently,
-which has attractive properties when dealing with imbalanced
-datasets~\cite{Norinder:2017qc,Sun:2017qm}.
-
-Staffans suggestion: For the classification case a prediction is given as set of conformal p-values, one for each class,
+concept of a model's `applicability domain'~\cite{Norinder:2014fe}. For the classification 
+case a prediction is given as set of conformal p-values, one for each class,
 which represent a ranking for the test object. The p-values together with the user decided $\epsilon$
 produces the final prediction set. Conformal predictors are Mondrian, meaning that they handle
 the classes independently, which has previously been shown to work very well on imbalanced datasets and remove
 the need for under/oversampling, boosting or similar techniques~\cite{Norinder:2017qc,Sun:2017qm}.
 
-In this study we used the Mondrian conformal prediction implementation in the
+Conformal Prediction was originally invented in the online transductive setting, meaning that the
+underlying learning model had to be retrained for every new test object. Later it was adapted for
+the off-line inductive setting, training the underlying model only once for a batch of training examples.
+The Inductive Conformal Predictor (ICP) require far less computational resources, 
+but has the disadvantage that a part of the training set must be set aside as a \textit{calibration set}.
+Remaining data, called \textit{proper training set}, is used to train the learning model. 
+As the partitioning of data into calibration or proper training can have a large influence on the performance
+of the predictor, it is common to redo this split multiple times and train an ICP
+for each such split, creating an Aggregated Conformal Predictor (ACP) that aggregates the predictions for 
+each individual ICP.
+
+In this study we used the Mondrian ACP implementation in the
 software CPSign~\cite{CPSignDocs}, leveraging the
 LIBLINEAR SVM implementation~\cite{fan2008liblinear} together with the
 signatures molecular descriptor~\cite{faulon2003signature}.  This descriptor is
@@ -531,10 +537,14 @@ As nonconformity measure we used the distance between the classifier's
 decision surface and the test object, as previously described 
 by~\cite{eklund2015application}. 
 In order to not use the assumed non-active compounds in Dataset2 in the
-calibration step in the Conformal Prediction method, these additional compounds
+calibration set of the ICPs, these additional compounds
 were treated separately, by providing them to the CPSign software with the
 \texttt{--proper-train} parameter, see the CPSign
-documentation~\cite{CPSignDocs}. \todo{Extend on why}
+documentation~\cite{CPSignDocs}. Using this parameter the additional compounds 
+are only added to the proper training set, thus part of training the underlying SVM, and 
+not part of the calibration of the predictions. This removes potential problems of 
+`strange' chemistry affecting the calibration of the predictions and have a negative 
+influence on the performance of the predictor.
 
 
 \subsection{Hyper-parameter tuning}
