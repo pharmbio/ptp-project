@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	wf := sp.NewWorkflow("extract_valdata", 4)
+	wf := sp.NewWorkflow("extract_valdata", 1)
 
 	for confIdx, confLevel := range []string{"0p9", "0p8"} { // We use 'p' instead of '.' to avoid confusion in the file name
 		confLevel := confLevel
@@ -28,9 +28,19 @@ func main() {
 		extractCmdTpl := `cat %s \
 			| jq -c '[.molecule.activity,.prediction.predictedLabels[%d].labels[]]' \
 			| tr -d "[" | tr -d "]" | tr -d '"' \
-			| awk -F, '{d[$1][$2,$3]++ }
+			| awk -F, 'BEGIN {
+					d["A"]["A","N"]=0;
+					d["A"]["A",""]=0;
+					d["A"]["N",""]=0;
+					d["A"]["",""]=0;
+					d["N"]["A","N"]=0;
+					d["N"]["A",""]=0;
+					d["N"]["N",""]=0;
+					d["N"]["",""]=0;
+				}
+				{d[$1][$2,$3]++ }
 				END {
-					print "a_pred_both\ta_pred_a\ta_pred_n\ta_pred_none\tn_pred_both\tn_pred_a\tn_pred_n\tn_pred_none\tsens_excl\tsens_incl\tspec_excl\tspec_incl";
+					print "a_pred_both,a_pred_a,a_pred_n,a_pred_none,n_pred_both,n_pred_a,n_pred_n,n_pred_none,sens_excl,sens_incl,spec_excl,spec_incl";
 					a_pred_both=d["A"]["A","N"];
 					a_pred_a=d["A"]["A",""];
 					a_pred_n=d["A"]["N",""];
@@ -42,16 +52,22 @@ func main() {
 					if (a_pred_a > 0) {
 						sens_excl=a_pred_a/(a_pred_a + a_pred_n);
 						sens_incl=a_pred_a/(a_pred_a + a_pred_n + a_pred_both + a_pred_none);
-					};
+					} else {
+						sens_excl=0;
+						sens_incl=0;
+					}
 					if (n_pred_n > 0) {
 						spec_excl=n_pred_n/(n_pred_n + n_pred_a);
 						spec_incl=n_pred_n/(n_pred_n + n_pred_a + n_pred_both + n_pred_none);
-					};
-					print a_pred_both "\t" a_pred_a "\t" a_pred_n "\t" a_pred_none "\t" n_pred_both "\t" n_pred_a "\t" n_pred_n "\t" n_pred_none "\t" sens_excl "\t" sens_incl "\t" spec_excl "\t" spec_incl;
+					} else {
+						spec_excl=0;
+						spec_incl=0;
+					}
+					print a_pred_both "," a_pred_a "," a_pred_n "," a_pred_none "," n_pred_both "," n_pred_a "," n_pred_n "," n_pred_none "," sens_excl "," sens_incl "," spec_excl "," spec_incl;
 				}' > {o:valstats}`
 
 		valDataAll := wf.NewProc("extract_valdata_all_"+confLevel, fmt.Sprintf(extractCmdTpl, "{i:valjson|join: }", confIdx))
-		valDataAll.SetOut("valstats", "res/validation/valstats."+confLevel+".tbl.tsv")
+		valDataAll.SetOut("valstats", "res/validation/valstats."+confLevel+".tbl.csv")
 		valDataAll.In("valjson").From(sts.OutSubStream())
 
 		valDataPerTarget := wf.NewProc("extract_valdata_pertarget_"+confLevel, fmt.Sprintf(extractCmdTpl, "{i:valjson}", confIdx))
@@ -60,9 +76,16 @@ func main() {
 			replacePtn, err := regexp.Compile(`\..*$`)
 			sp.Check(err)
 			gene := replacePtn.ReplaceAllString(inFile, "")
-			return "res/validation/" + gene + "/" + gene + "." + confLevel + ".valstats.tbl.tsv"
+			return "res/validation/" + gene + "/" + gene + "." + confLevel + ".valstats.tbl.csv"
 		})
 		valDataPerTarget.In("valjson").From(validateFiles.Out())
+
+		valDataPerTargetSTS := spc.NewStreamToSubStream(wf, "valdata_per_target_sts_"+confLevel)
+		valDataPerTargetSTS.In().From(valDataPerTarget.Out("valstats"))
+
+		mergeValDataPerTgt := wf.NewProc("merge_valdata_per_tgt_"+confLevel, `i=0; for f in {i:valdata_per_tgt|join: }; do let "i++"; if [[ $i == 1 ]]; then head -n 1 $f; fi; tail -n +2 $f; done > {o:merged}`)
+		mergeValDataPerTgt.SetOut("merged", "res/validation/valstats."+confLevel+".tbl.alltargets.csv")
+		mergeValDataPerTgt.In("valdata_per_tgt").From(valDataPerTargetSTS.OutSubStream())
 	}
 
 	wf.Run()
