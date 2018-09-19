@@ -439,8 +439,11 @@ created.
 The Conformal Prediction methodology, in particular with the Mondrian
 approach, can handle differing sizes of the datasets
 well~\cite{Norinder:2017qc}, and so we see no reason to stick to the exact
-same number of compounds as the actives, but instead go for a little bit more
-data.
+same number of compounds as the actives. Instead we use a active:non-active 
+ratio of 1:2 between the classes. The justification for this is that the assumed non-actives likely
+have chemistry coming from a larger chemical space compared to the known compounds, 
+thus by adding more of the assumed non-actives we can hopefully increase the number 
+of examples in the regions of chemical space that are of interest for separating the two classes.
 
 % (See
 % \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L308-L328}{here}
