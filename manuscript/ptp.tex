@@ -436,11 +436,6 @@ overview of how they were created in figure~\ref{fig:datasets}, and in
 table~\ref{tbl:datasets}, which summarizes in words how each dataset was
 created.
 
-The models built were validated by predicting the binding activity against each
-of the 31 targets for all compounds for which there existed known binding data
-for a particular target in ExCAPE-DB. The validation was done with CPSign's
-\texttt{validate} command, predicting values at confidence levels 0.8 and 0.9.
-
 The Conformal Prediction methodology, in particular with the Mondrian
 approach, can handle differing sizes of the datasets
 well~\cite{Norinder:2017qc}, and so we see no reason to stick to the exact
@@ -649,6 +644,11 @@ A graphical overview of the modeling workflow is shown in
 figure~\ref{fig:workflow_graph_clean}. More detailed workflow graphs are
 available in the supplementary material, figures S4 and S5).
 
+\subsection{Model validation}
+The models built were validated by predicting the binding activity against each
+of the 31 targets for all compounds for which there existed known binding data
+for a particular target in ExCAPE-DB. The validation was done with CPSign's
+\texttt{validate} command, predicting values at confidence levels 0.8 and 0.9.
 
 %%%%%%%
 % Results  %
