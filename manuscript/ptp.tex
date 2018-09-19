@@ -441,7 +441,7 @@ of the 31 targets for all compounds for which there existed known binding data
 for a particular target in ExCAPE-DB. The validation was done with CPSign's
 \texttt{validate} command, predicting values at confidence levels 0.8 and 0.9.
 
-The conformal prediction methodology, in particular with the Mondrian
+The Conformal Prediction methodology, in particular with the Mondrian
 approach, can handle differing sizes of the datasets
 well~\cite{Norinder:2017qc}, and so we see no reason to stick to the exact
 same number of compounds as the actives, but instead go for a little bit more
@@ -497,7 +497,7 @@ table~\ref{tbl:targets}.
 Conformal Prediction (CP)~\cite{Vovk2005} provides a layer on top of
 existing machine learning methods and produces valid prediction regions for test
 objects. This contrasts to standard machine learning that delivers point
-estimates. In conformal prediction a prediction region contains the true
+estimates. In CP a prediction region contains the true
 value with probability equal to $1-\epsilon$, where $\epsilon$ is the selected significance level. Such
 a prediction region can be obtained under the assumption that the observed data
 is exchangeable. An important consequence is that the size of this region directly
@@ -505,7 +505,7 @@ relates to the `strangeness' of the test example, and is an alternative to the
 concept of a model's `applicability domain'~\cite{Norinder:2014fe}. For the classification
 case a prediction is given as set of conformal p-values, one for each class,
 which represent a ranking for the test object. The p-values together with the user decided $\epsilon$
-produces the final prediction set. Conformal predictors are Mondrian, meaning that they handle
+produces the final prediction set. Conformal Predictors are Mondrian, meaning that they handle
 the classes independently, which has previously been shown to work very well on imbalanced datasets and remove
 the need for under/oversampling, boosting or similar techniques~\cite{Norinder:2017qc,Sun:2017qm}.
 
@@ -670,7 +670,7 @@ Genetta Soft AB.
 
 \subsection{Validity of models}
 
-To check that the conformal prediction models are valid (i.e. that they predict with
+To check that the Conformal Prediction models are valid (i.e. that they predict with
 an error rate in accordance to the selected significance level), calibration plots
 were generated in the cross validation step of the workflow. Three example
 plots, for three representative targets (the smallest, the median-sized and the
@@ -990,7 +990,7 @@ with fully automated and reproducible data pre-processing and model training
 workflows to build them. Models are packaged as portable Java Archive (JAR)
 files, and as Docker containers that can be deployed on any system. We trained
 data on 31 targets related to drug safety, from the ExCAPE-DB dataset and published
-these as a predictive profile, using conformal prediction to deliver prediction
+these as a predictive profile, using Conformal Prediction to deliver prediction
 intervals for each target. The example profile is deployed as an online service
 with an interoperable API.
 
