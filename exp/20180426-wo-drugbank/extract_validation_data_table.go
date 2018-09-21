@@ -40,7 +40,7 @@ func main() {
 				}
 				{d[$1][$2,$3]++ }
 				END {
-					print "a_pred_both,a_pred_a,a_pred_n,a_pred_none,n_pred_both,n_pred_a,n_pred_n,n_pred_none,sens_excl,sens_incl,spec_excl,spec_incl";
+					print "a_pred_both,a_pred_a,a_pred_n,a_pred_none,n_pred_both,n_pred_a,n_pred_n,n_pred_none";
 					a_pred_both=d["A"]["A","N"];
 					a_pred_a=d["A"]["A",""];
 					a_pred_n=d["A"]["N",""];
@@ -49,21 +49,7 @@ func main() {
 					n_pred_a=d["N"]["A",""];
 					n_pred_n=d["N"]["N",""];
 					n_pred_none=d["N"]["",""];
-					if (a_pred_a > 0) {
-						sens_excl=a_pred_a/(a_pred_a + a_pred_n);
-						sens_incl=a_pred_a/(a_pred_a + a_pred_n + a_pred_both + a_pred_none);
-					} else {
-						sens_excl=0;
-						sens_incl=0;
-					}
-					if (n_pred_n > 0) {
-						spec_excl=n_pred_n/(n_pred_n + n_pred_a);
-						spec_incl=n_pred_n/(n_pred_n + n_pred_a + n_pred_both + n_pred_none);
-					} else {
-						spec_excl=0;
-						spec_incl=0;
-					}
-					print a_pred_both "," a_pred_a "," a_pred_n "," a_pred_none "," n_pred_both "," n_pred_a "," n_pred_n "," n_pred_none "," sens_excl "," sens_incl "," spec_excl "," spec_incl;
+					print a_pred_both "," a_pred_a "," a_pred_n "," a_pred_none "," n_pred_both "," n_pred_a "," n_pred_n "," n_pred_none;
 				}' > {o:valstats}`
 
 		valDataAll := wf.NewProc("extract_valdata_all_"+confLevel, fmt.Sprintf(extractCmdTpl, "{i:valjson|join: }", confIdx))
