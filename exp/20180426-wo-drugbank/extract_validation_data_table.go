@@ -2,15 +2,14 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
-	"regexp"
+	"strings"
 
 	sp "github.com/scipipe/scipipe"
 	spc "github.com/scipipe/scipipe/components"
 )
 
 func main() {
-	wf := sp.NewWorkflow("extract_valdata", 1)
+	wf := sp.NewWorkflow("extract_valdata", 4)
 
 	for confIdx, confLevel := range []string{"0p9", "0p8"} { // We use 'p' instead of '.' to avoid confusion in the file name
 		confLevel := confLevel
@@ -40,7 +39,7 @@ func main() {
 				}
 				{d[$1][$2,$3]++ }
 				END {
-					print "a_pred_both,a_pred_a,a_pred_n,a_pred_none,n_pred_both,n_pred_a,n_pred_n,n_pred_none";
+					print "target_genesymbol,a_pred_both,a_pred_a,a_pred_n,a_pred_none,n_pred_both,n_pred_a,n_pred_n,n_pred_none";
 					a_pred_both=d["A"]["A","N"];
 					a_pred_a=d["A"]["A",""];
 					a_pred_n=d["A"]["N",""];
@@ -49,19 +48,28 @@ func main() {
 					n_pred_a=d["N"]["A",""];
 					n_pred_n=d["N"]["N",""];
 					n_pred_none=d["N"]["",""];
-					print a_pred_both "," a_pred_a "," a_pred_n "," a_pred_none "," n_pred_both "," n_pred_a "," n_pred_n "," n_pred_none;
+					print "{gene}," a_pred_both "," a_pred_a "," a_pred_n "," a_pred_none "," n_pred_both "," n_pred_a "," n_pred_n "," n_pred_none;
 				}' > {o:valstats}`
 
 		valDataAll := wf.NewProc("extract_valdata_all_"+confLevel, fmt.Sprintf(extractCmdTpl, "{i:valjson|join: }", confIdx))
 		valDataAll.SetOut("valstats", "res/validation/valstats."+confLevel+".tbl.csv")
 		valDataAll.In("valjson").From(sts.OutSubStream())
 
-		valDataPerTarget := wf.NewProc("extract_valdata_pertarget_"+confLevel, fmt.Sprintf(extractCmdTpl, "{i:valjson}", confIdx))
+		valDataPerTarget := wf.NewProc("extract_valdata_pertarget_"+confLevel, "#{i:valjson}{o:valstats}")
+		valDataPerTarget.CustomExecute = func(t *sp.Task) {
+			cmd := fmt.Sprintf(extractCmdTpl, t.InPath("valjson"), confIdx)
+			gene := t.InIP("valjson").Param("gene")
+			finCmd := strings.Replace(cmd, "{gene}", gene, -1)
+			finCmd = strings.Replace(finCmd, "{o:valstats}", t.OutPath("valstats"), 1)
+			println("COMMAND: " + finCmd)
+			sp.ExecCmd(finCmd)
+		}
 		valDataPerTarget.SetOutFunc("valstats", func(t *sp.Task) string {
-			inFile := filepath.Base(t.InPath("valjson"))
-			replacePtn, err := regexp.Compile(`\..*$`)
-			sp.Check(err)
-			gene := replacePtn.ReplaceAllString(inFile, "")
+			//inFile := filepath.Base(t.InPath("valjson"))
+			//replacePtn, err := regexp.Compile(`\..*$`)
+			//sp.Check(err)
+			//gene := replacePtn.ReplaceAllString(inFile, "")
+			gene := t.InIP("valjson").Param("gene")
 			return "res/validation/" + gene + "/" + gene + "." + confLevel + ".valstats.tbl.csv"
 		})
 		valDataPerTarget.In("valjson").From(validateFiles.Out())
