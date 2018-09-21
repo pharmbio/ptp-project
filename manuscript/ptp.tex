@@ -624,7 +624,7 @@ for test example $i$.  A smaller value is preferable.
     from top to bottom, of the graph. Each experiment contains additions and
     modifications to the workflow, but the workflow shown here, exemplifies
     the basic structure, common among most of the workflows. For more
-    detailed workflow plots, see the supplementary material, figures S4 and S5.}
+    detailed workflow plots, see Supplement 1, figures S4 and S5.}
     \label{fig:workflow_graph_clean}
 \end{center}
 \end{figure}
@@ -645,7 +645,7 @@ that is available as open source software at
 stored in the workflow code, available on GitHub~\cite{PTPGitHub}.
 A graphical overview of the modeling workflow is shown in
 figure~\ref{fig:workflow_graph_clean}. More detailed workflow graphs are
-available in the supplementary material, figures S4 and S5).
+available in Supplement 1, figures S4 and S5).
 
 \subsection{Model validation} \label{Model validation}
 
@@ -677,7 +677,7 @@ were generated in the cross validation step of the workflow. Three example
 plots, for three representative targets (the smallest, the median-sized and the
 largest, in terms of compounds in ExCAPE-DB) can be seen in figure
 \ref{fig:calplots}, while calibration plots for all targets can be
-found in the supplementary material (figure~S1).
+found in the Supplement 1 (figure~S1).
 From these calibration plots we conclude that all models produce valid results over all
 significance levels.
 
@@ -781,7 +781,14 @@ predictions to be part of the prediction region. This behavior might seem
 backwards, but at a higher confidence the predictor has to include less
 likely predictions in order to reach the specified confidence level, which
 leads to larger prediction sets. For predicted versus observed labels for
-each target individually, see the supplementary material, figure S2 and S3.
+each target individually, see Supplement 1, figure S2 and S3.
+Because of the fact that CP produces sets of predicted labels, including \emph{non},
+and \emph{both} in this case, the common sensitivity and specificity measures
+do not have clear definitions in this context. Because of this, we have not
+included calculated values for them but have instead included compound counts
+for the predicted label sets in \ref{fig:valplots} summarized for all
+targets, and as CSV files in Supplement 2 (for 0.8 confidence) and 3 (for 0.9
+confidence), for each target specifically.
 
 \begin{figure}[h!]
 \begin{minipage}[c]{0.38\textwidth}
@@ -803,7 +810,7 @@ each target individually, see the supplementary material, figure S2 and S3.
     while the y-axis show the set of predicted labels. The areas of the
     circles are proportional to the number of SAR data points for each
     observed label/predicted label combination. For predicted versus observed
-    labels for each target individually, see the supplementary material,
+    labels for each target individually, see Supplement 1,
     figure S2 and S3.}
     \label{fig:valplots}
 \end{figure}
@@ -937,17 +944,11 @@ Based on the efficiency metrics shown in~\ref{fig:21small_fill}
 and~\ref{fig:10large} we see that the efficiency, after adding assumed
 non-actives to the datasets with very few (under 10\,000) non-actives, is
 clearly improved.
-
+%
 Based on the external test set, Dataset4, though, especially based on the
 plots in figure~\ref{fig:valplots}, we see that there is a somewhat higher
-fraction of observed non-actives (`N') correctly predicted as non-actives,
-than the fraction of observed actives (`A') correctly predicted as active.
-This indicates a somewhat higher specificity than sensitivity, generally for
-all targets. We want to highlight to the reader though that the definition of
-specificity and sensitivity is not as clear-cut in the conformal prediction
-setting, as we are having four sets of labels for a binary classification
-setting (``None'' and ``Both'', in addition to the prediction labels), rather
-than just two.
+fraction of observed non-actives (``N'') correctly predicted as non-actives,
+than the fraction of observed actives (``A'') correctly predicted as active.
 
 The use of workflows to automate pre-processing and model training and make it
 completely reproducible has several implications. Primarily, the entire process
