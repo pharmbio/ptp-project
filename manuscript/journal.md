@@ -67,6 +67,7 @@
 - [x] Add numbers in the figure as well
 - [x] Update figure numbering in file names
 - [-] Add table with selectivity and specificity for all targets? (as columns in the table above?)
+- [ ] Include target names in supplement 2 and 3
 
 ## Staffans last suggestions
 
