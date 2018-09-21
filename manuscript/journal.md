@@ -73,7 +73,7 @@
 - [x] Check "model validation" section (too thin?)
 - [x] Make sure we have a reference to CPSign somewhere
 - [x] Fix strange wording: "positive predictions"
-- [ ] Harmonize quoting
+- [x] Harmonize quoting
 
 ## EAs suggestions
 
