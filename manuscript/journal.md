@@ -63,9 +63,10 @@
 - [x] Extend discussion about model quality, based on plots in figure 4 (prev fig 3)
 - [x] Height 3 -> Height 1-3
 - [x] Mention that downloadable models need a license and software
-- [>] Add dataset behind the “ball plots” as .TSV file (or table column) in the supplement
+- [x] Add dataset behind the “ball plots” as .TSV file (or table column) in the supplement
+- [x] Add numbers in the figure as well
+- [ ] Update figure numbering in file names
 - [-] Add table with selectivity and specificity for all targets? (as columns in the table above?)
-- [ ] Add numbers in the figure as well(?)
 
 ## EAs suggestions
 
