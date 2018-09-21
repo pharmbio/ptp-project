@@ -29,15 +29,16 @@
      id="ScribMaster"
      showgrid="false"
      inkscape:zoom="1.8118478"
-     inkscape:cx="178.4883"
-     inkscape:cy="159.79579"
-     inkscape:window-width="1920"
-     inkscape:window-height="1031"
-     inkscape:window-x="0"
+     inkscape:cx="227.44144"
+     inkscape:cy="166.5733"
+     inkscape:window-width="1620"
+     inkscape:window-height="1029"
+     inkscape:window-x="298"
      inkscape:window-y="25"
-     inkscape:window-maximized="1"
+     inkscape:window-maximized="0"
      inkscape:current-layer="svg2"
-     units="mm" />
+     units="mm"
+     borderlayer="true" />
   <filter
      id="blur">
     <feGaussianBlur
@@ -724,13 +725,13 @@
          sodipodi:nodetypes="ccc"
          inkscape:connector-curvature="0"
          id="path5420"
-         d="m 186.51846,20.525714 -171.399213,0 0,103.146116"
+         d="m 158.51846,20.525714 -159.399213,0 0,103.146116"
          style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker5918);color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
       <path
          sodipodi:nodetypes="ccc"
          inkscape:connector-curvature="0"
          id="path5420-7"
-         d="m 15.13315,158.44116 0,170.29224 42.10943,0"
+         d="m -0.86685,158.44116 0,170.29224 58.10943,0"
          style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker5918-3);color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
     </g>
   </g>
@@ -738,7 +739,7 @@
      xml:space="preserve"
      id="flowRoot6095"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     transform="matrix(0.21053158,0,0,0.21053158,102.2945,2.5950809)"><flowRegion
+     transform="matrix(0.21053158,0,0,0.21053158,74.2945,2.5950809)"><flowRegion
        id="flowRegion6097"><rect
          id="rect6099"
          width="299.72607"
@@ -746,9 +747,9 @@
          x="924.15533"
          y="51.788605" /></flowRegion><flowPara
        id="flowPara6101"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:47.49881363px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start">ExcapeDB</flowPara></flowRoot>  <g
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:47.49881363px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start">ExCAPE-DB</flowPara></flowRoot>  <g
      id="g4716"
-     transform="translate(143.126,19.344399)">
+     transform="translate(115.126,19.344399)">
     <g
        id="g4745">
       <path
@@ -815,18 +816,18 @@
   </g>
   <path
      style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker5734);color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-     d="m 276.76123,35.376737 0,12.00576"
+     d="m 248.76123,35.376737 0,12.00576"
      id="path5015"
      inkscape:connector-curvature="0"
      sodipodi:nodetypes="cc" />
   <path
      inkscape:connector-curvature="0"
      id="path5032"
-     d="m 276.76123,128.02188 0,12.00576"
+     d="m 248.76123,128.02188 0,12.00576"
      style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker6201);color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
      sodipodi:nodetypes="cc" />
   <flowRoot
-     transform="matrix(0.21053158,0,0,0.21053158,102.48005,79.796222)"
+     transform="matrix(0.21053158,0,0,0.21053158,74.48005,79.796222)"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
      id="flowRoot5053"
      xml:space="preserve"><flowRegion
@@ -834,18 +835,18 @@
          y="51.788605"
          x="924.15533"
          height="142.97359"
-         width="357.40051"
+         width="630.04358"
          id="rect5057" /></flowRegion><flowPara
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:47.49881363px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start"
        id="flowPara5059">Dataset0</flowPara><flowPara
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:47.49881363px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start"
-       id="flowPara5061">(44 targets)</flowPara><flowPara
+       id="flowPara5061">(SAR data for 44 targets)</flowPara><flowPara
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:47.49881363px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start"
        id="flowPara5063" /></flowRoot>  <flowRoot
      xml:space="preserve"
      id="flowRoot5065"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.21063137px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     transform="translate(116.90838,8.2268328)"><flowRegion
+     transform="translate(88.90838,8.2268328)"><flowRegion
        id="flowRegion5067"><rect
          id="rect5069"
          width="114.98255"
@@ -857,7 +858,7 @@
        style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1">Is included in </flowPara><flowPara
        style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1"
        id="flowPara5990">Bowes et al. ?</flowPara></flowRoot>  <flowRoot
-     transform="translate(116.58123,107.15619)"
+     transform="translate(88.58123,107.15619)"
      xml:space="preserve"
      id="flowRoot5065-1"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.21063137px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
@@ -871,7 +872,7 @@
        style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1"
        id="flowPara5176">≥ 100 A:s &amp;&amp; ≥ 100 N:s ?</flowPara></flowRoot>  <g
      id="g5201"
-     transform="matrix(0.87010051,0,0,0.87010051,138.99513,48.195111)"
+     transform="matrix(0.87010051,0,0,0.87010051,110.99513,48.195111)"
      style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#0000ff;stroke-width:1.14929247;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate">
     <ellipse
        ry="2.6569207"
@@ -892,7 +893,7 @@
     </g>
   </g>
   <g
-     transform="translate(145.126,107.98957)"
+     transform="translate(117.126,107.98957)"
      id="g5242">
     <g
        transform="translate(-4,4)"
@@ -946,18 +947,18 @@
   <path
      sodipodi:nodetypes="cc"
      style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker6478);color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-     d="m 276.76123,168.27197 0,12.00576"
+     d="m 248.76123,168.27197 0,12.00576"
      id="path5268"
      inkscape:connector-curvature="0" />
   <path
      sodipodi:nodetypes="cc"
      style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker6761);color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-     d="m 276.76123,216.66705 0,12.00576"
+     d="m 248.76123,216.66705 0,12.00576"
      id="path5274"
      inkscape:connector-curvature="0" />
   <g
      style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#0000ff;stroke-width:1.14929247;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-     transform="matrix(0.87010051,0,0,0.87010051,138.99513,136.84027)"
+     transform="matrix(0.87010051,0,0,0.87010051,110.99513,136.84027)"
      id="g5276">
     <ellipse
        style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#0000ff;stroke-width:1.14929247;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
@@ -981,21 +982,21 @@
      xml:space="preserve"
      id="flowRoot5288"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     transform="matrix(0.21053158,0,0,0.21053158,102.48005,172.44139)"><flowRegion
+     transform="matrix(0.21053158,0,0,0.21053158,74.48005,172.44139)"><flowRegion
        id="flowRegion5290"><rect
          id="rect5292"
-         width="357.40051"
-         height="142.97359"
+         width="611.69263"
+         height="137.73045"
          x="924.15533"
          y="51.788605" /></flowRegion><flowPara
        id="flowPara5298"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:47.49881363px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start">Dataset1</flowPara><flowPara
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:47.49881363px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start"
-       id="flowPara5305">(31 targets)</flowPara></flowRoot>  <flowRoot
+       id="flowPara5305">(SAR data for 31 targets)</flowPara></flowRoot>  <flowRoot
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.21063137px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
      id="flowRoot5307"
      xml:space="preserve"
-     transform="translate(116.58123,195.82576)"><flowRegion
+     transform="translate(88.58123,195.82576)"><flowRegion
        id="flowRegion5309"><rect
          style="fill:#0000ff;fill-opacity:1"
          y="42.111343"
@@ -1004,9 +1005,9 @@
          width="114.98255"
          id="rect5311" /></flowRegion><flowPara
        id="flowPara5315"
-       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1">≥ 10000 N:s ?</flowPara></flowRoot>  <g
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1">≥ 10,000 N:s ?</flowPara></flowRoot>  <g
      id="g5547"
-     transform="translate(119.13959,18.000002)">
+     transform="translate(91.13959,18.000002)">
     <g
        transform="translate(-14.259889,175.62673)"
        id="g5319">
@@ -1068,33 +1069,33 @@
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.21063137px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
      id="flowRoot5372"
      xml:space="preserve"
-     transform="translate(113.37693,57.737648)"><flowRegion
+     transform="translate(19.37693,57.737648)"><flowRegion
        id="flowRegion5374"><rect
          y="211.24399"
          x="58.746914"
-         height="30.100454"
-         width="75.244095"
+         height="30.100449"
+         width="113.87869"
          id="rect5376" /></flowRegion><flowPara
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:end;writing-mode:lr-tb;text-anchor:end"
        id="flowPara5378">Dataset2</flowPara><flowPara
        id="flowPara5380"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start">(21 targets)</flowPara></flowRoot>  <flowRoot
-     transform="translate(275.09029,57.737648)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:end;writing-mode:lr-tb;text-anchor:end">(SAR data for 21 targets)</flowPara></flowRoot>  <flowRoot
+     transform="translate(247.09029,57.737648)"
      xml:space="preserve"
      id="flowRoot5382"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.21063137px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
        id="flowRegion5384"><rect
          id="rect5386"
-         width="75.244095"
-         height="30.100454"
+         width="114.98254"
+         height="30.100449"
          x="58.746914"
          y="211.24399" /></flowRegion><flowPara
        id="flowPara5388"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start">Dataset3</flowPara><flowPara
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start"
-       id="flowPara5390">(10 targets)</flowPara></flowRoot>  <g
+       id="flowPara5390">(SAR data for 10 targets)</flowPara></flowRoot>  <g
      id="g5543"
-     transform="translate(118.54873,25.847292)">
+     transform="translate(90.54873,25.847292)">
     <path
        sodipodi:nodetypes="cc"
        style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#008000;stroke-width:0.79034364;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker5394);color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
@@ -1109,7 +1110,7 @@
        sodipodi:nodetypes="cc" />
   </g>
   <flowRoot
-     transform="translate(193.81535,57.382686)"
+     transform="translate(165.81535,57.382686)"
      xml:space="preserve"
      id="flowRoot5451"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.21063137px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#008000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
@@ -1125,7 +1126,7 @@
      style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.21063137px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#ff0101;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.79034364;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker5491);color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
      id="flowRoot5463"
      xml:space="preserve"
-     transform="translate(227.21532,57.382686)"><flowRegion
+     transform="translate(199.21532,57.382686)"><flowRegion
        id="flowRegion5465"
        style="marker-end:url(#marker5491)"><rect
          y="211.24399"
@@ -1163,16 +1164,16 @@
        id="flowRegion5505"><rect
          y="211.24399"
          x="58.746914"
-         height="27.892757"
-         width="111.11908"
+         height="27.892761"
+         width="175.14212"
          id="rect5507" /></flowRegion><flowPara
        id="flowPara5511"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start">Dataset4</flowPara><flowPara
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start"
-       id="flowPara5515">(1000 drug compounds)</flowPara></flowRoot>  <g
+       id="flowPara5515">(SAR data for 1000 drug compounds)</flowPara></flowRoot>  <g
      style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5.05913401;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
      id="g5531"
-     transform="matrix(0.16548217,0,0,0.18850291,210.3688,-27.754621)">
+     transform="matrix(0.16548217,0,0,0.18850291,182.3688,-27.754621)">
     <ellipse
        ry="12.620058"
        rx="53.284691"
@@ -1192,7 +1193,7 @@
      transform="translate(-2,0)">
     <g
        style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#0000ff;stroke-width:5.95905352;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-       transform="matrix(0.16781188,0,0,0.16781188,10.016763,35.829907)"
+       transform="matrix(0.16781188,0,0,0.16781188,2.016763,35.829907)"
        id="g6077">
       <path
          style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#0000ff;stroke-width:5.95905352;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#TriangleOutM);color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
@@ -1207,7 +1208,7 @@
     </g>
     <g
        id="g6047"
-       transform="translate(-16,0)">
+       transform="translate(-20,0)">
       <flowRoot
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.21063137px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          id="flowRoot6111"
@@ -1241,7 +1242,7 @@
     </g>
     <g
        id="g5560"
-       transform="matrix(0.87010051,0,0,0.87010051,-46.493269,34.449143)"
+       transform="matrix(0.87010051,0,0,0.87010051,-62.493269,34.449143)"
        style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#0000ff;stroke-width:1.14929247;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate">
       <ellipse
          ry="2.6569207"
@@ -1266,11 +1267,11 @@
      sodipodi:nodetypes="cc"
      inkscape:connector-curvature="0"
      id="path5584"
-     d="m 276.76123,75.626798 0,12.00576"
+     d="m 248.76123,75.626798 0,12.00576"
      style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker5930);color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
   <g
      style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#0000ff;stroke-width:1.14929247;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-     transform="matrix(0.87010051,0,0,0.87010051,138.99513,-44.450062)"
+     transform="matrix(0.87010051,0,0,0.87010051,110.99513,-44.450062)"
      id="g5602">
     <ellipse
        style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#0000ff;stroke-width:1.14929247;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
@@ -1294,15 +1295,15 @@
      xml:space="preserve"
      id="flowRoot5065-5"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.21063137px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     transform="translate(-72.5075,87.26661)"><flowRegion
+     transform="translate(-88.5075,87.26661)"><flowRegion
        id="flowRegion5067-3"><rect
          id="rect5069-5"
-         width="122.7095"
-         height="94.123505"
+         width="130.98834"
+         height="101.85043"
          x="180.16992"
          y="42.111343"
          style="fill:#0000ff;fill-opacity:1" /></flowRegion><flowPara
        style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1"
-       id="flowPara5990-2">All DrugBank &quot;withdrawn&quot; </flowPara><flowPara
+       id="flowPara4624">Keep SAR datapoints for all DrugBank &quot;withdrawn&quot; </flowPara><flowPara
        style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Arial;-inkscape-font-specification:'Arial, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1"
-       id="flowPara5959">small molecules with a ChEMBL or PubChem ID in ExcapeDB, and randomly drawn  &quot;approved&quot; small molecules until a total of 1000 molecules reached.</flowPara></flowRoot></svg>
+       id="flowPara5959">small molecules with a ChEMBL or PubChem ID in ExCAPE-DB, and randomly drawn  &quot;approved&quot; small molecules until a total of 1000 molecules reached</flowPara></flowRoot></svg>
