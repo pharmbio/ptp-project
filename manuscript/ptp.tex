@@ -272,7 +272,7 @@ al.}~\cite{Bowes2012}.
 \centering
 \caption{The panel of targets used in this study, identified by gene symbol.
 Actives and non-actives refer to the number of ligand interactions marked as
-active and non-active in ExCAPE-DB. The labels `included' and `not included'
+active and non-active in ExCAPE-DB. The labels ``included'' and ``not included''
 to the left, for the two row ranges, indicate whether targets did pass the
 filtering criteria of at least 100 actives and 100 non-actives, to be
 included.}
@@ -381,9 +381,9 @@ SMILES level.
 %
 For full information about the pre-processing done by the ExCAPE-DB authors,
 see~\cite{Sun2017}. As a help to the reader we note that the activity flag is
--- in the ExCAPE-DB dataset -- set to active (or `A') if the
+-- in the ExCAPE-DB dataset -- set to active (or ``A'') if the
 dose-response value in the binding assays was lower than 10 ${\mu}M$ and
-non-active (or `N') otherwise.
+non-active (or ``N'') otherwise.
 
 A subset of the panel of 44 binding targets as suggested in \cite{Bowes2012}
 was selected for inclusion in the study. The selection was based on the
@@ -414,8 +414,8 @@ stand out from the other datasets, and where some of them contain a
 problematically low amount of non-actives. These 21 targets are referred to
 as Dataset2, and their respective target datasets were expanded with randomly
 selected examples from the ExCAPE-DB dataset which were not reported to be
-active for the target, thus being `assumed non-active'. These target datasets
-are marked with a \checkmark\ in the `Assumed non-actives added' column of
+active for the target, thus being ``assumed non-active''. These target datasets
+are marked with a \checkmark\ in the ``Assumed non-actives added'' column of
 Table~\ref{tbl:targets}. The number of new examples was chosen such that the
 total number of non-actives and assumed non-actives added up to twice the
 number of actives, for each target respectively. The compounds for the
@@ -497,8 +497,8 @@ estimates. In CP a prediction region contains the true
 value with probability equal to $1-\epsilon$, where $\epsilon$ is the selected significance level. Such
 a prediction region can be obtained under the assumption that the observed data
 is exchangeable. An important consequence is that the size of this region directly
-relates to the `strangeness' of the test example, and is an alternative to the
-concept of a model's `applicability domain'~\cite{Norinder:2014fe}. For the classification
+relates to the \emph{strangeness} of the test example, and is an alternative to the
+concept of a model's \emph{applicability domain}~\cite{Norinder:2014fe}. For the classification
 case a prediction is given as set of conformal p-values, one for each class,
 which represent a ranking for the test object. The p-values together with the user decided $\epsilon$
 produces the final prediction set. Conformal Predictors are Mondrian, meaning that they handle
@@ -571,8 +571,7 @@ the wrong class, \textit{i.e.}, lower fuzziness means better prediction.
 To study the effect of imbalanced datasets on efficiency, we also implemented a
 modified version of $OF$, due to the fact that $OF$ is influenced more
 by values in the larger class in case of imbalanced datasets, referred to as
-``class-averaged
-observed fuzziness'' ($CAOF$) as:
+\emph{class-averaged observed fuzziness} ($CAOF$) as:
 \begin{equation}
 CAOF = \frac
         {\quad\sum\limits_{\mathclap{\substack{\scriptscriptstyle i,\ y_i=A}}}p_i^N}
@@ -635,7 +634,7 @@ Before the training, the CPSign \texttt{precompute} command was run, in order
 to generate a sparse representation of each target's dataset.  ACPs consisting
 of 10 models were then trained for each target using the CPSign \texttt{train}
 command. The cost value used was the one obtained from the hyper-parameter
-tuning. The observations added as `assumed non-actives' were not included in
+tuning. The observations added as ``assumed non-actives'' were not included in
 the calibration set to avoid biasing the evaluation.
 % (See \href{https://github.com/pharmbio/ptp-project/blob/c529cf307593c40e7f822a92b224036894c95de1/exp/20180426-wo-drugbank/wo_drugbank_wf.go#L69-L101}{here}).
 The computational workflows for orchestrating the extraction of data, model
@@ -770,8 +769,8 @@ was chosen for the subsequent analysis workflows.
 In figure~\ref{fig:valplots} predicted versus observed labels for Dataset4 is
 shown, for confidence levels 0.8 and 0.9 respectively. See the methods section
 and in particular figure~\ref{fig:datasets} and \ref{tbl:datasets}, for
-information about how Dataset4 was created. `A' denotes active
-compounds and `N' denotes non-active ones. It can be seen how the number
+information about how Dataset4 was created. ``A'' denotes active
+compounds and ``N'' denotes non-active ones. It can be seen how the number
 of prediction of ``Both'' labels increase when the confidence level increases
 from 0.8 to 0.9. This is as expected, as this means that fewer compounds
 could be predicted to only one label, with the higher confidence level. The
@@ -799,7 +798,7 @@ each target individually, see the supplementary material, figure S2 and S3.
 \end{minipage}
     \caption{Predicted versus observed labels, for all targets, for the
     prediction data, at confidence level 0.8 (\ref{fig:valplots:a}) and 0.9
-    (\ref{fig:valplots:b}). `A' denotes active compounds, and `N' denotes
+    (\ref{fig:valplots:b}). ``A'' denotes active compounds, and ``N'' denotes
     non-active compounds. The x-axis show observed labels (as found in ExCAPE-DB),
     while the y-axis show the set of predicted labels. The areas of the
     circles are proportional to the number of SAR data points for each
@@ -947,7 +946,7 @@ This indicates a somewhat higher specificity than sensitivity, generally for
 all targets. We want to highlight to the reader though that the definition of
 specificity and sensitivity is not as clear-cut in the conformal prediction
 setting, as we are having four sets of labels for a binary classification
-setting (`None' and `Both', in addition to the prediction labels), rather
+setting (``None'' and ``Both'', in addition to the prediction labels), rather
 than just two.
 
 The use of workflows to automate pre-processing and model training and make it
