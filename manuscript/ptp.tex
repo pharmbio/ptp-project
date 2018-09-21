@@ -409,12 +409,13 @@ with additional data available.
 
 The resulting set (named Dataset1) consists of 31 targets (marked as
 ``included'' in Table~\ref{tbl:targets}). For 21 of these targets, the
-dataset contained less than 10\,000 non-active compounds, which we think can
-potentially be problematic. These 21 targets are referred to as Dataset2, and
-their respective target datasets were expanded with randomly selected
-examples from the ExCAPE-DB dataset which were not reported to be active for
-the target, thus being `assumed non-active'. These target datasets are marked
-with a \checkmark\ in the `Assumed non-actives added' column of
+dataset contained less than 10\,000 non-active compounds, which makes them
+stand out from the other datasets, and where some of them contain a
+problematically low amount of non-actives. These 21 targets are referred to
+as Dataset2, and their respective target datasets were expanded with randomly
+selected examples from the ExCAPE-DB dataset which were not reported to be
+active for the target, thus being `assumed non-active'. These target datasets
+are marked with a \checkmark\ in the `Assumed non-actives added' column of
 Table~\ref{tbl:targets}. The number of new examples was chosen such that the
 total number of non-actives and assumed non-actives added up to twice the
 number of actives, for each target respectively. The compounds for the
@@ -439,7 +440,7 @@ created.
 The Conformal Prediction methodology, in particular with the Mondrian
 approach, can handle differing sizes of the datasets
 well~\cite{Norinder:2017qc}, and so we see no reason to stick to the exact
-same number of compounds as the actives. Instead we use a active:non-active 
+same number of compounds as the actives. Instead we use an active:non-active
 ratio of 1:2 between the classes. The justification for this is that the assumed non-actives likely
 have chemistry coming from a larger chemical space compared to the known compounds, 
 thus by adding more of the assumed non-actives we can hopefully increase the number 
@@ -647,7 +648,8 @@ A graphical overview of the modeling workflow is shown in
 figure~\ref{fig:workflow_graph_clean}. More detailed workflow graphs are
 available in the supplementary material, figures S4 and S5).
 
-\subsection{Model validation}
+\subsection{Model validation} \label{Model validation}
+
 The models built were validated by predicting the binding activity against each
 of the 31 targets for all compounds for which there existed known binding data
 for a particular target in ExCAPE-DB. The validation was done with CPSign's

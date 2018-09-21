@@ -68,6 +68,10 @@
 - [x] Update figure numbering in file names
 - [-] Add table with selectivity and specificity for all targets? (as columns in the table above?)
 
+## Staffans last suggestions
+
+- [x] Check "model validation" section (too thin?)
+
 ## EAs suggestions
 
 - [?] Add Bender CP refs
