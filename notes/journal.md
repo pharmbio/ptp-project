@@ -1,3 +1,37 @@
+# Project meeting 2017-06-21
+
+- CVAP not finished, run CCP in the meanwhile
+- CPSign: The (CLI) tool (Supports ICP, ACP, CCP … soon CVAP)
+    - Code: (Google Drive)
+    - Docs: http://cpsign-docs.genettasoft.com
+- CCP: Cross-Conformal Prediction
+- We'll use ExcapeDB
+- [CPSign documentation](http://cpsign-docs.genettasoft.com/)
+    - Exempel-invocation för train: http://cpsign-docs.genettasoft.com/sections/cli/train.html#example-usage-acp-classification
+    - Format för SMILES-inputfil: http://cpsign-docs.genettasoft.com/sections/input.html?highlight=smiles
+    - I ExcapeDB-filen är vi intresserade av: Gene name, Activity flag, SMILES
+- Ola skickat licensfil
+- Filtrera ut targets med minst 50 molecules per target
+- Rapport på slutet:
+    - Validity: Kalibreringsplott (träna med olika confidence från 0.1 …)
+    - Efficiency: Number of single value predictions
+    - ROC-kurva
+
+Example command:
+
+```bash
+$ java -jar cpsign-[version].jar train \
+   --license /path/to/Standard-license.license \
+   -t /path/to/datafile.sdf \
+   -rn "BIO" \    # The property in the SD-filen to train against
+   --nr-models 5 \
+   -i liblinear \
+   --model-out /tmp/datamodels/Chang_BIO.cpsign \
+   --model-name Chang_BIO \
+   --compress \
+   -c 2
+```
+
 # Project meeting 2017-09-29
 
 Participants: Jonathan, Staffan, Samuel (and Ola, for 20 minutes at the end).
