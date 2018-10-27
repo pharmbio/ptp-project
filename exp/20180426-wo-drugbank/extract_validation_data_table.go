@@ -12,6 +12,7 @@ func main() {
 	wf := sp.NewWorkflow("extract_valdata", 4)
 
 	for confIdx, confLevel := range []string{"0p9", "0p8"} { // We use 'p' instead of '.' to avoid confusion in the file name
+		confIdx := confIdx
 		confLevel := confLevel
 
 		// ------------------------------------------------------------------------
@@ -57,6 +58,7 @@ func main() {
 
 		valDataPerTarget := wf.NewProc("extract_valdata_pertarget_"+confLevel, "#{i:valjson}{o:valstats}")
 		valDataPerTarget.CustomExecute = func(t *sp.Task) {
+			confIdx := confIdx
 			cmd := fmt.Sprintf(extractCmdTpl, t.InPath("valjson"), confIdx)
 			gene := t.InIP("valjson").Param("gene")
 			finCmd := strings.Replace(cmd, "{gene}", gene, -1)
@@ -65,6 +67,7 @@ func main() {
 			sp.ExecCmd(finCmd)
 		}
 		valDataPerTarget.SetOutFunc("valstats", func(t *sp.Task) string {
+			confLevel := confLevel
 			//inFile := filepath.Base(t.InPath("valjson"))
 			//replacePtn, err := regexp.Compile(`\..*$`)
 			//sp.Check(err)

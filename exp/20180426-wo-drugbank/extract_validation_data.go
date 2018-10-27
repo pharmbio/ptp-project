@@ -44,6 +44,7 @@ func main() {
 
 		valDataPerTarget := wf.NewProc("extract_valdata_pertarget_"+confLevel, fmt.Sprintf(extractCmdTpl, "{i:valjson}", confIdx))
 		valDataPerTarget.SetOutFunc("valstats", func(t *sp.Task) string {
+			confLevel := confLevel
 			inFile := filepath.Base(t.InPath("valjson"))
 			replacePtn, err := regexp.Compile(`\..*$`)
 			sp.Check(err)
@@ -63,11 +64,11 @@ func main() {
 		})
 		extractGene.In().From(valDataPerTarget.Out("valstats"))
 
-		plotValData := wf.NewProc("plot_valdata_"+confLevel, `Rscript bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g {k:valdata.gene} -c `+strings.Replace(confLevel, "p", ".", 1))
+		plotValData := wf.NewProc("plot_valdata_"+confLevel, `Rscript ../bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g {k:valdata.gene} -c `+strings.Replace(confLevel, "p", ".", 1))
 		plotValData.SetOut("plot", "{i:valdata}.pdf")
 		plotValData.In("valdata").From(extractGene.Out())
 
-		plotValDataAll := wf.NewProc("plot_valdata_all_"+confLevel, `Rscript bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g "all targets" -c `+strings.Replace(confLevel, "p", ".", 1))
+		plotValDataAll := wf.NewProc("plot_valdata_all_"+confLevel, `Rscript ../bin/plot_valdata.r -i {i:valdata} -o {o:plot} -f pdf -g "all targets" -c `+strings.Replace(confLevel, "p", ".", 1))
 		plotValDataAll.SetOut("plot", "{i:valdata}.pdf")
 		plotValDataAll.In("valdata").From(valDataAll.Out("valstats"))
 	}
