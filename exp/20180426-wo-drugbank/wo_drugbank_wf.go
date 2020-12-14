@@ -150,7 +150,7 @@ func main() {
 	//unPackDB.Prepend = "salloc -A snic2017-7-89 -n 2 -t 8:00:00 -J unpack_excapedb"
 
 	// Download chemical structures and "links" (references) for *approved* (small molecule) drugs
-	dlApproved := wf.NewProc("dl_approv", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/approved-structure-links")
+	dlApproved := wf.NewProc("dl_approv", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://go.drugbank.com/releases/5-0-11/downloads/approved-structure-links")
 	dlApproved.SetPathStatic("zip", "dat/drugbank_approved_csv.zip")
 	// Unzip the above file
 	unzipApproved := wf.NewProc("unzip_approved", `unzip -d dat/approved/ {i:zip}; mv "dat/approved/structure links.csv" {o:csv}`)
@@ -158,7 +158,7 @@ func main() {
 	unzipApproved.In("zip").Connect(dlApproved.Out("zip"))
 
 	// Download chemical structures and "links" (references) for *withdrawn* (small molecule) drugs
-	dlWithdrawn := wf.NewProc("dl_withdrawn", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://www.drugbank.ca/releases/5-0-11/downloads/withdrawn-structure-links")
+	dlWithdrawn := wf.NewProc("dl_withdrawn", "curl -Lfv -o {o:zip} -u $(cat drugbank_userinfo.txt) https://go.drugbank.com/releases/5-0-11/downloads/withdrawn-structure-links")
 	dlWithdrawn.SetPathStatic("zip", "dat/drugbank_withdrawn_csv.zip")
 	// Unzip the above file
 	unzipWithdrawn := wf.NewProc("unzip_withdrawn", `unzip -d dat/withdrawn/ {i:zip}; mv "dat/withdrawn/structure links.csv" {o:csv}`)
