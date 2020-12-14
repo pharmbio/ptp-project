@@ -647,11 +647,11 @@ func main() {
 	// --------------------------------
 	// Run the pipeline!
 	// --------------------------------
-	if *graph {
-		wf.PlotGraph("wo_drugbank_wf.dot", true, true)
-	} else {
-		wf.RunToRegex(*procsRegex)
-	}
+	//if *graph {
+	//	wf.PlotGraph("wo_drugbank_wf.dot", true, true)
+	//} else {
+	wf.RunToRegex(*procsRegex)
+	//}
 }
 
 // --------------------------------------------------------------------------------

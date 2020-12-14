@@ -1,0 +1,46 @@
+site_name: SciPipe Docs
+theme: material
+pages:
+  - 'Introduction': 'index.md'
+  - 'Installing': 'install.md'
+  - 'Basic Concepts': 'basic_concepts.md'
+  - 'Writing Workflows': 'writing_workflows.md'
+#  - Tutorials:
+#      - 'Hello World workflow': 'tutorials/helloworld.md'
+  - Topical How-Tos:
+    - 'Running parts of workflows': 'howtos/partial_workflows.md'
+    - 'Using parameters in commands and file names': 'howtos/parameters.md'
+    - 'Creating components in Go': 'howtos/golang_components.md'
+    - 'Creating re-usable components': 'howtos/reusable_components.md'
+    - 'Globbing files': 'howtos/globbing.md'
+    - 'Splitting files': 'howtos/splitting.md'
+    - 'Joining multiple files': 'howtos/joining.md'
+    - 'Enable streaming between components': 'howtos/streaming.md'
+    - 'Creating sub-workflows': 'howtos/subworkflows.md'
+    - 'Implement scatter/gather workflows': 'howtos/scatter_gather.md'
+    - 'Interacting with an HPC resource manager': 'howtos/hpc.md'
+    - 'Constrain resource usage': 'howtos/constrain_resource_usage.md'
+  - 'Examples': 'examples.md'
+  - 'Other Resources': 'other_resources.md'
+  - 'Acknowledgements': 'acknowledgements.md'
+  - 'Related Tools': 'related_tools.md'
+repo_name: 'scipipe/scipipe'
+repo_url: 'https://github.com/scipipe/scipipe'
+extra:
+    logo: 'images/scipipe_logo_bluegrey.svg'
+    palette:
+        primary: 'blue grey'
+        accent: 'cyan'
+    social:
+        - type: 'github'
+          link: 'https://github.com/scipipe'
+        - type: 'twitter'
+          link: 'https://twitter.com/scipipe'
+        - type: 'linkedin'
+          link: 'https://www.linkedin.com/in/samuellampa/'
+google_analytics:
+  - 'UA-48319762-3'
+  - 'auto'
+markdown_extensions:
+  - codehilite
+extra_css: ['custom.css']
