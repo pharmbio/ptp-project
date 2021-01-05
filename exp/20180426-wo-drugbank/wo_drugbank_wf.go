@@ -402,7 +402,7 @@ func main() {
 					uniqStrCost := uniqStrRepl + "_" + cost
 					// If Liblinear
 					evalCostCmd := `java -jar ` + cpSignPath + ` crossvalidate \
-									--license ../../bin/cpsign.lic \
+									--license ` + cpSignLicensePath + `\
 									--seed {p:seed} \
 									--cptype 1 \
 									--trainfile {i:traindata} \
@@ -511,7 +511,7 @@ func main() {
 				// --------------------------------------------------------------------------------
 				cpSignTrain := wf.NewProc("cpsign_train_"+uniqStrRepl,
 					`java -jar `+cpSignPath+` train \
-									--license ../../bin/cpsign.lic \
+									--license `+cpSignLicensePath+` \
 									--seed {p:seed} \
 									--cptype 1 \
 									--modelfile {i:model} \
@@ -596,7 +596,7 @@ func main() {
 
 				// validateDrugBank ----------------------------------------------
 				validateDrugBank := wf.NewProc("validate_drugbank_"+uniqStrRepl, `java -jar `+cpSignPath+` validate \
-									--license ../../bin/cpsign.lic \
+									--license `+cpSignLicensePath+` \
 									--cptype 1 \
 									--modelfile {i:model} \
 									--predictfile {i:smiles} \
