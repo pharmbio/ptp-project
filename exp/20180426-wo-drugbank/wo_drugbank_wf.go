@@ -356,7 +356,7 @@ func main() {
 				cpSignPrecompCmd := `java -jar ` + cpSignPath + ` precompute \
 									--license ` + cpSignLicensePath + `\
 									--model-type classification \
-									--train-data {i:traindata} \
+									--train-data CSV delim:'\t' {i:traindata} \
 									--endpoint activity \
 									--labels A, N \
 									--model-out {o:precomp} \
@@ -403,23 +403,22 @@ func main() {
 					// If Liblinear
 					evalCostCmd := `java -jar ` + cpSignPath + ` crossvalidate \
 									--license ` + cpSignLicensePath + `\
+									--predictor-type ACP_Classification \
 									--seed {p:seed} \
-									--cptype 1 \
-									--trainfile {i:traindata} \
-									--response-name activity \
-									--impl liblinear \
+									--scorer LinearSVC:cost={p:cost} \
+									--train-data CSV delim:'\t' {i:traindata} \
+									--endpoint activity \
 									--labels A, N \
-									--nr-models {p:nrmdl} \
-									--cost {p:cost} \
+									--sampling-strategy random:numSamples={p:nrmdl}:calibRatio=0.2 \
 									--cv-folds {p:cvfolds} \
-									--output-format json \
+									--result-format json \
 									--logfile {o:logfile}`
 					if doFillUp {
 						evalCostCmd += ` \
 									--proper-trainfile {i:propertraindata}`
 					}
 					evalCostCmd += ` \
-									--confidences "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:runset} {p:replicate}`
+									--calibration-points "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:runset} {p:replicate}`
 					evalCost := wf.NewProc("crossval_"+uniqStrCost, evalCostCmd)
 					evalCostStatsPathFunc := func(t *sp.Task) string {
 						cost, err := strconv.ParseInt(t.Param("cost"), 10, 0)
@@ -601,7 +600,7 @@ func main() {
 									--modelfile {i:model} \
 									--predictfile {i:smiles} \
 									--validation-property activity \
-									--confidences {p:confidences} \
+									--calibration-points {p:confidences} \
 									--output-format json \
 									--logfile {o:log} \
 									--output {o:json} # {p:gene} {p:replicate} {p:runset}`)
