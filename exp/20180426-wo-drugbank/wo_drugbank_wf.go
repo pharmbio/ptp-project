@@ -412,13 +412,14 @@ func main() {
 									--sampling-strategy random:numSamples={p:nrmdl}:calibRatio=0.2 \
 									--cv-folds {p:cvfolds} \
 									--result-format json \
+									--result-output {o:stats} \
 									--logfile {o:logfile}`
 					if doFillUp {
 						evalCostCmd += ` \
 									--proper-trainfile {i:propertraindata}`
 					}
 					evalCostCmd += ` \
-									--calibration-points "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:runset} {p:replicate}`
+									--calibration-points "{p:confidences}" # {p:gene} {p:runset} {p:replicate}`
 					evalCost := wf.NewProc("crossval_"+uniqStrCost, evalCostCmd)
 					evalCostStatsPathFunc := func(t *sp.Task) string {
 						cost, err := strconv.ParseInt(t.Param("cost"), 10, 0)
