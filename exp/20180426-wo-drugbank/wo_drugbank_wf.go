@@ -364,7 +364,7 @@ func main() {
 									--logfile {o:logfile}`
 				if doFillUp {
 					cpSignPrecompCmd += ` \
-									--proper-trainfile {i:propertraindata}`
+									--model-data CSV delim:'\t' {i:propertraindata}`
 				}
 				cpSignPrecompCmd += ` # {p:gene} {p:runset} {p:replicate}`
 				cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrRepl, cpSignPrecompCmd)
