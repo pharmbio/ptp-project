@@ -416,7 +416,7 @@ func main() {
 									--logfile {o:logfile}`
 					if doFillUp {
 						evalCostCmd += ` \
-									--proper-trainfile {i:propertraindata}`
+									--model-data CSV delim:'\t' {i:propertraindata}`
 					}
 					evalCostCmd += ` \
 									--calibration-points "{p:confidences}" # {p:gene} {p:runset} {p:replicate}`
