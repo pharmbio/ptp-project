@@ -357,14 +357,18 @@ func main() {
 									--license ` + cpSignLicensePath + `\
 									--model-type classification \
 									--train-data CSV delim:'\t' {i:traindata} \
+<<<<<<< Updated upstream
 									--endpoint "activity" \
+=======
+									--endpoint 'activity' \
+>>>>>>> Stashed changes
 									--labels A, N \
 									--model-out {o:precomp} \
 									--model-name "` + geneUppercase + `" \
 									--logfile {o:logfile}`
 				if doFillUp {
 					cpSignPrecompCmd += ` \
-									--model-data CSV delim:'\t' {i:propertraindata}`
+					--model-data CSV header:smiles,activity delim:'\t' {i:propertraindata}`
 				}
 				cpSignPrecompCmd += ` # {p:gene} {p:runset} {p:replicate}`
 				cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrRepl, cpSignPrecompCmd)
@@ -416,7 +420,7 @@ func main() {
 									--logfile {o:logfile}`
 					if doFillUp {
 						evalCostCmd += ` \
-									--model-data CSV delim:'\t' {i:propertraindata}`
+									--model-data CSV header:smiles,activity delim:'\t' {i:propertraindata}`
 					}
 					evalCostCmd += ` \
 									--calibration-points "{p:confidences}" # {p:gene} {p:runset} {p:replicate}`
