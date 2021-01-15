@@ -357,7 +357,7 @@ func main() {
 									--license ` + cpSignLicensePath + `\
 									--model-type classification \
 									--train-data CSV delim:'\t' {i:traindata} \
-									--endpoint activity \
+									--endpoint "activity" \
 									--labels A, N \
 									--model-out {o:precomp} \
 									--model-name "` + geneUppercase + `" \
