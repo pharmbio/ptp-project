@@ -1,15 +1,21 @@
 
 # Reproducible Probabilistic Target Profiles (aka PTP)
 
-## Main links
+This is the source code with workflows and pipelines for producing the models
+behind the paper:
 
-- [Main Google Document with notes and initial paper structure](https://docs.google.com/document/d/1t2Wde01J45zfmpMeM363AyhTxwZXLQJ5ABGI5ZnLwtI/edit#heading=h.mrcqx5b1lwut)
+Lampa, S., Alvarsson, J., Arvidsson Mc Shane, S., Berg, A., Ahlberg, E., &
+Spjuth, O. (2018).
+[Predicting Off-Target Binding Profiles With Confidence Using Conformal Prediction](https://doi.org/10.3389/fphar.2018.01256).
+Frontiers in pharmacology, 9, 1256.
+
+## Code structure
+
+The computational experiments are found under the
+[`exp`](https://github.com/pharmbio/ptp-project/tree/master/exp) folder.
+The experiment that produced the final models is available in
+[`exp/20180426-wo-drugbank`](https://github.com/pharmbio/ptp-project/tree/master/exp/20180426-wo-drugbank).
 
 ## Misc links
 
-- [The research topic feature in Frontiers](https://www.frontiersin.org/research-topics/5898/chemoinformatics-approaches-to-structure--and-ligand-based-drug-design)
-- [Journal home page (Frontiers in Pharmacology)](https://www.frontiersin.org/journals/pharmacology)
-- [Journal author guidelines](https://www.frontiersin.org/journals/pharmacology#author-guidelines)
-- [Frontiers publisher-wide author guidelines](https://www.frontiersin.org/about/author-guidelines)
 - [CPSign Documentation](http://cpsign-docs.genettasoft.com/)
-- [An old Masters project description for the PTP project (GDocs)](https://docs.google.com/document/d/1pwisHGEUrjrmaRFQG4ZNWPWGhpt5ZCYHHJGyCSjQEw8/edit)
