@@ -25,8 +25,9 @@ var (
 	debug      = flag.Bool("debug", false, "Increase logging level to include DEBUG messages")
 	procsRegex = flag.String("procs", "plot_summary.*", "A regex specifying which processes (by name) to run up to")
 
-	cpSignPath = "../../bin/cpsign-0.6.14.jar"
-	geneSets   = map[string][]string{
+	cpSignPath        = "../../bin/cpsign-1.5.0-beta9.jar"
+	cpSignLicensePath = "../../bin/cpsign-10-develop-standard-2021.license"
+	geneSets          = map[string][]string{
 		"bowes44": []string{
 			// Not available in dataset: "CHRNA1".
 			// Not available in dataset: "KCNE1"
@@ -353,17 +354,17 @@ func main() {
 				// Pre-compute step
 				// --------------------------------------------------------------------------------
 				cpSignPrecompCmd := `java -jar ` + cpSignPath + ` precompute \
-									--license ../../bin/cpsign.lic \
-									--cptype 1 \
-									--trainfile {i:traindata} \
-									--response-name activity \
+									--license ` + cpSignLicensePath + `\
+									--model-type classification \
+									--train-data CSV delim:'\t' {i:traindata} \
+									--endpoint 'activity' \
 									--labels A, N \
 									--model-out {o:precomp} \
 									--model-name "` + geneUppercase + `" \
 									--logfile {o:logfile}`
 				if doFillUp {
 					cpSignPrecompCmd += ` \
-									--proper-trainfile {i:propertraindata}`
+					--model-data CSV header:smiles,activity delim:'\t' {i:propertraindata}`
 				}
 				cpSignPrecompCmd += ` # {p:gene} {p:runset} {p:replicate}`
 				cpSignPrecomp := wf.NewProc("cpsign_precomp_"+uniqStrRepl, cpSignPrecompCmd)
@@ -401,24 +402,24 @@ func main() {
 					uniqStrCost := uniqStrRepl + "_" + cost
 					// If Liblinear
 					evalCostCmd := `java -jar ` + cpSignPath + ` crossvalidate \
-									--license ../../bin/cpsign.lic \
+									--license ` + cpSignLicensePath + `\
+									--predictor-type ACP_Classification \
 									--seed {p:seed} \
-									--cptype 1 \
-									--trainfile {i:traindata} \
-									--response-name activity \
-									--impl liblinear \
+									--scorer LinearSVC:cost={p:cost} \
+									--train-data CSV delim:'\t' {i:traindata} \
+									--endpoint activity \
 									--labels A, N \
-									--nr-models {p:nrmdl} \
-									--cost {p:cost} \
+									--sampling-strategy random:numSamples={p:nrmdl}:calibRatio=0.2 \
 									--cv-folds {p:cvfolds} \
-									--output-format json \
+									--result-format json \
+									--result-output {o:stats} \
 									--logfile {o:logfile}`
 					if doFillUp {
 						evalCostCmd += ` \
-									--proper-trainfile {i:propertraindata}`
+									--model-data CSV header:smiles,activity delim:'\t' {i:propertraindata}`
 					}
 					evalCostCmd += ` \
-									--confidences "{p:confidences}" | grep -P "^\[" > {o:stats} # {p:gene} {p:runset} {p:replicate}`
+									--calibration-points "{p:confidences}" # {p:gene} {p:runset} {p:replicate}`
 					evalCost := wf.NewProc("crossval_"+uniqStrCost, evalCostCmd)
 					evalCostStatsPathFunc := func(t *sp.Task) string {
 						cost, err := strconv.ParseInt(t.Param("cost"), 10, 0)
@@ -510,7 +511,7 @@ func main() {
 				// --------------------------------------------------------------------------------
 				cpSignTrain := wf.NewProc("cpsign_train_"+uniqStrRepl,
 					`java -jar `+cpSignPath+` train \
-									--license ../../bin/cpsign.lic \
+									--license `+cpSignLicensePath+` \
 									--seed {p:seed} \
 									--cptype 1 \
 									--modelfile {i:model} \
@@ -595,12 +596,12 @@ func main() {
 
 				// validateDrugBank ----------------------------------------------
 				validateDrugBank := wf.NewProc("validate_drugbank_"+uniqStrRepl, `java -jar `+cpSignPath+` validate \
-									--license ../../bin/cpsign.lic \
+									--license `+cpSignLicensePath+` \
 									--cptype 1 \
 									--modelfile {i:model} \
 									--predictfile {i:smiles} \
 									--validation-property activity \
-									--confidences {p:confidences} \
+									--calibration-points {p:confidences} \
 									--output-format json \
 									--logfile {o:log} \
 									--output {o:json} # {p:gene} {p:replicate} {p:runset}`)
