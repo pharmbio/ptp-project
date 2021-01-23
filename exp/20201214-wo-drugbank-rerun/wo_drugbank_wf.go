@@ -404,7 +404,7 @@ func main() {
 									--predictor-type ACP_Classification \
 									--seed {p:seed} \
 									--scorer LinearSVC:cost={p:cost} \
-									--train-data CSV delim:'\t' {i:traindata} \
+									--train-data CSV header:smiles,activity delim:'\t' {i:traindata} \
 									--endpoint activity \
 									--labels A, N \
 									--sampling-strategy random:numSamples={p:nrmdl}:calibRatio=0.2 \
@@ -472,13 +472,12 @@ func main() {
 					`java -jar `+cpSignPath+` train \
 									--license `+cpSignLicensePath+` \
 									--seed {p:seed} \
-									--cptype 1 \
-									--modelfile {i:model} \
+									--ptype 1 \
+									--model-in {i:model} \
 									--labels A, N \
-									--impl liblinear \
-									--nr-models {p:nrmdl} \
-									--cost {p:cost} \
-									--percentilesfile {i:percentilesfile} \
+									--impl LinearSVC:{p:cost} \
+									--sampling-strategy random:numSamples={p:nrmdl}:calibRatio=0.2 \
+									--percentiles-data CSV delim:'\t' {i:percentilesfile} \
 									--percentiles {p:nrpercentiles} \
 									--model-out {o:model} \
 									--logfile {o:logfile} \
@@ -549,13 +548,12 @@ func main() {
 				// validateDrugBank ----------------------------------------------
 				validateDrugBank := wf.NewProc("validate_drugbank_"+uniqStrRepl, `java -jar `+cpSignPath+` validate \
 									--license `+cpSignLicensePath+` \
-									--cptype 1 \
-									--modelfile {i:model} \
-									--predictfile {i:smiles} \
-									--validation-property activity \
+									--model-in {i:model} \
+									--predict-file CSV header:smiles,activity {i:smiles} \
 									--calibration-points {p:confidences} \
-									--output-format json \
 									--logfile {o:log} \
+									--print-predictions \
+									--output-format json \
 									--output {o:json} # {p:gene} {p:replicate} {p:runset}`)
 				validateDrugBankJSONPathFunc := func(t *sp.Task) string {
 					uniqStrReplRunset := t.Param("gene") + "." + t.Param("replicate") + "." + t.Param("runset")
