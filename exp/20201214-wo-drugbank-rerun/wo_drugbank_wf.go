@@ -3,10 +3,8 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"fmt"
-	"math"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -449,50 +447,11 @@ func main() {
 						evalCost.Prepend = "salloc -A snic2017-7-89 -n 4 -c 4 -t 1-00:00:00 -J evalcg_" + uniqStrCost // SLURM string
 					}
 
-					extractCalibrationData := wf.NewProc("extract_calibration_data_"+uniqStrCost, "# {i:cvstats} {o:tsv}")
-					extractCalibrationData.SetPathExtend("cvstats", "tsv", ".calibration.tsv")
-					extractCalibrationData.In("cvstats").Connect(evalCost.Out("stats"))
-					extractCalibrationData.CustomExecute = func(t *sp.Task) {
-						tsvFh := t.OutIP("tsv").OpenWriteTemp()
-						defer tsvFh.Close()
-
-						tsvWrt := csv.NewWriter(tsvFh)
-						tsvWrt.Comma = '\t'
-
-						cvStatsRecords := &[]cpSignCrossValOutput{}
-						t.InIP("cvstats").UnMarshalJSON(cvStatsRecords)
-
-						tsvWrt.Write([]string{"confidence", "accuracty"})
-						for _, crossValOut := range *cvStatsRecords {
-							confidence := fmt.Sprintf("%.3f", crossValOut.Confidence)
-							accuracy := fmt.Sprintf("%.3f", crossValOut.Accuracy)
-							tsvWrt.Write([]string{confidence, accuracy})
-						}
-						tsvWrt.Flush()
-					}
-
-					plotCalibrationData := wf.NewProc("plot_calibration_data_"+uniqStrCost, "Rscript bin/plot_calibration.r -i {i:tsv} -o {o:pdf} -f pdf -g {p:gene}")
-					plotCalibrationData.SetPathExtend("tsv", "pdf", ".pdf")
-					plotCalibrationData.ParamInPort("gene").ConnectStr(geneUppercase)
-					plotCalibrationData.In("tsv").Connect(extractCalibrationData.Out("tsv"))
-					calibPlotPorts = append(calibPlotPorts, plotCalibrationData.Out("pdf"))
-
 					extractCostGammaStats := spc.NewMapToKeys(wf, "extract_cgstats_"+uniqStrCost, func(ip *sp.FileIP) map[string]string {
 						newKeys := map[string]string{}
-						crossValOuts := &[]cpSignCrossValOutput{}
-						ip.UnMarshalJSON(crossValOuts)
-						for _, crossValOut := range *crossValOuts {
-							if diff := math.Abs(crossValOut.Confidence - 0.9); diff < 0.001 {
-								newKeys["confidence"] = fmt.Sprintf("%.3f", crossValOut.Confidence)
-								newKeys["accuracy"] = fmt.Sprintf("%.3f", crossValOut.Accuracy)
-								newKeys["efficiency"] = fmt.Sprintf("%.3f", crossValOut.Efficiency)
-								newKeys["class_confidence"] = fmt.Sprintf("%.3f", crossValOut.ClassConfidence)
-								newKeys["class_credibility"] = fmt.Sprintf("%.3f", crossValOut.ClassCredibility)
-								newKeys["obsfuzz_active"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Active)
-								newKeys["obsfuzz_nonactive"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Nonactive)
-								newKeys["obsfuzz_overall"] = fmt.Sprintf("%.3f", crossValOut.ObservedFuzziness.Overall)
-							}
-						}
+						crossValStats := &cpSignCrossValOutput{}
+						ip.UnMarshalJSON(crossValStats)
+						newKeys["obsfuzz_overall"] = fmt.Sprintf("%.3f", crossValStats.ObservedFuzziness)
 						return newKeys
 					})
 					extractCostGammaStats.In().Connect(evalCost.Out("stats"))
@@ -523,7 +482,7 @@ func main() {
 									--percentiles {p:nrpercentiles} \
 									--model-out {o:model} \
 									--logfile {o:logfile} \
-									--model-name "{p:gene}" # {p:runset} {p:replicate} Accuracy: {p:accuracy} Efficiency: {p:efficiency} Class-Equalized Observed Fuzziness: {p:obsfuzz_classavg} Observed Fuzziness (Overall): {p:obsfuzz_overall} Observed Fuzziness (Active class): {p:obsfuzz_active} Observed Fuzziness (Non-active class): {p:obsfuzz_nonactive} Class Confidence: {p:class_confidence} Class Credibility: {p:class_credibility}`)
+									--model-name "{p:gene}" # {p:runset} {p:replicate} Observed Fuzziness: {p:obsfuzz_overall}`)
 				cpSignTrain.In("model").Connect(cpSignPrecomp.Out("precomp"))
 				cpSignTrain.In("percentilesfile").Connect(extractTargetData.Out("target_data"))
 				cpSignTrain.ParamInPort("seed").ConnectStr(fmt.Sprintf("%d", seed))
@@ -531,14 +490,7 @@ func main() {
 				cpSignTrain.ParamInPort("gene").ConnectStr(geneUppercase)
 				cpSignTrain.ParamInPort("replicate").ConnectStr(replicate)
 				cpSignTrain.ParamInPort("runset").ConnectStr(runSet)
-				cpSignTrain.ParamInPort("accuracy").Connect(selectBest.OutBestAccuracy())
-				cpSignTrain.ParamInPort("efficiency").Connect(selectBest.OutBestEfficiency())
-				cpSignTrain.ParamInPort("obsfuzz_classavg").Connect(selectBest.OutBestObsFuzzClassAvg())
 				cpSignTrain.ParamInPort("obsfuzz_overall").Connect(selectBest.OutBestObsFuzzOverall())
-				cpSignTrain.ParamInPort("obsfuzz_active").Connect(selectBest.OutBestObsFuzzActive())
-				cpSignTrain.ParamInPort("obsfuzz_nonactive").Connect(selectBest.OutBestObsFuzzNonactive())
-				cpSignTrain.ParamInPort("class_confidence").Connect(selectBest.OutBestClassConfidence())
-				cpSignTrain.ParamInPort("class_credibility").Connect(selectBest.OutBestClassCredibility())
 				cpSignTrain.ParamInPort("cost").Connect(selectBest.OutBestCost())
 				cpSignTrain.ParamInPort("nrpercentiles").ConnectStr("200") // Reasonable number according to staffan
 				cpSignTrainModelPathFunc := func(t *sp.Task) string {
@@ -619,7 +571,6 @@ func main() {
 				validateDrugBank.ParamInPort("replicate").ConnectStr(replicate)
 				validateDrugBank.ParamInPort("runset").ConnectStr(runSet)
 				validateDrugBank.ParamInPort("confidences").ConnectStr("0.8, 0.9")
-
 			} // end: for replicate
 			finalModelsSummary.InTargetDataCount().Connect(countProcs[uniqStrRunSet].Out("count"))
 		} // end: runset
@@ -673,18 +624,7 @@ func main() {
 // --------------------------------------------------------------------------------
 
 type cpSignCrossValOutput struct {
-	Efficiency        float64                 `json:"efficiency"`
-	Confidence        float64                 `json:"confidence"`
-	ClassCredibility  float64                 `json:"classCredibility"`
-	Accuracy          float64                 `json:"accuracy"`
-	ClassConfidence   float64                 `json:"classConfidence"`
-	ObservedFuzziness cpSignObservedFuzziness `json:"observedFuzziness"`
-}
-
-type cpSignObservedFuzziness struct {
-	Active    float64 `json:"A"`
-	Nonactive float64 `json:"N"`
-	Overall   float64 `json:"overall"`
+	ObservedFuzziness float64 `json:"observedFuzziness"`
 }
 
 func strInSlice(searchStr string, strings []string) bool {

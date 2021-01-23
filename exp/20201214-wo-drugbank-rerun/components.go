@@ -59,24 +59,17 @@ func (p *SummarizeCostGammaPerf) Run() {
 	if outIp.Exists() {
 		sp.Info.Printf("Process %s: Out-target %s already exists, so skipping\n", p.Name(), outIp.Path())
 	} else {
-		header := []string{"Gene", "Efficiency", "Accuracy", "ObsFuzzActive", "ObsFuzzNonactive", "ObsFuzzOverall", "ClassConfidence", "ClassCredibility", "Cost"}
+		header := []string{"Gene", "ObsFuzzOverall", "Cost"}
 		if p.IncludeGamma {
 			header = append(header, "Gamma")
 		}
 		rows := [][]string{header}
 		for iip := range p.In().Chan {
 			gene := iip.Param("gene")
-			efficiency := iip.Key("efficiency")
-			accuracy := iip.Key("accuracy")
 			cost := iip.Param("cost")
-
-			obsFuzzActive := iip.Key("obsfuzz_active")
-			obsFuzzNonactive := iip.Key("obsfuzz_nonactive")
 			obsFuzzOverall := iip.Key("obsfuzz_overall")
-			classConfidence := iip.Key("class_confidence")
-			classCredibility := iip.Key("class_credibility")
 
-			row := []string{gene, efficiency, accuracy, obsFuzzActive, obsFuzzNonactive, obsFuzzOverall, classConfidence, classCredibility, cost}
+			row := []string{gene, obsFuzzOverall, cost}
 			if p.IncludeGamma {
 				row = append(row, iip.Param("gamma"))
 			}
@@ -115,14 +108,7 @@ func NewBestCostGamma(wf *sp.Workflow, procName string, separator rune, header b
 		IncludeGamma: includeGamma,
 	}
 	sbcr.InitInPort(sbcr, "csv_file")
-	sbcr.InitParamOutPort(sbcr, "best_accuracy")
-	sbcr.InitParamOutPort(sbcr, "best_eff")
-	sbcr.InitParamOutPort(sbcr, "best_obsfuzz_classavg")
 	sbcr.InitParamOutPort(sbcr, "best_obsfuzz_overall")
-	sbcr.InitParamOutPort(sbcr, "best_obsfuzz_active")
-	sbcr.InitParamOutPort(sbcr, "best_obsfuzz_nonactive")
-	sbcr.InitParamOutPort(sbcr, "best_class_confidence")
-	sbcr.InitParamOutPort(sbcr, "best_class_credibility")
 	sbcr.InitParamOutPort(sbcr, "best_cost")
 	sbcr.InitParamOutPort(sbcr, "best_gamma")
 	wf.AddProc(sbcr)
@@ -132,29 +118,8 @@ func NewBestCostGamma(wf *sp.Workflow, procName string, separator rune, header b
 func (p BestCostGamma) InCSVFile() *sp.InPort {
 	return p.InPort("csv_file")
 }
-func (p *BestCostGamma) OutBestAccuracy() *sp.ParamOutPort {
-	return p.ParamOutPort("best_accuracy")
-}
-func (p *BestCostGamma) OutBestEfficiency() *sp.ParamOutPort {
-	return p.ParamOutPort("best_eff")
-}
-func (p *BestCostGamma) OutBestObsFuzzClassAvg() *sp.ParamOutPort {
-	return p.ParamOutPort("best_obsfuzz_classavg")
-}
 func (p *BestCostGamma) OutBestObsFuzzOverall() *sp.ParamOutPort {
 	return p.ParamOutPort("best_obsfuzz_overall")
-}
-func (p *BestCostGamma) OutBestObsFuzzActive() *sp.ParamOutPort {
-	return p.ParamOutPort("best_obsfuzz_active")
-}
-func (p *BestCostGamma) OutBestObsFuzzNonactive() *sp.ParamOutPort {
-	return p.ParamOutPort("best_obsfuzz_nonactive")
-}
-func (p *BestCostGamma) OutBestClassConfidence() *sp.ParamOutPort {
-	return p.ParamOutPort("best_class_confidence")
-}
-func (p *BestCostGamma) OutBestClassCredibility() *sp.ParamOutPort {
-	return p.ParamOutPort("best_class_credibility")
 }
 func (p *BestCostGamma) OutBestCost() *sp.ParamOutPort {
 	return p.ParamOutPort("best_cost")
@@ -168,14 +133,7 @@ func (p *BestCostGamma) Run() {
 	if p.IncludeGamma {
 		defer p.OutBestGamma().Close()
 	}
-	defer p.OutBestAccuracy().Close()
-	defer p.OutBestEfficiency().Close()
-	defer p.OutBestObsFuzzClassAvg().Close()
 	defer p.OutBestObsFuzzOverall().Close()
-	defer p.OutBestObsFuzzActive().Close()
-	defer p.OutBestObsFuzzNonactive().Close()
-	defer p.OutBestClassConfidence().Close()
-	defer p.OutBestClassCredibility().Close()
 
 	for iip := range p.InCSVFile().Chan {
 		csvData := iip.Read()
@@ -190,13 +148,6 @@ func (p *BestCostGamma) Run() {
 
 		var bestCost int64 = -1
 		var bestGamma float64 = -1.0
-		var bestAccuracy float64 = -1.0
-		var bestEfficiency float64 = -1.0
-		var bestObsFuzzActive float64 = -1.0
-		var bestObsFuzzNonactive float64 = -1.0
-		var bestClassConfidence float64 = -1.0
-		var bestClassCredibility float64 = -1.0
-		var bestClassAvgObsFuzz float64 = -1.0
 
 		i := 0
 		for {
@@ -227,26 +178,6 @@ func (p *BestCostGamma) Run() {
 					bestGamma, err = strconv.ParseFloat(rec[indexOfStr("Gamma", header)], 64)
 					sp.Check(err)
 				}
-
-				bestAccuracy, err = strconv.ParseFloat(rec[indexOfStr("Accuracy", header)], 64)
-				sp.Check(err)
-
-				bestEfficiency, err = strconv.ParseFloat(rec[indexOfStr("Efficiency", header)], 64)
-				sp.Check(err)
-
-				bestObsFuzzActive, err := strconv.ParseFloat(rec[indexOfStr("ObsFuzzActive", header)], 64)
-				sp.Check(err)
-
-				bestObsFuzzNonactive, err := strconv.ParseFloat(rec[indexOfStr("ObsFuzzNonactive", header)], 64)
-				sp.Check(err)
-
-				bestClassAvgObsFuzz = (bestObsFuzzActive + bestObsFuzzNonactive) / 2 // We take the average for the two classes, to get more equal influence of each class
-
-				bestClassConfidence, err = strconv.ParseFloat(rec[indexOfStr("ClassConfidence", header)], 64)
-				sp.Check(err)
-
-				bestClassCredibility, err = strconv.ParseFloat(rec[indexOfStr("ClassCredibility", header)], 64)
-				sp.Check(err)
 			}
 		}
 		sp.Debug.Printf("Final optimal (minimal) observed fuzziness (overall): %f (For: Cost:%03d)\n", bestObsFuzzOverall, bestCost)
@@ -257,14 +188,7 @@ func (p *BestCostGamma) Run() {
 		if p.IncludeGamma {
 			p.OutBestGamma().Send(fmt.Sprintf("%.3f", bestGamma))
 		}
-		p.OutBestAccuracy().Send(fmt.Sprintf("%.3f", bestAccuracy))
-		p.OutBestEfficiency().Send(fmt.Sprintf("%.3f", bestEfficiency))
-		p.OutBestObsFuzzClassAvg().Send(fmt.Sprintf("%.3f", bestClassAvgObsFuzz))
 		p.OutBestObsFuzzOverall().Send(fmt.Sprintf("%.3f", bestObsFuzzOverall))
-		p.OutBestObsFuzzActive().Send(fmt.Sprintf("%.3f", bestObsFuzzActive))
-		p.OutBestObsFuzzNonactive().Send(fmt.Sprintf("%.3f", bestObsFuzzNonactive))
-		p.OutBestClassConfidence().Send(fmt.Sprintf("%.3f", bestClassConfidence))
-		p.OutBestClassCredibility().Send(fmt.Sprintf("%.3f", bestClassCredibility))
 	}
 }
 
